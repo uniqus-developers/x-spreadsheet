@@ -120,7 +120,8 @@ class Rows {
          retrievedText = result;
          formattedText = ''
         }
-        cell.text = text ?? ''
+        console.log(retrievedText, formattedText, "console")
+        cell.text = retrievedText ?? ''
         cell.formattedText = formattedText ?? ''
       } else {
         cell.text = text;
