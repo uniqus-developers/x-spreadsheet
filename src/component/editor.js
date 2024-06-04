@@ -159,7 +159,8 @@ function dateFormat(d) {
 }
 
 export default class Editor {
-  constructor(formulas, viewFn, rowHeight) {
+  constructor(formulas, viewFn, rowHeight, options={}) {
+    this.options = options
     this.viewFn = viewFn;
     this.rowHeight = rowHeight;
     this.formulas = formulas;
@@ -250,12 +251,17 @@ export default class Editor {
 
   setCell(cell, validator) {
     if (cell && cell.editable === false) return;
-
+    const editValueFormatter = this.options.editValueFormatter
     // console.log('::', validator);
     const { el, datepicker, suggest } = this;
     el.show();
     this.cell = cell;
-    const text = (cell && cell.text) || '';
+    let text = ''
+    if(editValueFormatter){
+      text = editValueFormatter({...this, cell}) ?? ''
+    }else{
+      text = (cell && cell.text) || '';
+    }
     this.setText(text);
 
     this.validator = validator;

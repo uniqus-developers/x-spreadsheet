@@ -2,7 +2,8 @@ import helper from './helper';
 import { expr2expr } from './alphabet';
 
 class Rows {
-  constructor({ len, height }) {
+  constructor({ len, height }, options={}) {
+    this.options = options
     this._ = {};
     this.len = len;
     // default row height
@@ -106,7 +107,25 @@ class Rows {
 
   setCellText(ri, ci, text) {
     const cell = this.getCellOrNew(ri, ci);
-    if (cell.editable !== false) cell.text = text;
+    if (cell.editable !== false){
+      const valueSetter = this.options.valueSetter
+      if (valueSetter) {
+        const result = valueSetter({...this, text, cell});
+         let text, formattedText;
+         if (result && typeof result === 'object' && !Array.isArray(result)) {
+          ({ text, formattedText } = result);
+         } else if (Array.isArray(result)) {
+          [text, formattedText] = result;
+         } else {
+         text = result;
+         formattedText = ''
+        }
+        cell.text = text ?? ''
+        cell.formattedText = formattedText ?? ''
+      } else {
+        cell.text = text;
+      }
+    } 
   }
 
   // what: all | format | text

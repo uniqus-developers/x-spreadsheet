@@ -908,6 +908,7 @@ export default class Sheet {
       formulas,
       () => this.getTableOffset(),
       data.rows.height,
+      this.options
     );
     // data validation
     this.modalValidation = new ModalValidation();
