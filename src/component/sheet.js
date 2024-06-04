@@ -886,7 +886,8 @@ function sheetInitEvents() {
 }
 
 export default class Sheet {
-  constructor(targetEl, data) {
+  constructor(targetEl, data, options={}) {
+    this.options = options
     this.eventMap = createEventEmitter();
     const { view, showToolbar, showContextmenu } = data.settings;
     this.el = h('div', `${cssPrefix}-sheet`);
@@ -936,7 +937,7 @@ export default class Sheet {
       this.sortFilter.el,
     );
     // table
-    this.table = new Table(this.tableEl.el, data);
+    this.table = new Table(this.tableEl.el, data, this.options);
     sheetInitEvents.call(this);
     sheetReset.call(this);
     // init selector [0, 0]

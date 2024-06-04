@@ -35,7 +35,7 @@ class Spreadsheet {
       .on('contextmenu', evt => evt.preventDefault());
     // create canvas element
     targetEl.appendChild(rootEl.el);
-    this.sheet = new Sheet(rootEl, this.data);
+    this.sheet = new Sheet(rootEl, this.data, this.options);
     if (this.bottombar !== null) {
       rootEl.child(this.bottombar.el);
     }
