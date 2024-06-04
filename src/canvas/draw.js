@@ -216,10 +216,10 @@ class Draw {
     }
     textWrap: text wrapping
   */
-  text(mtxt, box, attr = {}, textWrap = true) {
+  text(mtxt, box, attr = {}, textWrap = true, cellMeta={}) {
     const valueFormatter = this.options.valueFormatter
     if(valueFormatter){
-      mtxt = valueFormatter({...this, value:mtxt}) ?? mtxt
+      mtxt = valueFormatter({...this, value:mtxt, cellMeta}) ?? mtxt
     }
     const { ctx } = this;
     const {
