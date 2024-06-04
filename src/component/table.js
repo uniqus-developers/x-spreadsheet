@@ -300,9 +300,10 @@ function renderFreezeHighlightLine(fw, fh, ftw, fth) {
 
 /** end */
 class Table {
-  constructor(el, data) {
+  constructor(el, data, options={}) {
+    this.options= options
     this.el = el;
-    this.draw = new Draw(el, data.viewWidth(), data.viewHeight());
+    this.draw = new Draw(el, data.viewWidth(), data.viewHeight(), options);
     this.data = data;
   }
 

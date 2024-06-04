@@ -131,7 +131,8 @@ function drawFontLine(type, tx, ty, align, valign, blheight, blwidth) {
 }
 
 class Draw {
-  constructor(el, width, height) {
+  constructor(el, width, height, options={}) {
+    this.options = options
     this.el = el;
     this.ctx = el.getContext('2d');
     this.resize(width, height);
@@ -216,6 +217,10 @@ class Draw {
     textWrap: text wrapping
   */
   text(mtxt, box, attr = {}, textWrap = true) {
+    const valueFormatter = this.options.valueFormatter
+    if(valueFormatter){
+      mtxt = valueFormatter({...this, value:mtxt}) ?? mtxt
+    }
     const { ctx } = this;
     const {
       align, valign, font, color, strike, underline,
