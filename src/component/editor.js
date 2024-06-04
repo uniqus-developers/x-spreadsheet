@@ -258,7 +258,7 @@ export default class Editor {
     this.cell = cell;
     let text = ''
     if(editValueFormatter){
-      text = editValueFormatter({...this, cell}) ?? ''
+      text = editValueFormatter({...this, cell}) ?? ((cell && cell.text) || '')
     }else{
       text = (cell && cell.text) || '';
     }
