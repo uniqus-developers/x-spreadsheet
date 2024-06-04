@@ -118,7 +118,7 @@ class Rows {
           [text, formattedText] = result;
          } else {
          text = result;
-         formattedText = undefined;  // or any default value if needed
+         formattedText = ''
         }
         cell.text = text ?? ''
         cell.formattedText = formattedText ?? ''
