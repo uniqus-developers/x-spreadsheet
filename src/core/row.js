@@ -110,7 +110,16 @@ class Rows {
     if (cell.editable !== false){
       const valueSetter = this.options.valueSetter
       if (valueSetter) {
-        const {text, formattedText} = valueSetter({...this, text, cell:cell}) ?? {}
+        const result = valueSetter({...this, text, cell});
+         let text, formattedText;
+         if (result && typeof result === 'object' && !Array.isArray(result)) {
+          ({ text, formattedText } = result);
+         } else if (Array.isArray(result)) {
+          [text, formattedText] = result;
+         } else {
+         text = result;
+         formattedText = undefined;  // or any default value if needed
+        }
         cell.text = text ?? ''
         cell.formattedText = formattedText ?? ''
       } else {
