@@ -168,6 +168,9 @@ const evalSuffixExpr = (srcStack, formulaMap, cellRender, cellList) => {
     } else if (expr === "/") {
       const top = stack.pop();
       stack.push(numberCalc("/", stack.pop(), top));
+    } else if (expr === "^") {
+      const top = stack.pop();
+      stack.push(numberCalc("^", stack.pop(), top));
     } else if (fc === "=" || fc === ">" || fc === "<") {
       let top = stack.pop();
       if (!Number.isNaN(top)) top = Number(top);
