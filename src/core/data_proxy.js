@@ -14,6 +14,7 @@ import { CellRange } from "./cell_range";
 import { expr2xy, xy2expr } from "./alphabet";
 import { t } from "../locale/locale";
 import { getStylingForClass, parseCssToXDataStyles } from "../utils";
+import SheetConfig from "./sheetConfig";
 
 // private methods
 /*
@@ -152,7 +153,7 @@ function cutPaste(srcCellRange, dstCellRange) {
   merges.move(
     srcCellRange,
     dstCellRange.sri - srcCellRange.sri,
-    dstCellRange.sci - srcCellRange.sci,
+    dstCellRange.sci - srcCellRange.sci
   );
   clipboard.clear();
 }
@@ -323,7 +324,7 @@ function getCellColByX(x, scrollOffsetx) {
     inits,
     cols.indexWidth,
     x,
-    (i) => cols.getWidth(i),
+    (i) => cols.getWidth(i)
   );
   if (left <= 0) {
     return { ci: -1, left: 0, width: cols.indexWidth };
@@ -341,6 +342,7 @@ export default class DataProxy {
     this.merges = new Merges(); // [CellRange, ...]
     this.rows = new Rows(this.settings.row, this.settings);
     this.cols = new Cols(this.settings.col);
+    this.sheetConfig = new SheetConfig(this.name, this.settings);
     this.validations = new Validations();
     this.hyperlinks = {};
     this.comments = {};
@@ -446,9 +448,9 @@ export default class DataProxy {
           console.log(
             "text copy to the system clipboard error  ",
             copyText,
-            err,
+            err
           );
-        },
+        }
       );
     }
   }
@@ -487,7 +489,7 @@ export default class DataProxy {
             const parser = new DOMParser();
             const htmlDocument = parser.parseFromString(
               htmlContent,
-              "text/html",
+              "text/html"
             );
             const htmlStyles = htmlDocument?.getElementsByTagName("style")?.[0];
             const htmlBody = htmlDocument?.getElementsByTagName("body")?.[0];
@@ -504,7 +506,7 @@ export default class DataProxy {
                   const cellContent = td?.innerText ?? "";
                   const cellClassName = td?.getAttribute("class");
                   const cellStyle = parseCssToXDataStyles(
-                    getStylingForClass(htmlStyles, cellClassName),
+                    getStylingForClass(htmlStyles, cellClassName)
                   );
                   this.setCellText(startRow, startColumn, cellContent, "input");
                   const cell = this.getCell(startRow, startColumn);
@@ -888,7 +890,7 @@ export default class DataProxy {
     if (!autoFilter.active()) return;
     const { sort } = autoFilter;
     const { rset, fset } = autoFilter.filteredRows((r, c) =>
-      rows.getCell(r, c),
+      rows.getCell(r, c)
     );
     const fary = Array.from(fset);
     const oldAry = Array.from(fset);
@@ -994,7 +996,7 @@ export default class DataProxy {
       0,
       0,
       x,
-      (i) => cols.getWidth(i),
+      (i) => cols.getWidth(i)
     );
     // console.log('fci:', fci, ', ci:', ci);
     let x1 = left;
@@ -1015,7 +1017,7 @@ export default class DataProxy {
       0,
       0,
       y,
-      (i) => rows.getHeight(i),
+      (i) => rows.getHeight(i)
     );
     let y1 = top;
     if (y > 0) y1 += height;
@@ -1160,7 +1162,7 @@ export default class DataProxy {
       ri - 1,
       ci - 1,
       this.freezeTotalWidth(),
-      this.freezeTotalHeight(),
+      this.freezeTotalHeight()
     );
   }
 
@@ -1301,7 +1303,8 @@ export default class DataProxy {
         property === "merges" ||
         property === "rows" ||
         property === "cols" ||
-        property === "validations"
+        property === "validations" ||
+        property === "sheetConfig"
       ) {
         this[property].setData(d[property]);
       } else if (property === "freeze") {
@@ -1326,6 +1329,7 @@ export default class DataProxy {
       cols,
       validations,
       autoFilter,
+      sheetConfig,
     } = this;
     return {
       name,
@@ -1336,6 +1340,7 @@ export default class DataProxy {
       cols: cols.getData(),
       validations: validations.getData(),
       autofilter: autoFilter.getData(),
+      sheetConfig: sheetConfig.getData(),
     };
   }
 }
