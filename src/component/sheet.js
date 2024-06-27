@@ -14,6 +14,7 @@ import SortFilter from "./sort_filter";
 import { xtoast } from "./message";
 import { cssPrefix } from "../config";
 import { formulas } from "../core/formula";
+import SheetContext from "./sheetContext";
 
 /**
  * @desc throttle fn
@@ -369,7 +370,7 @@ function overlayerMousedown(evt) {
         ci,
         items,
         autoFilter.getFilter(ci),
-        autoFilter.getSort(ci),
+        autoFilter.getSort(ci)
       );
       sortFilter.setOffset({ left, top: top + height + 2 });
       return;
@@ -407,7 +408,7 @@ function overlayerMousedown(evt) {
         }
         selector.hideAutofill();
         toolbarChangePaintformatPaste.call(this);
-      },
+      }
     );
   }
 
@@ -871,6 +872,7 @@ function sheetInitEvents() {
 export default class Sheet {
   constructor(targetEl, data, options = {}) {
     this.options = options;
+    this.options.initialGridStatus = true;
     this.eventMap = createEventEmitter();
     const { view, showToolbar, showContextmenu } = data.settings;
     this.el = h("div", `${cssPrefix}-sheet`);
@@ -891,7 +893,7 @@ export default class Sheet {
       formulas,
       () => this.getTableOffset(),
       data.rows.height,
-      this.options,
+      this.options
     );
     // data validation
     this.modalValidation = new ModalValidation();
@@ -901,10 +903,10 @@ export default class Sheet {
     this.selector = new Selector(data);
     this.overlayerCEl = h("div", `${cssPrefix}-overlayer-content`).children(
       this.editor.el,
-      this.selector.el,
+      this.selector.el
     );
     this.overlayerEl = h("div", `${cssPrefix}-overlayer`).child(
-      this.overlayerCEl,
+      this.overlayerCEl
     );
     // sortFilter
     this.sortFilter = new SortFilter();
@@ -918,10 +920,16 @@ export default class Sheet {
       this.horizontalScrollbar.el,
       this.contextMenu.el,
       this.modalValidation.el,
-      this.sortFilter.el,
+      this.sortFilter.el
     );
     // table
     this.table = new Table(this.tableEl.el, data, this.options);
+    this.sheetContext = new SheetContext(
+      this.table,
+      this.toolbar,
+      data,
+      options
+    );
     sheetInitEvents.call(this);
     sheetReset.call(this);
     // init selector [0, 0]

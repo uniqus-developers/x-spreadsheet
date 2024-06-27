@@ -73,7 +73,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
     let cellText = "";
     if (!data.settings.evalPaused) {
       cellText = _cell.render(cell.text || "", formulam, (y, x) =>
-        data.getCellTextOrDefault(x, y),
+        data.getCellTextOrDefault(x, y)
       );
     } else {
       cellText = cell.text || "";
@@ -97,7 +97,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         underline: style.underline,
       },
       style.textwrap,
-      { data, rindex, cindex },
+      { data, rindex, cindex }
     );
     // error
     const error = data.validations.getError(rindex, cindex);
@@ -144,7 +144,7 @@ function renderContent(viewRange, fw, fh, tx, ty) {
 
   const exceptRowTotalHeight = data.exceptRowTotalHeight(
     viewRange.sri,
-    viewRange.eri,
+    viewRange.eri
   );
   // 1 render cell
   draw.save();
@@ -153,7 +153,7 @@ function renderContent(viewRange, fw, fh, tx, ty) {
     (ri, ci) => {
       renderCell(draw, data, ri, ci);
     },
-    (ri) => filteredTranslateFunc(ri),
+    (ri) => filteredTranslateFunc(ri)
   );
   draw.restore();
 
@@ -261,6 +261,11 @@ function renderFixedLeftTopCell(fw, fh) {
 }
 
 function renderContentGrid({ sri, sci, eri, eci, w, h }, fw, fh, tx, ty) {
+  const gridStatus = this.gridStatus;
+  if (!gridStatus) {
+    return;
+  }
+
   const { draw, data } = this;
   const { settings } = data;
 
@@ -304,6 +309,16 @@ class Table {
     this.el = el;
     this.draw = new Draw(el, data.viewWidth(), data.viewHeight(), options);
     this.data = data;
+    this.gridStatus = options.initialGridStatus;
+  }
+
+  getGridStatus() {
+    return this.gridStatus;
+  }
+
+  setGridStatus(status) {
+    this.gridStatus = status;
+    this.render();
   }
 
   resetData(data) {
