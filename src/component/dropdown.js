@@ -34,9 +34,9 @@ export default class Dropdown extends Element {
         this.title,
         showArrow
           ? h("div", `${cssPrefix}-icon arrow-right`).child(
-              h("div", `${cssPrefix}-icon-img arrow-down`)
+              h("div", `${cssPrefix}-icon-img arrow-down`),
             )
-          : ""
+          : "",
       );
     this.children(this.headerEl, this.contentEl);
   }

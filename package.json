@@ -32,7 +32,8 @@
     "lint": "./node_modules/eslint/bin/eslint.js src",
     "test": "nyc ./node_modules/mocha/bin/mocha --require @babel/register --recursive test",
     "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov -t 31ecdb12-8ecb-46f7-a486-65c2516307dd",
-    "postinstall": "opencollective-postinstall"
+    "postinstall": "opencollective-postinstall",
+    "format": "prettier -v && prettier --write \"src/**/*.j{s,sx}\""
   },
   "keywords": [
     "javascript",
@@ -67,7 +68,8 @@
   "dependencies": {
     "hot-formula-parser": "^4.0.0",
     "opencollective": "^1.0.3",
-    "opencollective-postinstall": "^2.0.2"
+    "opencollective-postinstall": "^2.0.2",
+    "prettier": "^3.3.2"
   },
   "collective": {
     "type": "opencollective",
