@@ -13,6 +13,7 @@ import { Validations } from './validation';
 import { CellRange } from './cell_range';
 import { expr2xy, xy2expr } from './alphabet';
 import { t } from '../locale/locale';
+import { getStylingForClass, parseCssToXDataStyles } from '../utils';
 
 // private methods
 /*
@@ -460,22 +461,66 @@ export default class DataProxy {
     return true;
   }
 
-  pasteFromSystemClipboard(resetSheet, eventTrigger) {
+  pasteFromSystemClipboard(evt, resetSheet, eventTrigger) {
     const { selector } = this;
-    navigator.clipboard.readText().then((content) => {
-      const contentToPaste = this.parseClipboardContent(content);
-      let startRow = selector.ri;
-      contentToPaste.forEach((row) => {
-        let startColumn = selector.ci;
-        row.forEach((cellContent) => {
-          this.setCellText(startRow, startColumn, cellContent, 'input');
-          startColumn += 1;
-        });
-        startRow += 1;
+    const htmlContent = evt?.clipboardData?.getData("text/html");
+
+    navigator.clipboard
+      .read()
+      .then((data) => {
+        data.forEach((item) => {
+          if(item?.types?.includes('text/html')) {
+            const parser = new DOMParser();
+            const htmlDocument = parser.parseFromString(htmlContent, "text/html");
+            const htmlStyles = htmlDocument?.getElementsByTagName('style')?.[0]
+            const htmlBody = htmlDocument?.getElementsByTagName('body')?.[0]
+            const tableContent = htmlBody?.querySelectorAll('table');
+
+            tableContent?.forEach((table) => {
+              const tBody = table?.querySelector('tbody')
+              const trs = tBody?.querySelectorAll('tr')
+              let startRow = selector.ri;
+              trs?.forEach((tr) => {
+                let startColumn = selector.ci;
+                const tds = tr?.querySelectorAll('td')
+                tds?.forEach((td) => {
+                  const cellContent = td?.innerText ?? ''
+                  const cellClassName = td?.getAttribute("class")
+                  const cellStyle = parseCssToXDataStyles(getStylingForClass(htmlStyles, cellClassName))
+                  this.setCellText(startRow, startColumn, cellContent, 'input');
+                  const cell = this.getCell(startRow, startColumn);
+                  if(cell)
+                    cell.style = this.addStyle(cellStyle)
+
+                  startColumn += 1;
+                })
+                startRow += 1;
+              })
+            })
+            resetSheet();
+            eventTrigger(this.rows.getData());
+          } else if(item?.types?.includes('text/plain')) {
+              navigator.clipboard.readText().then((content) => {
+                const contentToPaste = this.parseClipboardContent(content);
+                let startRow = selector.ri;
+                contentToPaste.forEach((row) => {
+                  let startColumn = selector.ci;
+                  row.forEach((cellContent) => {
+                    this.setCellText(startRow, startColumn, cellContent, 'input');
+                    startColumn += 1;
+                  });
+                  startRow += 1;
+                });
+                resetSheet();
+                eventTrigger(this.rows.getData());
+              });
+            }
+          }
+        );
+      })
+      .catch((err) => {
+        console.error("Failed to read clipboard contents: ", err);
       });
-      resetSheet();
-      eventTrigger(this.rows.getData());
-    });
   }
 
   parseClipboardContent(clipboardContent) {
