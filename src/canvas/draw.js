@@ -130,7 +130,7 @@ function drawFontLine(type, tx, ty, align, valign, blheight, blwidth) {
   }
   this.line(
     [tx - floffset.x, ty - floffset.y],
-    [tx - floffset.x + blwidth, ty - floffset.y],
+    [tx - floffset.x + blwidth, ty - floffset.y]
   );
 }
 
@@ -141,6 +141,11 @@ class Draw {
     this.ctx = el.getContext("2d");
     this.resize(width, height);
     this.ctx.scale(dpr(), dpr());
+    this.numberRegexObject = {
+      ",": /^[+-]?[0-9,]*(\.[0-9,]*)?$/,
+      ".": /^[+-]?[0-9.]*(\,[0-9.]*)?$/,
+      "'": /^[+-]?[0-9']*(\.[0-9']*)?$/,
+    };
   }
 
   resize(width, height) {
@@ -220,11 +225,29 @@ class Draw {
     }
     textWrap: text wrapping
   */
-  text(mtxt, box, attr = {}, textWrap = true, cellMeta = {}) {
-    const valueFormatter = this.options.valueFormatter;
-    if (valueFormatter) {
-      mtxt = valueFormatter({ ...this, value: mtxt, cellMeta }) ?? mtxt;
+  textConfigOperation(text, cellMeta) {
+    if (text) {
+      const valueFormatter = this.options.valueFormatter;
+      const numberConfig = this.options.numberConfig ?? {};
+      if (valueFormatter) {
+        text = valueFormatter({ ...this, value: text, cellMeta }) ?? text;
+      }
+      const { zeroReplacer, groupingSymbol } = numberConfig;
+      if (zeroReplacer) {
+        const regEx = this.numberRegexObject[groupingSymbol ?? ","];
+        if (regEx.test(text)) {
+          const izZero = !parseFloat(text);
+          if (izZero) {
+            text = zeroReplacer;
+          }
+        }
+      }
     }
+    return text;
+  }
+
+  text(mtxt, box, attr = {}, textWrap = true, cellMeta = {}) {
+    mtxt = this.textConfigOperation(mtxt, cellMeta);
     const { ctx } = this;
     const { align, valign, font, color, strike, underline } = attr;
     const tx = box.textx(align);
@@ -273,7 +296,7 @@ class Draw {
           align,
           valign,
           font.size,
-          txtWidth,
+          txtWidth
         );
       }
       if (underline) {
@@ -285,7 +308,7 @@ class Draw {
           align,
           valign,
           font.size,
-          txtWidth,
+          txtWidth
         );
       }
       ty += font.size + 2;
