@@ -15,7 +15,7 @@ export default class Dropdown extends Element {
     }
     this.contentEl = h("div", `${cssPrefix}-dropdown-content`)
       .css("width", width)
-      .css("height", "400px")
+      .css("max-height", "400px")
       .css("overflow-y", "auto")
       .hide();
 

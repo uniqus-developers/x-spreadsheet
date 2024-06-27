@@ -23,6 +23,7 @@ export default {
     autofilter: "Filter",
     formula: "Functions",
     more: "More",
+    grid:"Grid",
   },
   contextmenu: {
     copy: "Copy",
