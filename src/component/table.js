@@ -262,10 +262,6 @@ function renderFixedLeftTopCell(fw, fh) {
 
 function renderContentGrid({ sri, sci, eri, eci, w, h }, fw, fh, tx, ty) {
   const gridStatus = this.gridStatus;
-  if (!gridStatus) {
-    return;
-  }
-
   const { draw, data } = this;
   const { settings } = data;
 
@@ -275,7 +271,7 @@ function renderContentGrid({ sri, sci, eri, eci, w, h }, fw, fh, tx, ty) {
   // const sumHeight = rows.sumHeight(sri, eri + 1);
   // console.log('sumWidth:', sumWidth);
   // draw.clearRect(0, 0, w, h);
-  if (!settings.showGrid) {
+  if (!settings.showGrid || !gridStatus) {
     draw.restore();
     return;
   }
