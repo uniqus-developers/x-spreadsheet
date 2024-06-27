@@ -1,5 +1,6 @@
 import { expr2xy, xy2expr } from "./alphabet";
 import { numberCalc } from "./helper";
+import { Parser } from "hot-formula-parser";
 
 // Converting infix expression to a suffix expression
 // src: AVERAGE(SUM(A1,A2), B1) + 50 + B20
@@ -123,6 +124,7 @@ const infixExprToSuffixExpr = (src) => {
   return stack;
 };
 
+//This function returns value by converting into number and resolve cell value
 const evalSubExpr = (subExpr, cellRender) => {
   const [fl] = subExpr;
   let expr = subExpr;
@@ -213,17 +215,76 @@ const evalSuffixExpr = (srcStack, formulaMap, cellRender, cellList) => {
   return stack[0];
 };
 
+const rangeToCellConversion = (range) => {
+  let cells = "";
+  if (range.length) {
+    const cellInfo = range?.toUpperCase()?.split(":");
+    if (cellInfo.length === 2) {
+      const [ex, ey] = expr2xy(cellInfo[1]);
+      const [sx, sy] = expr2xy(cellInfo[0]);
+      const cellArray = [];
+      for (let x = sx; x <= ex; x += 1) {
+        for (let y = sy; y <= ey; y += 1) {
+          cellArray.push(xy2expr(x, y));
+        }
+      }
+      return cellArray?.join(",");
+    }
+  }
+  return cells;
+};
+
+const parserFormulaString = (string, getCellText) => {
+  if (string?.length) {
+    const cellRefRegex = /\b[A-Za-z]+[1-9][0-9]*\b/g;
+    const cellRangeRegex =
+      /\$?[A-Za-z]+\$?[1-9][0-9]*:\$?[A-Za-z]+\$?[1-9][0-9]*/gi;
+    try {
+      let newFormulaString = "";
+      newFormulaString = string.replaceAll(" ", "");
+      newFormulaString = newFormulaString.replace(cellRangeRegex, (match) => {
+        const cells = rangeToCellConversion(match);
+        if (cells?.length) {
+          return cells;
+        }
+      });
+      newFormulaString = newFormulaString.replace(cellRefRegex, (match) => {
+        const [x, y] = expr2xy(match);
+        const text = getCellText(x, y);
+        return text || 0;
+      });
+      return newFormulaString;
+    } catch (e) {
+      return string;
+    }
+  }
+  return string;
+};
+
 const cellRender = (src, formulaMap, getCellText, cellList = []) => {
   if (src[0] === "=") {
-    const stack = infixExprToSuffixExpr(src.substring(1));
-    if (stack.length <= 0) return src;
-    return evalSuffixExpr(
-      stack,
-      formulaMap,
-      (x, y) =>
-        cellRender(getCellText(x, y), formulaMap, getCellText, cellList),
-      cellList
-    );
+    const a = src.substring(1);
+    try {
+      var parser = new Parser();
+      const parsedFormula = parserFormulaString(a, getCellText);
+      const data = parser.parse(parsedFormula);
+      return data?.error ?? data?.result;
+    } catch (e) {
+      return "#Error";
+    }
+
+    //Commented This functionality of formula calculation on X-Spread sheet and doing it by our own way
+
+    // const stack = infixExprToSuffixExpr(src.substring(1));
+    // console.log(stack, "stack");
+    // if (stack.length <= 0) return src;
+    // return evalSuffixExpr(
+    //   stack,
+    //   formulaMap,
+    //   (x, y) =>
+    //     cellRender(getCellText(x, y), formulaMap, getCellText, cellList),
+    //   cellList
+    // );
   }
   return src;
 };
