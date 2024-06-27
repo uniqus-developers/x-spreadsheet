@@ -3,11 +3,11 @@ export const getStylingForClass = (styleTag, className) => {
   for (let i = 0; i < cssRules?.length; i++) {
     const cssRule = cssRules[i];
     if (cssRule.selectorText === `.${className}`) {
-      return cssRule.style.cssText
+      return cssRule.style.cssText;
     }
   }
-  return '';
-}
+  return "";
+};
 
 export const parseCssToXDataStyles = (styleString) => {
   if (styleString) {
@@ -25,7 +25,7 @@ export const parseCssToXDataStyles = (styleString) => {
     const parsedStylesObject = parseBorderProperties(stylesObject);
     Object.entries(parsedStylesObject).forEach(([property, value]) => {
       switch (property) {
-        case "background": 
+        case "background":
         case "background-color":
           parsedStyles["bgcolor"] = value;
           break;
@@ -43,8 +43,10 @@ export const parseCssToXDataStyles = (styleString) => {
           parsedStyles["valign"] = value;
           break;
         case "font-weight":
-          const parsedIntValue = parseInt(value)
-          fontStyles["bold"] = ((parsedIntValue !== NaN && parsedIntValue > 400) || value === "bold");
+          const parsedIntValue = parseInt(value);
+          fontStyles["bold"] =
+            (parsedIntValue !== NaN && parsedIntValue > 400) ||
+            value === "bold";
           break;
         case "font-size":
           fontStyles["size"] = value.split("px")?.[0] ?? "";
@@ -70,8 +72,8 @@ export const parseCssToXDataStyles = (styleString) => {
                 ? intValue <= 1
                   ? "thin"
                   : intValue <= 2
-                  ? "medium"
-                  : "thick"
+                    ? "medium"
+                    : "thick"
                 : values[1];
             const color = ["black", "initial"].includes(values[2])
               ? "#000000"

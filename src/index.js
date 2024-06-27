@@ -1,12 +1,11 @@
 /* global window, document */
-import { h } from './component/element';
-import DataProxy from './core/data_proxy';
-import Sheet from './component/sheet';
-import Bottombar from './component/bottombar';
-import { cssPrefix } from './config';
-import { locale } from './locale/locale';
-import './index.less';
-
+import { h } from "./component/element";
+import DataProxy from "./core/data_proxy";
+import Sheet from "./component/sheet";
+import Bottombar from "./component/bottombar";
+import { cssPrefix } from "./config";
+import { locale } from "./locale/locale";
+import "./index.less";
 
 class Spreadsheet {
   constructor(selectors, options = {}) {
@@ -14,25 +13,33 @@ class Spreadsheet {
     this.options = { showBottomBar: true, ...options };
     this.sheetIndex = 1;
     this.datas = [];
-    if (typeof selectors === 'string') {
+    if (typeof selectors === "string") {
       targetEl = document.querySelector(selectors);
     }
-    this.bottombar = this.options.showBottomBar ? new Bottombar(() => {
-      if (this.options.mode === 'read') return;
-      const d = this.addSheet();
-      this.sheet.resetData(d);
-    }, (index) => {
-      const d = this.datas[index];
-      this.sheet.resetData(d);
-    }, () => {
-      this.deleteSheet();
-    }, (index, value) => {
-      this.datas[index].name = value;
-      this.sheet.trigger('change');
-    }) : null;
+    this.bottombar = this.options.showBottomBar
+      ? new Bottombar(
+          () => {
+            if (this.options.mode === "read") return;
+            const d = this.addSheet();
+            this.sheet.resetData(d);
+          },
+          (index) => {
+            const d = this.datas[index];
+            this.sheet.resetData(d);
+          },
+          () => {
+            this.deleteSheet();
+          },
+          (index, value) => {
+            this.datas[index].name = value;
+            this.sheet.trigger("change");
+          },
+        )
+      : null;
     this.data = this.addSheet();
-    const rootEl = h('div', `${cssPrefix}`)
-      .on('contextmenu', evt => evt.preventDefault());
+    const rootEl = h("div", `${cssPrefix}`).on("contextmenu", (evt) =>
+      evt.preventDefault(),
+    );
     // create canvas element
     targetEl.appendChild(rootEl.el);
     this.sheet = new Sheet(rootEl, this.data, this.options);
@@ -45,7 +52,7 @@ class Spreadsheet {
     const n = name || `sheet${this.sheetIndex}`;
     const d = new DataProxy(n, this.options);
     d.change = (...args) => {
-      this.sheet.trigger('change', ...args);
+      this.sheet.trigger("change", ...args);
     };
     this.datas.push(d);
     // console.log('d:', n, d, this.datas);
@@ -63,7 +70,7 @@ class Spreadsheet {
     if (oldIndex >= 0) {
       this.datas.splice(oldIndex, 1);
       if (nindex >= 0) this.sheet.resetData(this.datas[nindex]);
-      this.sheet.trigger('change');
+      this.sheet.trigger("change");
     }
   }
 
@@ -87,11 +94,11 @@ class Spreadsheet {
   }
 
   getData() {
-    return this.datas.map(it => it.getData());
+    return this.datas.map((it) => it.getData());
   }
 
   cellText(ri, ci, text, sheetIndex = 0) {
-    this.datas[sheetIndex].setCellText(ri, ci, text, 'finished');
+    this.datas[sheetIndex].setCellText(ri, ci, text, "finished");
     return this;
   }
 
@@ -119,7 +126,7 @@ class Spreadsheet {
   }
 
   change(cb) {
-    this.sheet.on('change', cb);
+    this.sheet.on("change", cb);
     return this;
   }
 
@@ -136,6 +143,4 @@ if (window) {
 }
 
 export default Spreadsheet;
-export {
-  spreadsheet,
-};
+export { spreadsheet };
