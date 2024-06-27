@@ -234,7 +234,7 @@ const rangeToCellConversion = (range) => {
   return cells;
 };
 
-const parserFormulaString = (string, getCellText) => {
+const parserFormulaString = (string, getCellText, cellRender) => {
   if (string?.length) {
     const cellRefRegex = /\b[A-Za-z]+[1-9][0-9]*\b/g;
     const cellRangeRegex =
@@ -251,7 +251,15 @@ const parserFormulaString = (string, getCellText) => {
       newFormulaString = newFormulaString.replace(cellRefRegex, (match) => {
         const [x, y] = expr2xy(match);
         const text = getCellText(x, y);
-        return text || 0;
+        if (text) {
+          if (text.startsWith("=")) {
+            return cellRender(text, [], getCellText);
+          } else {
+            return text;
+          }
+        } else {
+          return 0;
+        }
       });
       return newFormulaString;
     } catch (e) {
@@ -266,7 +274,7 @@ const cellRender = (src, formulaMap, getCellText, cellList = []) => {
     const a = src.substring(1);
     try {
       var parser = new Parser();
-      const parsedFormula = parserFormulaString(a, getCellText);
+      const parsedFormula = parserFormulaString(a, getCellText, cellRender);
       const data = parser.parse(parsedFormula);
       return data?.error ?? data?.result;
     } catch (e) {
