@@ -253,14 +253,13 @@ const parserFormulaString = (string, getCellText, cellRender) => {
         const text = getCellText(x, y);
         if (text) {
           if (text.startsWith("=")) {
-            return cellRender(text);
+            return cellRender(text, [], getCellText);
           } else {
             return text;
           }
         } else {
           return 0;
         }
-        return text || 0;
       });
       return newFormulaString;
     } catch (e) {
