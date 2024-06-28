@@ -146,6 +146,11 @@ class Draw {
       ".": /^[+-]?[0-9.]*(\,[0-9.]*)?$/,
       "'": /^[+-]?[0-9']*(\.[0-9']*)?$/,
     };
+    this.gridStatus = true;
+  }
+
+  setGridStatus(status) {
+    this.gridStatus = status;
   }
 
   resize(width, height) {
@@ -318,9 +323,9 @@ class Draw {
   }
 
   border(style, color) {
-    const { ctx } = this;
+    const { ctx, gridStatus } = this;
     ctx.lineWidth = thinLineWidth;
-    ctx.strokeStyle = color;
+    ctx.strokeStyle = gridStatus === false ? color ?? "#ffffff" : color;
     // console.log('style:', style);
     if (style === "medium") {
       ctx.lineWidth = npx(2) - 0.5;
@@ -359,6 +364,7 @@ class Draw {
     if (borderTop) {
       this.border(...borderTop);
       // console.log('box.topxys:', box.topxys());
+
       this.line(...box.topxys());
     }
     if (borderRight) {

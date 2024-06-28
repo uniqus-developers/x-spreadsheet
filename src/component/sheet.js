@@ -872,7 +872,6 @@ function sheetInitEvents() {
 export default class Sheet {
   constructor(targetEl, data, options = {}) {
     this.options = options;
-    this.options.initialGridStatus = true;
     this.eventMap = createEventEmitter();
     const { view, showToolbar, showContextmenu } = data.settings;
     this.el = h("div", `${cssPrefix}-sheet`);

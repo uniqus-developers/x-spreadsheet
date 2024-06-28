@@ -305,7 +305,7 @@ class Table {
     this.el = el;
     this.draw = new Draw(el, data.viewWidth(), data.viewHeight(), options);
     this.data = data;
-    this.gridStatus = options.initialGridStatus;
+    this.gridStatus = true;
   }
 
   getGridStatus() {
@@ -314,6 +314,7 @@ class Table {
 
   setGridStatus(status) {
     this.gridStatus = status;
+    this.draw.setGridStatus(status);
     this.render();
   }
 
