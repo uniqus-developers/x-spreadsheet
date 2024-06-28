@@ -1035,6 +1035,10 @@ form fieldset select {
   left: -54px;
   top: -54px;
 }
+.x-spreadsheet-icon .x-spreadsheet-icon-img.grid {
+  left: -162px;
+  top: -36px;
+}
 
 
 /*# sourceMappingURL=xspreadsheet.css.map*/
