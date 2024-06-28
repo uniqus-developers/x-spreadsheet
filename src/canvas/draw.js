@@ -323,9 +323,9 @@ class Draw {
   }
 
   border(style, color) {
-    const { ctx } = this;
+    const { ctx, gridStatus } = this;
     ctx.lineWidth = thinLineWidth;
-    ctx.strokeStyle = color;
+    ctx.strokeStyle = gridStatus === false ? color ?? "#ffffff" : color;
     // console.log('style:', style);
     if (style === "medium") {
       ctx.lineWidth = npx(2) - 0.5;
