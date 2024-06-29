@@ -625,7 +625,7 @@ export default class DataProxy {
 
   setSelectedCellAttr(property, value) {
     this.changeData(() => {
-      const { selector, styles, rows } = this;
+      const { selector, styles, rows, sheetConfig } = this;
       if (property === "merge") {
         if (value) this.merge();
         else this.unmerge();
@@ -681,6 +681,8 @@ export default class DataProxy {
           ) {
             cstyle[property] = value;
             cell.style = this.addStyle(cstyle);
+          } else if (property === "grid") {
+            sheetConfig.setData({ gridLine: value });
           } else {
             cell[property] = value;
           }

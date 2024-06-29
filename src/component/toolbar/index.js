@@ -246,5 +246,6 @@ export default class Toolbar {
     this.textwrapEl.setState(style.textwrap);
     // console.log('freeze is Active:', data.freezeIsActive());
     this.freezeEl.setState(data.freezeIsActive());
+    this.gridEl.setState(!!data.sheetConfig.gridLine)
   }
 }

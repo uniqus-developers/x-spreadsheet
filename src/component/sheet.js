@@ -14,7 +14,6 @@ import SortFilter from "./sort_filter";
 import { xtoast } from "./message";
 import { cssPrefix } from "../config";
 import { formulas } from "../core/formula";
-import SheetContext from "./sheetContext";
 
 /**
  * @desc throttle fn
@@ -923,12 +922,6 @@ export default class Sheet {
     );
     // table
     this.table = new Table(this.tableEl.el, data, this.options);
-    this.sheetContext = new SheetContext(
-      this.table,
-      this.toolbar,
-      data,
-      options
-    );
     sheetInitEvents.call(this);
     sheetReset.call(this);
     // init selector [0, 0]
@@ -956,7 +949,6 @@ export default class Sheet {
     this.print.resetData(data);
     this.selector.resetData(data);
     this.table.resetData(data);
-    this.sheetContext.resetState(data);
   }
 
   loadData(data) {
