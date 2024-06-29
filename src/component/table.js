@@ -261,17 +261,15 @@ function renderFixedLeftTopCell(fw, fh) {
 }
 
 function renderContentGrid({ sri, sci, eri, eci, w, h }, fw, fh, tx, ty) {
-  const gridStatus = this.gridStatus;
   const { draw, data } = this;
   const { settings } = data;
-
   draw.save();
   draw.attr(tableGridStyle).translate(fw + tx, fh + ty);
   // const sumWidth = cols.sumWidth(sci, eci + 1);
   // const sumHeight = rows.sumHeight(sri, eri + 1);
   // console.log('sumWidth:', sumWidth);
   // draw.clearRect(0, 0, w, h);
-  if (!settings.showGrid || !gridStatus) {
+  if (!settings.showGrid || data?.sheetConfig?.gridLine === false) {
     draw.restore();
     return;
   }
@@ -303,23 +301,19 @@ class Table {
   constructor(el, data, options = {}) {
     this.options = options;
     this.el = el;
-    this.draw = new Draw(el, data.viewWidth(), data.viewHeight(), options);
+    this.draw = new Draw(
+      el,
+      data.viewWidth(),
+      data.viewHeight(),
+      options,
+      data
+    );
     this.data = data;
-    this.gridStatus = true;
-  }
-
-  getGridStatus() {
-    return this.gridStatus;
-  }
-
-  setGridStatus(status) {
-    this.gridStatus = status;
-    this.draw.setGridStatus(status);
-    this.render();
   }
 
   resetData(data) {
     this.data = data;
+    this.draw.resetData(data);
     this.render();
   }
 

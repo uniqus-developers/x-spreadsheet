@@ -135,7 +135,7 @@ function drawFontLine(type, tx, ty, align, valign, blheight, blwidth) {
 }
 
 class Draw {
-  constructor(el, width, height, options = {}) {
+  constructor(el, width, height, options = {}, data = {}) {
     this.options = options;
     this.el = el;
     this.ctx = el.getContext("2d");
@@ -146,11 +146,11 @@ class Draw {
       ".": /^[+-]?[0-9.]*(\,[0-9.]*)?$/,
       "'": /^[+-]?[0-9']*(\.[0-9']*)?$/,
     };
-    this.gridStatus = true;
+    this.data = data;
   }
 
-  setGridStatus(status) {
-    this.gridStatus = status;
+  resetData(data) {
+    this.data = data;
   }
 
   resize(width, height) {
@@ -323,9 +323,9 @@ class Draw {
   }
 
   border(style, color) {
-    const { ctx, gridStatus } = this;
+    const { ctx, data } = this;
     ctx.lineWidth = thinLineWidth;
-    ctx.strokeStyle = gridStatus === false ? color ?? "#ffffff" : color;
+    ctx.strokeStyle = data.sheetConfig.gridLine === false ? color ?? "#ffffff" : color;
     // console.log('style:', style);
     if (style === "medium") {
       ctx.lineWidth = npx(2) - 0.5;
