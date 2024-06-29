@@ -13,7 +13,11 @@ import { Validations } from "./validation";
 import { CellRange } from "./cell_range";
 import { expr2xy, xy2expr } from "./alphabet";
 import { t } from "../locale/locale";
-import { getStylingForClass, parseCssToXDataStyles } from "../utils";
+import {
+  getStylingForClass,
+  parseCssToXDataStyles,
+  parseHtmlToText,
+} from "../utils";
 
 // private methods
 /*
@@ -152,7 +156,7 @@ function cutPaste(srcCellRange, dstCellRange) {
   merges.move(
     srcCellRange,
     dstCellRange.sri - srcCellRange.sri,
-    dstCellRange.sci - srcCellRange.sci,
+    dstCellRange.sci - srcCellRange.sci
   );
   clipboard.clear();
 }
@@ -323,7 +327,7 @@ function getCellColByX(x, scrollOffsetx) {
     inits,
     cols.indexWidth,
     x,
-    (i) => cols.getWidth(i),
+    (i) => cols.getWidth(i)
   );
   if (left <= 0) {
     return { ci: -1, left: 0, width: cols.indexWidth };
@@ -446,9 +450,9 @@ export default class DataProxy {
           console.log(
             "text copy to the system clipboard error  ",
             copyText,
-            err,
+            err
           );
-        },
+        }
       );
     }
   }
@@ -487,7 +491,7 @@ export default class DataProxy {
             const parser = new DOMParser();
             const htmlDocument = parser.parseFromString(
               htmlContent,
-              "text/html",
+              "text/html"
             );
             const htmlStyles = htmlDocument?.getElementsByTagName("style")?.[0];
             const htmlBody = htmlDocument?.getElementsByTagName("body")?.[0];
@@ -501,16 +505,43 @@ export default class DataProxy {
                 let startColumn = selector.ci;
                 const tds = tr?.querySelectorAll("td");
                 tds?.forEach((td) => {
-                  const cellContent = td?.innerText ?? "";
-                  const cellClassName = td?.getAttribute("class");
-                  const cellStyle = parseCssToXDataStyles(
-                    getStylingForClass(htmlStyles, cellClassName),
+                  const cellContent = parseHtmlToText(td?.innerHTML ?? "");
+
+                  const mergedCellRange = this.merges.getFirstIncludes(
+                    startRow,
+                    startColumn
                   );
+
+                  if (mergedCellRange) {
+                    for (let k = startColumn; k <= mergedCellRange.eci; k += 1)
+                      startColumn += 1;
+                  }
+
                   this.setCellText(startRow, startColumn, cellContent, "input");
+                  const rowSpan = Number(td?.getAttribute("rowspan") ?? 1);
+                  const colSpan = Number(td?.getAttribute("colspan") ?? 1);
+                  if (rowSpan - 1 !== 0 || colSpan - 1 !== 0) {
+                    this.setCellMerge(startRow, startColumn, [
+                      rowSpan - 1,
+                      colSpan - 1,
+                    ]);
+                  }
+                  const cellClassName = td?.getAttribute("class");
+                  const cellStyleString = `${td?.getAttribute("style") ?? ""};${getStylingForClass(htmlStyles, cellClassName)}`;
+                  const cellStyle = parseCssToXDataStyles(cellStyleString);
+
+                  const { width, height } = cellStyle?.dimensions ?? {};
+                  delete cellStyle.dimensions;
+                  if (width && this.getColWidth(startColumn) < width) {
+                    this.setColWidth(startColumn, width);
+                  }
+                  if (height && this.getRowHeight(startRow) < height) {
+                    this.setRowHeight(startRow, height);
+                  }
                   const cell = this.getCell(startRow, startColumn);
                   if (cell) cell.style = this.addStyle(cellStyle);
 
-                  startColumn += 1;
+                  startColumn += colSpan;
                 });
                 startRow += 1;
               });
@@ -888,7 +919,7 @@ export default class DataProxy {
     if (!autoFilter.active()) return;
     const { sort } = autoFilter;
     const { rset, fset } = autoFilter.filteredRows((r, c) =>
-      rows.getCell(r, c),
+      rows.getCell(r, c)
     );
     const fary = Array.from(fset);
     const oldAry = Array.from(fset);
@@ -994,7 +1025,7 @@ export default class DataProxy {
       0,
       0,
       x,
-      (i) => cols.getWidth(i),
+      (i) => cols.getWidth(i)
     );
     // console.log('fci:', fci, ', ci:', ci);
     let x1 = left;
@@ -1015,7 +1046,7 @@ export default class DataProxy {
       0,
       0,
       y,
-      (i) => rows.getHeight(i),
+      (i) => rows.getHeight(i)
     );
     let y1 = top;
     if (y > 0) y1 += height;
@@ -1136,6 +1167,28 @@ export default class DataProxy {
     });
   }
 
+  setCellMerge(ri, ci, merge) {
+    if (merge?.length > 1) {
+      const { rows, merges } = this;
+      const cellRange = new CellRange(ri, ci, ri + merge[0], ci + merge[1]);
+      this.changeData(() => {
+        rows.setCellMerge(ri, ci, merge);
+        merges.add(cellRange);
+        const cell = rows.getCellOrNew(ri, ci);
+        rows.deleteCells(cellRange);
+        rows.setCell(ri, ci, cell);
+      });
+    }
+  }
+
+  getRowHeight(ri) {
+    return this.rows.getHeight(ri);
+  }
+
+  getColWidth(ci) {
+    return this.cols.getWidth(ci);
+  }
+
   viewHeight() {
     const { view, showToolbar, showBottomBar } = this.settings;
     let h = view.height();
@@ -1160,7 +1213,7 @@ export default class DataProxy {
       ri - 1,
       ci - 1,
       this.freezeTotalWidth(),
-      this.freezeTotalHeight(),
+      this.freezeTotalHeight()
     );
   }
 

@@ -15,7 +15,7 @@ export default class Dropdown extends Element {
     }
     this.contentEl = h("div", `${cssPrefix}-dropdown-content`)
       .css("width", width)
-      .css("height", "400px")
+      .css("max-height", "400px")
       .css("overflow-y", "auto")
       .hide();
 
@@ -34,9 +34,9 @@ export default class Dropdown extends Element {
         this.title,
         showArrow
           ? h("div", `${cssPrefix}-icon arrow-right`).child(
-              h("div", `${cssPrefix}-icon-img arrow-down`),
+              h("div", `${cssPrefix}-icon-img arrow-down`)
             )
-          : "",
+          : ""
       );
     this.children(this.headerEl, this.contentEl);
   }

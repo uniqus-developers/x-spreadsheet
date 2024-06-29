@@ -14,7 +14,7 @@ export const parseCssToXDataStyles = (styleString) => {
     const parsedStyles = {};
     const fontStyles = {};
     let borderStyles = {};
-
+    const dimensions = {};
     const styles = styleString.split(";");
     const stylesObject = {};
     styles.forEach((style) => {
@@ -49,7 +49,7 @@ export const parseCssToXDataStyles = (styleString) => {
             value === "bold";
           break;
         case "font-size":
-          fontStyles["size"] = value.split("px")?.[0] ?? "";
+          fontStyles["size"] = parsePtOrPxValue(value);
           break;
         case "font-style":
           fontStyles["italic"] = value === "italic";
@@ -66,7 +66,7 @@ export const parseCssToXDataStyles = (styleString) => {
           const values = String(value).match(regexp) ?? [];
           let parsedValues = [];
           if (values.length > 2) {
-            const intValue = Number(values[0]?.split("px")?.[0]);
+            const intValue = parsePtOrPxValue(values[0]);
             const lineStyle =
               values[1] === "solid"
                 ? intValue <= 1
@@ -79,21 +79,30 @@ export const parseCssToXDataStyles = (styleString) => {
               ? "#000000"
               : values[2];
             parsedValues = [lineStyle, color];
+            if (property === "border") {
+              borderStyles = {
+                top: parsedValues,
+                bottom: parsedValues,
+                left: parsedValues,
+                right: parsedValues,
+              };
+            } else {
+              const side = property.split("-")[1];
+              borderStyles[side] = parsedValues;
+            }
           }
-          if (property === "border") {
-            borderStyles = {
-              top: parsedValues,
-              bottom: parsedValues,
-              left: parsedValues,
-              right: parsedValues,
-            };
-          } else {
-            const side = property.split("-")[1];
-            borderStyles[side] = parsedValues;
-          }
+          break;
+        case "width":
+          const widthValue = parsePtOrPxValue(value);
+          if (widthValue) dimensions.width = widthValue;
+          break;
+        case "height":
+          const heightValue = parsePtOrPxValue(value);
+          if (heightValue) dimensions.height = heightValue;
           break;
       }
     });
+    parsedStyles["dimensions"] = dimensions;
     parsedStyles["font"] = fontStyles;
     if (Object.keys(borderStyles).length) parsedStyles["border"] = borderStyles;
     return parsedStyles;
@@ -177,3 +186,49 @@ const parseBorderProperties = (styles) => {
 
   return { ...parsedBorders, ...others };
 };
+
+const parsePtOrPxValue = (value) => {
+  const PX_TO_PT = 0.75;
+  let parsedValue = value;
+  if (value) {
+    if (value.includes("px")) {
+      parsedValue = Math.ceil(Number(value.split("px")[0]));
+    } else if (value.includes("pt")) {
+      parsedValue = Math.ceil(Number(value.split("pt")[0]) / PX_TO_PT);
+    }
+  }
+  return parsedValue;
+};
+
+export const parseHtmlToText = (function () {
+  const entities = [
+    ["nbsp", ""],
+    ["middot", "·"],
+    ["quot", '"'],
+    ["apos", "'"],
+    ["gt", ">"],
+    ["lt", "<"],
+    ["amp", "&"],
+  ].map(function (x) {
+    return [new RegExp("&" + x[0] + ";", "ig"), x[1]];
+  });
+  return function parseHtmlToText(str) {
+    let o = str
+      // Remove new lines and spaces from start of content
+      .replace(/^[\t\n\r ]+/, "")
+      // Remove new lines and spaces from end of content
+      .replace(/[\t\n\r ]+$/, "")
+      // Added line which removes any white space characters after and before html tags
+      .replace(/>\s+/g, ">")
+      .replace(/\s+</g, "<")
+      // Replace remaining new lines and spaces with space
+      .replace(/[\t\n\r ]+/g, " ")
+      // Replace <br> tags with new lines
+      .replace(/<\s*[bB][rR]\s*\/?>/g, "\n")
+      // Strip HTML elements
+      .replace(/<[^>]*>/g, "");
+    for (let i = 0; i < entities.length; ++i)
+      o = o.replace(entities[i][0], entities[i][1]);
+    return o;
+  };
+})();
