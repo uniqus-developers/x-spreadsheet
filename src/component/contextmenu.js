@@ -41,6 +41,11 @@ function buildMenuItem(item) {
   }
   return h("div", `${cssPrefix}-item`)
     .on("click", () => {
+      const range = this.sheet.selector.range;
+      this.sheet?.trigger?.("context-menu-action", {
+        action: [item.key],
+        range,
+      });
       this.itemClick(item.key);
       this.hide();
     })
@@ -52,7 +57,7 @@ function buildMenu() {
 }
 
 export default class ContextMenu {
-  constructor(viewFn, isHide = false) {
+  constructor(sheetContext, viewFn, isHide = false) {
     this.menuItems = buildMenu.call(this);
     this.el = h("div", `${cssPrefix}-contextmenu`)
       .children(...this.menuItems)
@@ -61,6 +66,7 @@ export default class ContextMenu {
     this.itemClick = () => {};
     this.isHide = isHide;
     this.setMode("range");
+    this.sheet = sheetContext;
   }
 
   // row-col: the whole rows or the whole cols
