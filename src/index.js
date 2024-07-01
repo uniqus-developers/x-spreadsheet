@@ -63,18 +63,19 @@ class Spreadsheet {
     return d;
   }
 
-  deleteSheet() {
+  deleteSheet(fireEvent = true) {
     if (this.bottombar === null) return;
 
     const [oldIndex, nindex] = this.bottombar.deleteItem();
     if (oldIndex >= 0) {
       this.datas.splice(oldIndex, 1);
       if (nindex >= 0) this.sheet.resetData(this.datas[nindex]);
-      this.sheet.trigger("change");
+      if (fireEvent) this.sheet.trigger("change");
     }
   }
 
   loadData(data) {
+    this.reset();
     const ds = Array.isArray(data) ? data : [data];
     if (this.bottombar !== null) {
       this.bottombar.clear();
@@ -128,6 +129,11 @@ class Spreadsheet {
   change(cb) {
     this.sheet.on("change", cb);
     return this;
+  }
+
+  reset() {
+    this.sheetIndex = 1;
+    this.deleteSheet(false);
   }
 
   static locale(lang, message) {
