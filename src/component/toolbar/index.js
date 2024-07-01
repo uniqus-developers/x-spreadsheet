@@ -29,6 +29,7 @@ import Item from "./item";
 import { h } from "../element";
 import { cssPrefix } from "../../config";
 import { bind } from "../event";
+import CellConfigButtons from "./cellConfigButtons";
 
 function buildDivider() {
   return h("div", `${cssPrefix}-toolbar-divider`);
@@ -109,7 +110,8 @@ function genBtn(it) {
 }
 
 export default class Toolbar {
-  constructor(data, widthFn, isHide = false) {
+  constructor(data, widthFn, isHide = false, options = {}) {
+    this.options = options;
     this.data = data;
     this.change = () => {};
     this.widthFn = widthFn;
@@ -170,6 +172,19 @@ export default class Toolbar {
       this.items.push(btns);
     }
 
+    const cellConfigButtons = options.cellConfigButtons;
+    if (cellConfigButtons?.length) {
+      const configButtons = cellConfigButtons.map((config) => {
+        if (config.tag) {
+          return (this[`${config.tag}El`] = new CellConfigButtons(config));
+        }
+      });
+      if (configButtons?.length) {
+        this.items.push(buildDivider());
+        this.items.push(configButtons);
+      }
+    }
+
     this.items.push([(this.moreEl = new More())]);
 
     this.el = h("div", `${cssPrefix}-toolbar`);
@@ -223,6 +238,8 @@ export default class Toolbar {
   reset() {
     if (this.isHide) return;
     const { data } = this;
+    const { cellConfig = {} } = data;
+    const { cellButtons = [] } = cellConfig;
     const style = data.getSelectedCellStyle();
     // console.log('canUndo:', data.canUndo());
     this.undoEl.setState(!data.canUndo());
@@ -246,6 +263,13 @@ export default class Toolbar {
     this.textwrapEl.setState(style.textwrap);
     // console.log('freeze is Active:', data.freezeIsActive());
     this.freezeEl.setState(data.freezeIsActive());
-    this.gridEl.setState(!!data.sheetConfig.gridLine)
+    this.gridEl.setState(!!data.sheetConfig.gridLine);
+    if (cellButtons?.length) {
+      const cellMeta = data.getSelectedCellMetaData();
+      cellButtons.forEach((button) => {
+        const status = cellMeta[button.tag];
+        this[`${button.tag}El`].setState(!!status);
+      });
+    }
   }
 }

@@ -61,6 +61,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
   }
 
   const style = data.getCellStyleOrDefault(nrindex, cindex);
+  const cellMeta = data.getCellMetaOrDefault(nrindex, cindex);
   const dbox = getDrawBox(data, rindex, cindex, yoffset);
   dbox.bgcolor = style.bgcolor;
   if (style.border !== undefined) {
@@ -68,6 +69,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
     // bboxes.push({ ri: rindex, ci: cindex, box: dbox });
     draw.strokeBorders(dbox);
   }
+
   draw.rect(dbox, () => {
     // render text
     let cellText = "";
@@ -109,6 +111,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
       draw.frozen(dbox);
     }
   });
+  draw.drawIcon(dbox, cellMeta);
 }
 
 function renderAutofilter(viewRange) {
