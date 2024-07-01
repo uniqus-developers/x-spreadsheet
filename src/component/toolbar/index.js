@@ -4,6 +4,7 @@ import Align from "./align";
 import Valign from "./valign";
 import Autofilter from "./autofilter";
 import Bold from "./bold";
+import Grid from "./grid";
 import Italic from "./italic";
 import Strike from "./strike";
 import Underline from "./underline";
@@ -145,6 +146,7 @@ export default class Toolbar {
         (this.fillColorEl = new FillColor(style.bgcolor)),
         (this.borderEl = new Border()),
         (this.mergeEl = new Merge()),
+        (this.gridEl = new Grid()),
       ],
       buildDivider(),
       [
@@ -255,5 +257,6 @@ export default class Toolbar {
     this.textwrapEl.setState(style.textwrap);
     // console.log('freeze is Active:', data.freezeIsActive());
     this.freezeEl.setState(data.freezeIsActive());
+    this.gridEl.setState(!!data.sheetConfig.gridLine)
   }
 }

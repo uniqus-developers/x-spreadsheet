@@ -73,7 +73,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
     let cellText = "";
     if (!data.settings.evalPaused) {
       cellText = _cell.render(cell.text || "", formulam, (y, x) =>
-        data.getCellTextOrDefault(x, y),
+        data.getCellTextOrDefault(x, y)
       );
     } else {
       cellText = cell.text || "";
@@ -97,7 +97,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         underline: style.underline,
       },
       style.textwrap,
-      { data, rindex, cindex },
+      { data, rindex, cindex }
     );
     // error
     const error = data.validations.getError(rindex, cindex);
@@ -144,7 +144,7 @@ function renderContent(viewRange, fw, fh, tx, ty) {
 
   const exceptRowTotalHeight = data.exceptRowTotalHeight(
     viewRange.sri,
-    viewRange.eri,
+    viewRange.eri
   );
   // 1 render cell
   draw.save();
@@ -153,7 +153,7 @@ function renderContent(viewRange, fw, fh, tx, ty) {
     (ri, ci) => {
       renderCell(draw, data, ri, ci);
     },
-    (ri) => filteredTranslateFunc(ri),
+    (ri) => filteredTranslateFunc(ri)
   );
   draw.restore();
 
@@ -263,14 +263,13 @@ function renderFixedLeftTopCell(fw, fh) {
 function renderContentGrid({ sri, sci, eri, eci, w, h }, fw, fh, tx, ty) {
   const { draw, data } = this;
   const { settings } = data;
-
   draw.save();
   draw.attr(tableGridStyle).translate(fw + tx, fh + ty);
   // const sumWidth = cols.sumWidth(sci, eci + 1);
   // const sumHeight = rows.sumHeight(sri, eri + 1);
   // console.log('sumWidth:', sumWidth);
   // draw.clearRect(0, 0, w, h);
-  if (!settings.showGrid) {
+  if (!settings.showGrid || data?.sheetConfig?.gridLine === false) {
     draw.restore();
     return;
   }
@@ -302,12 +301,19 @@ class Table {
   constructor(el, data, options = {}) {
     this.options = options;
     this.el = el;
-    this.draw = new Draw(el, data.viewWidth(), data.viewHeight(), options);
+    this.draw = new Draw(
+      el,
+      data.viewWidth(),
+      data.viewHeight(),
+      options,
+      data
+    );
     this.data = data;
   }
 
   resetData(data) {
     this.data = data;
+    this.draw.resetData(data);
     this.render();
   }
 

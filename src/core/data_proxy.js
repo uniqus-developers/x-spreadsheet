@@ -18,6 +18,7 @@ import {
   parseCssToXDataStyles,
   parseHtmlToText,
 } from "../utils";
+import SheetConfig from "./sheetConfig";
 
 // private methods
 /*
@@ -345,6 +346,7 @@ export default class DataProxy {
     this.merges = new Merges(); // [CellRange, ...]
     this.rows = new Rows(this.settings.row, this.settings);
     this.cols = new Cols(this.settings.col);
+    this.sheetConfig = new SheetConfig(this.name, this.settings);
     this.validations = new Validations();
     this.hyperlinks = {};
     this.comments = {};
@@ -654,7 +656,7 @@ export default class DataProxy {
 
   setSelectedCellAttr(property, value) {
     this.changeData(() => {
-      const { selector, styles, rows } = this;
+      const { selector, styles, rows, sheetConfig } = this;
       if (property === "merge") {
         if (value) this.merge();
         else this.unmerge();
@@ -710,6 +712,8 @@ export default class DataProxy {
           ) {
             cstyle[property] = value;
             cell.style = this.addStyle(cstyle);
+          } else if (property === "grid") {
+            sheetConfig.setData({ gridLine: value });
           } else {
             cell[property] = value;
           }
@@ -1354,7 +1358,8 @@ export default class DataProxy {
         property === "merges" ||
         property === "rows" ||
         property === "cols" ||
-        property === "validations"
+        property === "validations" ||
+        property === "sheetConfig"
       ) {
         this[property].setData(d[property]);
       } else if (property === "freeze") {
@@ -1379,6 +1384,7 @@ export default class DataProxy {
       cols,
       validations,
       autoFilter,
+      sheetConfig,
     } = this;
     return {
       name,
@@ -1389,6 +1395,7 @@ export default class DataProxy {
       cols: cols.getData(),
       validations: validations.getData(),
       autofilter: autoFilter.getData(),
+      sheetConfig: sheetConfig.getData(),
     };
   }
 }
