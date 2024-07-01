@@ -89,6 +89,11 @@ function moreResize() {
 function genBtn(it) {
   const btn = new Item();
   btn.el.on("click", () => {
+    const range = this.sheet.selector.range;
+    this.sheet?.trigger("toolbar-action", {
+      action: [it.tip],
+      range,
+    });
     if (it.onClick) it.onClick(this.data.getData(), this.data);
   });
   btn.tip = it.tip || "";
@@ -109,11 +114,12 @@ function genBtn(it) {
 }
 
 export default class Toolbar {
-  constructor(data, widthFn, isHide = false) {
+  constructor(sheetContext, data, widthFn, isHide = false) {
     this.data = data;
     this.change = () => {};
     this.widthFn = widthFn;
     this.isHide = isHide;
+    this.sheet = sheetContext;
     const style = data.defaultStyle();
     this.items = [
       [
@@ -180,6 +186,11 @@ export default class Toolbar {
         it.forEach((i) => {
           this.btns.child(i.el);
           i.change = (...args) => {
+            const range = this.sheet.selector.range;
+            this.sheet?.trigger?.("toolbar-action", {
+              action: args,
+              range,
+            });
             this.change(...args);
           };
         });
