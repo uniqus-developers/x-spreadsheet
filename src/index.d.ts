@@ -1,5 +1,3 @@
-import CellRange from "./core/cell_range";
-
 declare module "x-data-spreadsheet" {
   export interface ExtendToolbarOption {
     tip?: string;
@@ -83,12 +81,19 @@ declare module "x-data-spreadsheet" {
     ): void;
     (
       evnt: TOOLBAR_ACTION,
-      callback: (action: any[], range: CellRange) => void
+      callback: (action: any[], range: CellRangeType) => void
     ): void;
     (
       evnt: CONTEXT_MENU_ACTION,
-      callback: (action: any[], range: CellRange) => void
+      callback: (action: any[], range: CellRangeType) => void
     ): void;
+  }
+
+  export interface CellRangeType {
+    sci: number;
+    sri: number;
+    eci: number;
+    eri: number;
   }
 
   export interface ColProperties {
