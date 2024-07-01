@@ -16,7 +16,7 @@ function buildTd(iconName) {
         this.mode = iconName;
         const { mode, style, color } = this;
         this.change({ mode, style, color });
-      }),
+      })
   );
 }
 
@@ -41,21 +41,21 @@ export default class BorderPalette {
           buildTable(
             h("tr", "").children(
               ...["all", "inside", "horizontal", "vertical", "outside"].map(
-                (it) => buildTd.call(this, it),
-              ),
+                (it) => buildTd.call(this, it)
+              )
             ),
             h("tr", "").children(
               ...["left", "top", "right", "bottom", "none"].map((it) =>
-                buildTd.call(this, it),
-              ),
-            ),
-          ),
+                buildTd.call(this, it)
+              )
+            )
+          )
         ),
         h("td", `${cssPrefix}-border-palette-right`).children(
           h("div", `${cssPrefix}-toolbar-btn`).child(this.ddColor.el),
-          h("div", `${cssPrefix}-toolbar-btn`).child(this.ddType.el),
-        ),
-      ),
+          h("div", `${cssPrefix}-toolbar-btn`).child(this.ddType.el)
+        )
+      )
     );
     this.el.child(table);
   }

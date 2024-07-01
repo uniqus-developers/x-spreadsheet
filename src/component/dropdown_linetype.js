@@ -24,7 +24,10 @@ const lineTypes = [
     "dotted",
     '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="1" style="user-select: none;"><line x1="0" y1="0.5" x2="50" y2="0.5" stroke-width="1" stroke="black" stroke-dasharray="1" style="user-select: none;"></line></svg>',
   ],
-  // ['double', '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="3" style="user-select: none;"><line x1="0" y1="0.5" x2="50" y2="0.5" stroke-width="1" stroke="black" style="user-select: none;"></line><line x1="0" y1="2.5" x2="50" y2="2.5" stroke-width="1" stroke="black" style="user-select: none;"></line></svg>'],
+  [
+    "double",
+    '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="3" style="user-select: none;"><line x1="0" y1="0.5" x2="50" y2="0.5" stroke-width="1" stroke="black" style="user-select: none;"></line><line x1="0" y1="2.5" x2="50" y2="2.5" stroke-width="1" stroke="black" style="user-select: none;"></line></svg>',
+  ],
 ];
 
 export default class DropdownLineType extends Dropdown {
@@ -40,7 +43,7 @@ export default class DropdownLineType extends Dropdown {
           this.hide();
           this.change(it);
         })
-        .child(h("div", `${cssPrefix}-line-type`).html(it[1])),
+        .child(h("div", `${cssPrefix}-line-type`).html(it[1]))
     );
 
     super(icon, "auto", false, "bottom-left", ...lineTypeEls);

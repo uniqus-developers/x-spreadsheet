@@ -366,6 +366,47 @@ class Draw {
     return this;
   }
 
+  borderLine(isDouble, side, ...xys) {
+    const { ctx } = this;
+    if (xys.length > 1) {
+      ctx.beginPath();
+      const [x, y] = xys[0];
+      ctx.moveTo(npxLine(x), npxLine(y));
+      for (let i = 1; i < xys.length; i += 1) {
+        const [x1, y1] = xys[i];
+        ctx.lineTo(npxLine(x1), npxLine(y1));
+      }
+      ctx.stroke();
+      if (isDouble) {
+        const [x1, y1] = xys[1];
+        let xGap = 0;
+        let yGap = 0;
+        let gapUnit = 3;
+        switch (side) {
+          case "top":
+            yGap = gapUnit;
+            break;
+          case "bottom":
+            yGap = -1 * gapUnit;
+            break;
+          case "left":
+            xGap = gapUnit;
+            break;
+          case "right":
+            xGap = -1 * gapUnit;
+            break;
+        }
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(npx(x + xGap), npx(y + yGap));
+        ctx.lineTo(npx(x1 + xGap), npx(y1 + yGap));
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+    return this;
+  }
+
   strokeBorders(box) {
     const { ctx } = this;
     ctx.save();
@@ -373,21 +414,25 @@ class Draw {
     const { borderTop, borderRight, borderBottom, borderLeft } = box;
     if (borderTop) {
       this.border(...borderTop);
+      const isDouble = borderTop[0] === "double";
       // console.log('box.topxys:', box.topxys());
 
-      this.line(...box.topxys());
+      this.borderLine(isDouble, "top", ...box.topxys());
     }
     if (borderRight) {
       this.border(...borderRight);
-      this.line(...box.rightxys());
+      const isDouble = borderRight[0] === "double";
+      this.borderLine(isDouble, "right", ...box.rightxys());
     }
     if (borderBottom) {
       this.border(...borderBottom);
-      this.line(...box.bottomxys());
+      const isDouble = borderBottom[0] === "double";
+      this.borderLine(isDouble, "bottom", ...box.bottomxys());
     }
     if (borderLeft) {
       this.border(...borderLeft);
-      this.line(...box.leftxys());
+      const isDouble = borderLeft[0] === "double";
+      this.borderLine(isDouble, "left", ...box.leftxys());
     }
     ctx.restore();
   }
