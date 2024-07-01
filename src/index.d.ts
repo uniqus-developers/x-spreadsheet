@@ -1,19 +1,21 @@
-declare module 'x-data-spreadsheet' {
+import CellRange from "./core/cell_range";
+
+declare module "x-data-spreadsheet" {
   export interface ExtendToolbarOption {
     tip?: string;
     el?: HTMLElement;
     icon?: string;
-    onClick?: (data: object, sheet: object) => void
+    onClick?: (data: object, sheet: object) => void;
   }
   export interface Options {
-    mode?: 'edit' | 'read';
+    mode?: "edit" | "read";
     showToolbar?: boolean;
     showGrid?: boolean;
     showContextmenu?: boolean;
     showBottomBar?: boolean;
     extendToolbar?: {
-      left?: ExtendToolbarOption[],
-      right?: ExtendToolbarOption[],
+      left?: ExtendToolbarOption[];
+      right?: ExtendToolbarOption[];
     };
     autoFocus?: boolean;
     view?: {
@@ -32,24 +34,34 @@ declare module 'x-data-spreadsheet' {
     };
     style?: {
       bgcolor: string;
-      align: 'left' | 'center' | 'right';
-      valign: 'top' | 'middle' | 'bottom';
+      align: "left" | "center" | "right";
+      valign: "top" | "middle" | "bottom";
       textwrap: boolean;
       strike: boolean;
       underline: boolean;
       color: string;
       font: {
-        name: 'Helvetica';
+        name: "Helvetica";
         size: number;
         bold: boolean;
         italic: false;
       };
     };
+    cellConfigButtons: CellConfigButton[];
   }
 
-  export type CELL_SELECTED = 'cell-selected';
-  export type CELLS_SELECTED = 'cells-selected';
-  export type CELL_EDITED = 'cell-edited';
+  export type CELL_SELECTED = "cell-selected";
+  export type CELLS_SELECTED = "cells-selected";
+  export type CELL_EDITED = "cell-edited";
+  export type TOOLBAR_ACTION = "toolbar-action";
+  export type CONTEXT_MENU_ACTION = "context-menu-action";
+
+  export interface CellConfigButton {
+    tag: string;
+    tip?: string;
+    icon?: string;
+    indicator: string;
+  }
 
   export type CellMerge = [number, number];
 
@@ -68,6 +80,14 @@ declare module 'x-data-spreadsheet' {
     (
       evnt: CELL_EDITED,
       callback: (text: string, rowIndex: number, colIndex: number) => void
+    ): void;
+    (
+      evnt: TOOLBAR_ACTION,
+      callback: (action: any[], range: CellRange) => void
+    ): void;
+    (
+      evnt: CONTEXT_MENU_ACTION,
+      callback: (action: any[], range: CellRange) => void
     ): void;
   }
 
@@ -89,7 +109,7 @@ declare module 'x-data-spreadsheet' {
   export interface RowData {
     cells: {
       [key: number]: CellData;
-    }
+    };
   }
 
   /**
@@ -105,7 +125,7 @@ declare module 'x-data-spreadsheet' {
       [key: number]: ColProperties;
     };
     rows?: {
-      [key: number]: RowData
+      [key: number]: RowData;
     };
   }
 
@@ -117,11 +137,11 @@ declare module 'x-data-spreadsheet' {
   }
 
   export interface CellStyle {
-    align?: 'left' | 'center' | 'right';
-    valign?: 'top' | 'middle' | 'bottom';
+    align?: "left" | "center" | "right";
+    valign?: "top" | "middle" | "bottom";
     font?: {
       bold?: boolean;
-    }
+    };
     bgcolor?: string;
     textwrap?: boolean;
     color?: string;
@@ -202,8 +222,10 @@ declare module 'x-data-spreadsheet' {
   }
   global {
     interface Window {
-      x_spreadsheet(container: string | HTMLElement, opts?: Options): Spreadsheet; 
+      x_spreadsheet(
+        container: string | HTMLElement,
+        opts?: Options
+      ): Spreadsheet;
     }
   }
 }
-

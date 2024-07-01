@@ -64,11 +64,11 @@ function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
   const cell = data.getCell(ri, ci);
   if (multiple) {
     selector.setEnd(ri, ci, moving);
-    this.trigger("cells-selected", cell, selector.range);
+    if (!moving) this.trigger("cells-selected", cell, selector.range);
   } else {
-    // trigger click event
     selector.set(ri, ci, indexesUpdated);
-    this.trigger("cell-selected", cell, ri, ci);
+    if (!moving && ri !== -1 && ci !== -1)
+      this.trigger("cell-selected", cell, ri, ci);
   }
   contextMenu.setMode(ri === -1 || ci === -1 ? "row-col" : "range");
   toolbar.reset();
@@ -77,11 +77,12 @@ function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
 
 // multiple: boolean
 // direction: left | right | up | down | row-first | row-last | col-first | col-last
-function selectorMove(multiple, direction) {
+function selectorMove(multiple, direction, isMoving = true) {
   const { selector, data } = this;
   const { rows, cols } = data;
   let [ri, ci] = selector.indexes;
   const { eri, eci } = selector.range;
+  let isLastOrFirst = false;
   if (multiple) {
     [ri, ci] = selector.moveIndexes;
   }
@@ -98,17 +99,21 @@ function selectorMove(multiple, direction) {
     if (ri < rows.len - 1) ri += 1;
   } else if (direction === "row-first") {
     ci = 0;
+    isLastOrFirst = true;
   } else if (direction === "row-last") {
     ci = cols.len - 1;
+    isLastOrFirst = true;
   } else if (direction === "col-first") {
     ri = 0;
+    isLastOrFirst = true;
   } else if (direction === "col-last") {
     ri = rows.len - 1;
+    isLastOrFirst = true;
   }
   if (multiple) {
     selector.moveIndexes = [ri, ci];
   }
-  selectorSet.call(this, multiple, ri, ci);
+  selectorSet.call(this, multiple, ri, ci, true, !isLastOrFirst && isMoving);
   scrollbarMove.call(this);
 }
 
@@ -382,7 +387,7 @@ function overlayerMousedown(evt) {
     if (isAutofillEl) {
       selector.showAutofill(ri, ci);
     } else {
-      selectorSet.call(this, false, ri, ci);
+      selectorSet.call(this, false, ri, ci, true, true);
     }
 
     // mouse move up
@@ -397,13 +402,18 @@ function overlayerMousedown(evt) {
           selectorSet.call(this, true, ri, ci, true, true);
         }
       },
-      () => {
+      (e) => {
         if (isAutofillEl && selector.arange && data.settings.mode !== "read") {
           if (
             data.autofill(selector.arange, "all", (msg) => xtoast("Tip", msg))
           ) {
             table.render();
           }
+        } else if (!e.shiftKey) {
+          const range = this.selector.range;
+          const isSingleSelect =
+            range.sri === range.eri && range.sci === range.eci;
+          selectorSet.call(this, !isSingleSelect, ri, ci, true, false);
         }
         selector.hideAutofill();
         toolbarChangePaintformatPaste.call(this);
@@ -870,6 +880,18 @@ function sheetInitEvents() {
       }
     }
   });
+
+  bind(window, "keyup", (evt) => {
+    const keyCode = evt.keyCode || evt.which;
+    if (keyCode === 16 || keyCode === 17) {
+      const range = this.selector.range;
+      if (range.sri === range.eri && range.sci === range.eci) return;
+      else {
+        const cell = this.data.getCell(range.sri, range.sci);
+        this.trigger("cells-selected", cell, range);
+      }
+    }
+  });
 }
 
 export default class Sheet {
@@ -878,7 +900,7 @@ export default class Sheet {
     this.eventMap = createEventEmitter();
     const { view, showToolbar, showContextmenu } = data.settings;
     this.el = h("div", `${cssPrefix}-sheet`);
-    this.toolbar = new Toolbar(data, view.width, !showToolbar, options);
+    this.toolbar = new Toolbar(this, data, view.width, !showToolbar);
     this.print = new Print(data);
     targetEl.children(this.toolbar.el, this.el, this.print.el);
     this.data = data;
@@ -900,7 +922,11 @@ export default class Sheet {
     // data validation
     this.modalValidation = new ModalValidation();
     // contextMenu
-    this.contextMenu = new ContextMenu(() => this.getRect(), !showContextmenu);
+    this.contextMenu = new ContextMenu(
+      this,
+      () => this.getRect(),
+      !showContextmenu
+    );
     // selector
     this.selector = new Selector(data);
     this.overlayerCEl = h("div", `${cssPrefix}-overlayer-content`).children(

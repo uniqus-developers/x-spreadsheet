@@ -6,6 +6,9 @@ import "./_.prototypes";
  */
 const baseFonts = [
   { key: "Arial", title: "Arial" },
+  { key: "Times New Roman", title: "Times New Roman" },
+  { key: "Georgia", title: "Georgia" },
+  { key: "Montserrat", title: "Montserrat" },
   { key: "Helvetica", title: "Helvetica" },
   { key: "Source Sans Pro", title: "Source Sans Pro" },
   { key: "Comic Sans MS", title: "Comic Sans MS" },
