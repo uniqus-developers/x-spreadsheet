@@ -220,7 +220,7 @@ declare module "x-data-spreadsheet" {
      */
     static locale(lang: string, message: object): void;
   }
-  global {
+  declare global {
     interface Window {
       x_spreadsheet(
         container: string | HTMLElement,
