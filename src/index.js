@@ -9,15 +9,6 @@ import "./index.less";
 
 class Spreadsheet {
   constructor(selectors, options = {}) {
-    options.cellConfigButtons = [
-      {
-        icon: "",
-        tip: "ignore decimal",
-        indicator: "D",
-        tag: "isIgnoreDecimal",
-      },
-      { icon: "", tip: "ignore round", indicator: "R", tag: "isRoundOff" },
-    ];
     let targetEl = selectors;
     this.options = { showBottomBar: true, ...options };
     this.sheetIndex = 1;

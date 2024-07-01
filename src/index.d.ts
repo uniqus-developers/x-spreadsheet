@@ -47,7 +47,7 @@ declare module "x-data-spreadsheet" {
         italic: false;
       };
     };
-    cellConfigButtons: CellConfigButton[];
+    cellConfigButtons?: CellConfigButton[];
   }
 
   export type CELL_SELECTED = "cell-selected";
