@@ -7,14 +7,15 @@ export default class Item {
   // tooltip
   // tag: the subclass type
   // shortcut: shortcut key
-  constructor(tag, shortcut, value) {
+  constructor(tag, shortcut, value, config) {
     this.tip = "";
     if (tag)
-      this.tip = t(
-        `toolbar.${tag.replace(/-[a-z]/g, (c) => c[1].toUpperCase())}`,
-      );
+      this.tip =
+        config?.tip ||
+        t(`toolbar.${tag.replace(/-[a-z]/g, (c) => c[1].toUpperCase())}`);
     if (shortcut) this.tip += ` (${shortcut})`;
     this.tag = tag;
+    this.config = config;
     this.shortcut = shortcut;
     this.value = value;
     this.el = this.element();

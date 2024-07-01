@@ -29,6 +29,15 @@ class DrawBox {
     this.borderRight = null;
     this.borderBottom = null;
     this.borderLeft = null;
+    this.iconCount = 0;
+  }
+
+  getIconCount() {
+    return this.iconCount;
+  }
+
+  setIconCount(count) {
+    this.iconCount = count;
   }
 
   setBorders({ top, bottom, left, right }) {
@@ -325,7 +334,8 @@ class Draw {
   border(style, color) {
     const { ctx, data } = this;
     ctx.lineWidth = thinLineWidth;
-    ctx.strokeStyle = data.sheetConfig.gridLine === false ? color ?? "#ffffff" : color;
+    ctx.strokeStyle =
+      data.sheetConfig.gridLine === false ? color ?? "#ffffff" : color;
     // console.log('style:', style);
     if (style === "medium") {
       ctx.lineWidth = npx(2) - 0.5;
@@ -426,6 +436,41 @@ class Draw {
     ctx.fillStyle = "rgba(0, 255, 0, .85)";
     ctx.fill();
     ctx.restore();
+  }
+
+  drawIcon(box, cellMeta) {
+    const { cellConfigButtons = [] } = this.options;
+    if (cellMeta && Object.keys(cellMeta).length && cellConfigButtons?.length) {
+      const { x, y, width } = box;
+      const { ctx } = this;
+      let radius = 5;
+      let gap = radius * 2;
+      cellConfigButtons.forEach((button) => {
+        if (cellMeta[button.tag]) {
+          const indicator = button.indicator;
+          const iconCount = box.getIconCount();
+          ctx.beginPath();
+          const xPos =
+            x +
+            npx(width) -
+            Math.max(iconCount + 1 * radius, radius) -
+            Math.max(iconCount * gap);
+          const yPos = y + radius;
+          ctx.arc(xPos, yPos, radius, 0, 2 * Math.PI);
+          ctx.fillStyle = "#ffffff";
+          ctx.fill();
+          ctx.strokeStyle = "#ff0000";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          box.setIconCount(iconCount + 1);
+          ctx.fillStyle = "#ff0000";
+          ctx.font = `${radius * 1.5}px Arial`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(indicator, xPos, yPos);
+        }
+      });
+    }
   }
 
   rect(box, dtextcb) {

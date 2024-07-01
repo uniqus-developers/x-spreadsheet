@@ -547,7 +547,8 @@ function insertDeleteRowColumn(type) {
 }
 
 function toolbarChange(type, value) {
-  const { data } = this;
+  const { data, options } = this;
+  const { cellConfigButtons = [] } = options;
   if (type === "undo") {
     this.undo();
   } else if (type === "redo") {
@@ -573,6 +574,9 @@ function toolbarChange(type, value) {
     } else {
       this.freeze(0, 0);
     }
+  } else if (cellConfigButtons?.find((config) => config.tag === type)) {
+    data.setSelectedCellAttr(type, value);
+    sheetReset.call(this);
   } else {
     data.setSelectedCellAttr(type, value);
     if (type === "formula" && !data.selector.multiple()) {

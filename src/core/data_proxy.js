@@ -19,6 +19,7 @@ import {
   parseHtmlToText,
 } from "../utils";
 import SheetConfig from "./sheetConfig";
+import CellConfig from "./cellConfig";
 
 // private methods
 /*
@@ -347,6 +348,7 @@ export default class DataProxy {
     this.rows = new Rows(this.settings.row, this.settings);
     this.cols = new Cols(this.settings.col);
     this.sheetConfig = new SheetConfig(this.name, this.settings);
+    this.cellConfig = new CellConfig(this.name, this.settings);
     this.validations = new Validations();
     this.hyperlinks = {};
     this.comments = {};
@@ -656,7 +658,7 @@ export default class DataProxy {
 
   setSelectedCellAttr(property, value) {
     this.changeData(() => {
-      const { selector, styles, rows, sheetConfig } = this;
+      const { selector, styles, rows, sheetConfig, cellConfig } = this;
       if (property === "merge") {
         if (value) this.merge();
         else this.unmerge();
@@ -714,6 +716,11 @@ export default class DataProxy {
             cell.style = this.addStyle(cstyle);
           } else if (property === "grid") {
             sheetConfig.setData({ gridLine: value });
+          } else if (
+            cellConfig?.cellButtons?.find((button) => button?.tag === property)
+          ) {
+            cell.cellMeta = cell.cellMeta ?? {};
+            cell.cellMeta[property] = value;
           } else {
             cell[property] = value;
           }
@@ -1120,9 +1127,20 @@ export default class DataProxy {
     return helper.merge(this.defaultStyle(), cellStyle);
   }
 
+  getCellMetaOrDefault(ri, ci) {
+    const { rows } = this;
+    const cell = rows.getCell(ri, ci);
+    return cell?.cellMeta ?? {};
+  }
+
   getSelectedCellStyle() {
     const { ri, ci } = this.selector;
     return this.getCellStyleOrDefault(ri, ci);
+  }
+
+  getSelectedCellMetaData() {
+    const { ri, ci } = this.selector;
+    return this.getCellMetaOrDefault(ri, ci)
   }
 
   // state: input | finished

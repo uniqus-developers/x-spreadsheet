@@ -33,12 +33,12 @@ class Spreadsheet {
           (index, value) => {
             this.datas[index].name = value;
             this.sheet.trigger("change");
-          },
+          }
         )
       : null;
     this.data = this.addSheet();
     const rootEl = h("div", `${cssPrefix}`).on("contextmenu", (evt) =>
-      evt.preventDefault(),
+      evt.preventDefault()
     );
     // create canvas element
     targetEl.appendChild(rootEl.el);

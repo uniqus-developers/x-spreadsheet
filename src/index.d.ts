@@ -47,6 +47,7 @@ declare module "x-data-spreadsheet" {
         italic: false;
       };
     };
+    cellConfigButtons?: CellConfigButton[];
   }
 
   export type CELL_SELECTED = "cell-selected";
@@ -54,6 +55,13 @@ declare module "x-data-spreadsheet" {
   export type CELL_EDITED = "cell-edited";
   export type TOOLBAR_ACTION = "toolbar-action";
   export type CONTEXT_MENU_ACTION = "context-menu-action";
+
+  export interface CellConfigButton {
+    tag: string;
+    tip?: string;
+    icon?: string;
+    indicator: string;
+  }
 
   export type CellMerge = [number, number];
 
