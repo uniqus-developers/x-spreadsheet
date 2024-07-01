@@ -13,11 +13,14 @@ export default class Dropdown extends Element {
     } else if (showArrow) {
       this.title.addClass("arrow-left");
     }
+    const childrenCount = children?.length;
     this.contentEl = h("div", `${cssPrefix}-dropdown-content`)
       .css("width", width)
-      .css("max-height", "400px")
-      .css("overflow-y", "auto")
       .hide();
+
+    if (childrenCount > 30) {
+      this.contentEl.css("max-height", "400px").css("overflow", "auto");
+    }
 
     this.setContentChildren(...children);
 
