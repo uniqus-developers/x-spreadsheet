@@ -24,15 +24,13 @@ class Spreadsheet {
             this.sheet.resetData(d);
           },
           (index) => {
-            const d = this.datas[index];
-            this.sheet.resetData(d);
+            this.selectSheet(index);
           },
           () => {
             this.deleteSheet();
           },
           (index, value) => {
-            this.datas[index].name = value;
-            this.sheet.trigger("change");
+            this.renameSheet(index, value);
           }
         )
       : null;
@@ -59,6 +57,12 @@ class Spreadsheet {
     if (this.bottombar !== null) {
       this.bottombar.addItem(n, active, this.options);
     }
+    if (this.sheetIndex !== 1) {
+      this.sheet.trigger("sheet-change", {
+        action: "ADD",
+        sheet: d,
+      });
+    }
     this.sheetIndex += 1;
     return d;
   }
@@ -68,10 +72,38 @@ class Spreadsheet {
 
     const [oldIndex, nindex] = this.bottombar.deleteItem();
     if (oldIndex >= 0) {
+      const deletedSheet = this.datas[oldIndex];
       this.datas.splice(oldIndex, 1);
       if (nindex >= 0) this.sheet.resetData(this.datas[nindex]);
-      if (fireEvent) this.sheet.trigger("change");
+      if (fireEvent) {
+        this.sheet.trigger("change");
+        this.sheet.trigger("sheet-change", {
+          action: "DELETE",
+          sheet: deletedSheet,
+        });
+      }
     }
+  }
+
+  selectSheet(index) {
+    const currentSheet = this.sheet.data;
+    const newSheet = this.datas[index];
+    if (currentSheet.name !== newSheet.name) {
+      this.sheet.resetData(newSheet);
+      this.sheet.trigger("sheet-change", {
+        action: "SELECT",
+        sheet: newSheet,
+      });
+    }
+  }
+
+  renameSheet(index, value) {
+    this.datas[index].name = value;
+    this.sheet.trigger("change");
+    this.sheet.trigger("sheet-change", {
+      action: "RENAME",
+      sheet: this.datas[index],
+    });
   }
 
   loadData(data) {

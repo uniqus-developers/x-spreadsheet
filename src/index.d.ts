@@ -55,12 +55,18 @@ declare module "x-data-spreadsheet" {
   export type CELL_EDITED = "cell-edited";
   export type TOOLBAR_ACTION = "toolbar-action";
   export type CONTEXT_MENU_ACTION = "context-menu-action";
+  export type SHEET_CHANGE = "sheet-change";
 
   export interface CellConfigButton {
     tag: string;
     tip?: string;
     icon?: string;
     indicator: string;
+  }
+
+  export interface SheetChangeType {
+    action: string;
+    sheet: any;
   }
 
   export type CellMerge = [number, number];
@@ -89,6 +95,7 @@ declare module "x-data-spreadsheet" {
       evnt: CONTEXT_MENU_ACTION,
       callback: (action: any[], range: CellRange) => void
     ): void;
+    (evnt: SHEET_CHANGE, callback: (data: SheetChangeType) => void): void;
   }
 
   export interface ColProperties {
