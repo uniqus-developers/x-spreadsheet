@@ -124,7 +124,6 @@ class Rows {
           retrievedText = result;
           formattedText = "";
         }
-        console.log(retrievedText, formattedText, "console");
         cell.text = retrievedText ?? "";
         cell.formattedText = formattedText ?? "";
       } else {

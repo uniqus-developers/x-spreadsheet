@@ -239,9 +239,23 @@ const parserFormulaString = (string, getCellText, cellRender) => {
     const cellRefRegex = /\b[A-Za-z]+[1-9][0-9]*\b/g;
     const cellRangeRegex =
       /\$?[A-Za-z]+\$?[1-9][0-9]*:\$?[A-Za-z]+\$?[1-9][0-9]*/gi;
+    const spaceRemovalRegex = /\s+(?=(?:[^']*'[^']*')*[^']*$)/g;
+    const sheetToCellRefRegex =
+      /(?:'([^']*)'|\b[A-Za-z0-9]+)\![A-Za-z]+[1-9][0-9]*/g;
+
     try {
       let newFormulaString = "";
-      newFormulaString = string.replaceAll(" ", "");
+      // Removing spaces other than the spaces that are in apostrophes
+      newFormulaString = string.replace(spaceRemovalRegex, "");
+      newFormulaString = newFormulaString.replace(
+        sheetToCellRefRegex,
+        (match) => {
+          const [sheetName, cellRef] = match.replaceAll("'", "").split("!");
+          const [x, y] = expr2xy(cellRef);
+          const text = getCellText(x, y, sheetName);
+          return text;
+        }
+      );
       newFormulaString = newFormulaString.replace(cellRangeRegex, (match) => {
         const cells = rangeToCellConversion(match);
         if (cells?.length) {

@@ -74,8 +74,23 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
     // render text
     let cellText = "";
     if (!data.settings.evalPaused) {
-      cellText = _cell.render(cell.text || "", formulam, (y, x) =>
-        data.getCellTextOrDefault(x, y)
+      cellText = _cell.render(
+        cell.text || "",
+        formulam,
+        (y, x, sheetName = data.name) => {
+          if (!sheetName || sheetName === data.name)
+            return data.getCellTextOrDefault(x, y);
+          else {
+            const rootContext = data.getRootContext();
+            const sheets = rootContext.datas;
+            const selectedSheet = sheets?.find(
+              (sheet) => sheet.name === sheetName
+            );
+            return selectedSheet
+              ? selectedSheet.getCellTextOrDefault(x, y)
+              : "";
+          }
+        }
       );
     } else {
       cellText = cell.text || "";

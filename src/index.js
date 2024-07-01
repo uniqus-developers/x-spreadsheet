@@ -50,7 +50,7 @@ class Spreadsheet {
 
   addSheet(name, active = true) {
     const n = name || `sheet${this.sheetIndex}`;
-    const d = new DataProxy(n, this.options);
+    const d = new DataProxy(this, n, this.options);
     d.change = (...args) => {
       this.sheet.trigger("change", ...args);
     };

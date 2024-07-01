@@ -14,6 +14,7 @@ import { CellRange } from "./cell_range";
 import { expr2xy, xy2expr } from "./alphabet";
 import { t } from "../locale/locale";
 import {
+  generateUniqueId,
   getStylingForClass,
   parseCssToXDataStyles,
   parseHtmlToText,
@@ -338,7 +339,7 @@ function getCellColByX(x, scrollOffsetx) {
 }
 
 export default class DataProxy {
-  constructor(name, settings) {
+  constructor(rootContext, name, settings) {
     this.settings = helper.merge(defaultSettings, settings || {});
     // save data begin
     this.name = name || "sheet";
@@ -364,6 +365,8 @@ export default class DataProxy {
     this.exceptRowSet = new Set();
     this.sortedRowMap = new Map();
     this.unsortedRowMap = new Map();
+    this.rootContext = rootContext;
+    this.sheetId = this.sheetConfig.sheetId ?? generateUniqueId();
   }
 
   addValidation(mode, ref, validator) {
@@ -1140,7 +1143,7 @@ export default class DataProxy {
 
   getSelectedCellMetaData() {
     const { ri, ci } = this.selector;
-    return this.getCellMetaOrDefault(ri, ci)
+    return this.getCellMetaOrDefault(ri, ci);
   }
 
   // state: input | finished
@@ -1403,6 +1406,7 @@ export default class DataProxy {
       validations,
       autoFilter,
       sheetConfig,
+      sheetId,
     } = this;
     return {
       name,
@@ -1414,6 +1418,11 @@ export default class DataProxy {
       validations: validations.getData(),
       autofilter: autoFilter.getData(),
       sheetConfig: sheetConfig.getData(),
+      sheetId,
     };
+  }
+
+  getRootContext() {
+    return this.rootContext;
   }
 }
