@@ -25,4 +25,8 @@ export default class FormInput {
   val(v) {
     return this.input.val(v);
   }
+
+  blur() {
+    this.input.el.blur();
+  }
 }
