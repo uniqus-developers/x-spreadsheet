@@ -11,6 +11,7 @@ export default class CellConfigButtons extends ToggleItem {
   element() {
     const icon = this.config.icon;
     const element = super.element();
+    element.children().forEach((child) => element.removeChild(child));
     if (icon) {
       const child = h("img").attr("src", icon);
       element.child(child);
