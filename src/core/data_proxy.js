@@ -683,6 +683,15 @@ export default class DataProxy {
           const cell = rows.getCellOrNew(ri, ci);
           cell.text = `=${value}()`;
         }
+      } else if (property === "grid") {
+        sheetConfig.setData({ gridLine: value });
+      } else if (
+        cellConfig?.cellButtons?.find((button) => button?.tag === property)
+      ) {
+        const { ri, ci } = selector;
+        const cell = rows.getCellOrNew(ri, ci);
+        cell.cellMeta = cell?.cellMeta ?? {};
+        cell.cellMeta[property] = value;
       } else {
         selector.range.each((ri, ci) => {
           const cell = rows.getCellOrNew(ri, ci);
@@ -714,13 +723,6 @@ export default class DataProxy {
           ) {
             cstyle[property] = value;
             cell.style = this.addStyle(cstyle);
-          } else if (property === "grid") {
-            sheetConfig.setData({ gridLine: value });
-          } else if (
-            cellConfig?.cellButtons?.find((button) => button?.tag === property)
-          ) {
-            cell.cellMeta = cell.cellMeta ?? {};
-            cell.cellMeta[property] = value;
           } else {
             cell[property] = value;
           }
@@ -1140,7 +1142,7 @@ export default class DataProxy {
 
   getSelectedCellMetaData() {
     const { ri, ci } = this.selector;
-    return this.getCellMetaOrDefault(ri, ci)
+    return this.getCellMetaOrDefault(ri, ci);
   }
 
   // state: input | finished

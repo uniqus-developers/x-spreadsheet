@@ -444,18 +444,19 @@ class Draw {
       const { x, y, width } = box;
       const { ctx } = this;
       let radius = 5;
-      let gap = radius * 2;
+      let gap = radius * 2.2;
       cellConfigButtons.forEach((button) => {
         if (cellMeta[button.tag]) {
           const indicator = button.indicator;
           const iconCount = box.getIconCount();
           ctx.beginPath();
-          const xPos =
+          const xPos = npx(
             x +
-            npx(width) -
-            Math.max(iconCount + 1 * radius, radius) -
-            Math.max(iconCount * gap);
-          const yPos = y + radius;
+              width -
+              Math.max(iconCount + 1 * radius, radius) -
+              Math.max(iconCount * gap)
+          );
+          const yPos = npx(y + radius);
           ctx.arc(xPos, yPos, radius, 0, 2 * Math.PI);
           ctx.fillStyle = "#ffffff";
           ctx.fill();
