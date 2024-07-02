@@ -244,7 +244,7 @@ class Draw {
       const valueFormatter = this.options.valueFormatter;
       const numberConfig = this.options.numberConfig ?? {};
       if (valueFormatter) {
-        text = valueFormatter({ ...this, value: text, cellMeta }) ?? text;
+        text = valueFormatter({ ...this, value: text, cell: cellMeta }) ?? text;
       }
       const { zeroReplacer, groupingSymbol } = numberConfig;
       if (zeroReplacer) {

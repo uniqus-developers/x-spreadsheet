@@ -46,6 +46,10 @@ declare module "x-data-spreadsheet" {
       };
     };
     cellConfigButtons?: CellConfigButton[];
+    numberConfig?: { zeroReplacer?: string; groupingSymbol?: string };
+    valueFormatter?: (metaData: FormatterMeta) => string;
+    valueSetter?: (metaData: FormatterMeta) => string;
+    editValueFormatter?: (metaData: FormatterMeta) => string;
   }
 
   export type CELL_SELECTED = "cell-selected";
@@ -53,6 +57,11 @@ declare module "x-data-spreadsheet" {
   export type CELL_EDITED = "cell-edited";
   export type TOOLBAR_ACTION = "toolbar-action";
   export type CONTEXT_MENU_ACTION = "context-menu-action";
+
+  export interface FormatterMeta {
+    value: string;
+    cell: CellData;
+  }
 
   export interface CellConfigButton {
     tag: string;
@@ -107,6 +116,7 @@ declare module "x-data-spreadsheet" {
     text: string;
     style?: number;
     merge?: CellMerge;
+    cellMeta?: { [key: string]: boolean };
   }
   /**
    * Data for representing a row
