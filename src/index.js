@@ -6,6 +6,7 @@ import Bottombar from "./component/bottombar";
 import { cssPrefix } from "./config";
 import { locale } from "./locale/locale";
 import "./index.less";
+import { SHEET_TO_CELL_REF_REGEX } from "./constants";
 
 class Spreadsheet {
   constructor(selectors, options = {}) {
@@ -110,13 +111,11 @@ class Spreadsheet {
   }
 
   updateSheetRef(oldSheetName, newSheetName) {
-    const sheetToCellRefRegex =
-      /(?:'([^']*)'|\b[A-Za-z0-9]+)\![A-Za-z]+[1-9][0-9]*/g;
     this.datas.forEach((d) => {
       d.rows.each((ri, row) => {
         Object.entries(row.cells).forEach(([ci, cell]) => {
           const text = cell?.text ?? "";
-          const updatedText = text.replace(sheetToCellRefRegex, (match) => {
+          const updatedText = text.replace(SHEET_TO_CELL_REF_REGEX, (match) => {
             const [sheetName] = match.replaceAll("'", "").split("!");
             if (sheetName === oldSheetName) {
               return match.replace(oldSheetName, newSheetName);

@@ -5,7 +5,7 @@ import { formulam } from "../core/formula";
 import { formatm } from "../core/format";
 
 import { Draw, DrawBox, thinLineWidth, npx } from "../canvas/draw";
-import { REF_ERROR } from "../contants";
+import { REF_ERROR } from "../constants";
 // gobal var
 const cellPaddingWidth = 5;
 const tableFixedHeaderCleanStyle = { fillStyle: "#f4f5f8" };

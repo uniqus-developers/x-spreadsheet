@@ -1,4 +1,11 @@
-import { GENERAL_ERROR, REF_ERROR } from "../contants";
+import {
+  CELL_RANGE_REGEX,
+  CELL_REF_REGEX,
+  GENERAL_ERROR,
+  REF_ERROR,
+  SHEET_TO_CELL_REF_REGEX,
+  SPACE_REMOVAL_REGEX,
+} from "../constants";
 import { expr2xy, xy2expr } from "./alphabet";
 import { numberCalc } from "./helper";
 import { Parser } from "hot-formula-parser";
@@ -237,20 +244,13 @@ const rangeToCellConversion = (range) => {
 
 const parserFormulaString = (string, getCellText, cellRender) => {
   if (string?.length) {
-    const cellRefRegex = /\b[A-Za-z]+[1-9][0-9]*\b/g;
-    const cellRangeRegex =
-      /\$?[A-Za-z]+\$?[1-9][0-9]*:\$?[A-Za-z]+\$?[1-9][0-9]*/gi;
-    const spaceRemovalRegex = /\s+(?=(?:[^']*'[^']*')*[^']*$)/g;
-    const sheetToCellRefRegex =
-      /(?:'([^']*)'|\b[A-Za-z0-9]+)\![A-Za-z]+[1-9][0-9]*/g;
-
     try {
       let isFormulaResolved = false;
       let newFormulaString = "";
       // Removing spaces other than the spaces that are in apostrophes
-      newFormulaString = string.replace(spaceRemovalRegex, "");
+      newFormulaString = string.replace(SPACE_REMOVAL_REGEX, "");
       newFormulaString = newFormulaString.replace(
-        sheetToCellRefRegex,
+        SHEET_TO_CELL_REF_REGEX,
         (match) => {
           const [sheetName, cellRef] = match.replaceAll("'", "").split("!");
           const [x, y] = expr2xy(cellRef);
@@ -261,13 +261,13 @@ const parserFormulaString = (string, getCellText, cellRender) => {
       );
 
       if (isFormulaResolved) return REF_ERROR;
-      newFormulaString = newFormulaString.replace(cellRangeRegex, (match) => {
+      newFormulaString = newFormulaString.replace(CELL_RANGE_REGEX, (match) => {
         const cells = rangeToCellConversion(match);
         if (cells?.length) {
           return cells;
         }
       });
-      newFormulaString = newFormulaString.replace(cellRefRegex, (match) => {
+      newFormulaString = newFormulaString.replace(CELL_REF_REGEX, (match) => {
         const [x, y] = expr2xy(match);
         const text = getCellText(x, y);
         if (text) {
