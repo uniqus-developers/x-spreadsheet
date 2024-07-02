@@ -13,7 +13,10 @@ export default class CellConfigButtons extends ToggleItem {
     const element = super.element();
     element.children().forEach((child) => element.removeChild(child));
     if (icon) {
-      const child = h("img").attr("src", icon);
+      const child = h("img")
+        .attr("src", icon)
+        .css("max-width", "25px")
+        .css("max-height", "25px").css('overflow', 'hidden')
       element.child(child);
     }
 
