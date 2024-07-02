@@ -5,7 +5,7 @@ import Icon from "./icon";
 import FormInput from "./form_input";
 import Dropdown from "./dropdown";
 // Record: temp not used
-// import { xtoast } from './message';
+import { xtoast } from "./message";
 import { tf } from "../locale/locale";
 
 class DropdownMore extends Dropdown {
@@ -24,7 +24,7 @@ class DropdownMore extends Dropdown {
           this.contentClick(i);
           this.hide();
         })
-        .child(it),
+        .child(it)
     );
     this.setContentChildren(...eles);
   }
@@ -75,7 +75,7 @@ export default class Bottombar {
     addFunc = () => {},
     swapFunc = () => {},
     deleteFunc = () => {},
-    updateFunc = () => {},
+    updateFunc = () => {}
   ) {
     this.swapFunc = swapFunc;
     this.updateFunc = updateFunc;
@@ -83,6 +83,7 @@ export default class Bottombar {
     this.activeEl = null;
     this.deleteEl = null;
     this.items = [];
+    this.isInput = false;
     this.moreEl = new DropdownMore((i) => {
       this.clickSwap2(this.items[i]);
     });
@@ -95,9 +96,9 @@ export default class Bottombar {
           new Icon("add").on("click", () => {
             addFunc();
           }),
-          h("span", "").child(this.moreEl),
-        ),
-      )),
+          h("span", "").child(this.moreEl)
+        )
+      ))
     );
   }
 
@@ -119,22 +120,40 @@ export default class Bottombar {
       })
       .on("dblclick", () => {
         if (options.mode === "read") return;
-        const v = item.html();
-        const input = new FormInput("auto", "");
-        input.val(v);
-        input.input.on("blur", ({ target }) => {
-          const { value } = target;
-          const nindex = this.dataNames.findIndex((it) => it === v);
-          this.renameItem(nindex, value);
-          /*
-        this.dataNames.splice(nindex, 1, value);
-        this.moreEl.reset(this.dataNames);
-        item.html('').child(value);
-        this.updateFunc(nindex, value);
-        */
-        });
-        item.html("").child(input.el);
-        input.focus();
+        if (!this.isInput) {
+          this.isInput = true;
+          const oldValue = item.html();
+          const input = new FormInput("auto", "");
+          input.val(oldValue);
+          const handleInputEvent = ({ target }) => {
+            const { value } = target;
+            const isUnique = this.dataNames.every((name) => {
+              return name.toLowerCase() !== value.toLowerCase();
+            });
+            if (isUnique || oldValue === value) {
+              this.isInput = false;
+              const nindex = this.dataNames.findIndex((it) => it === oldValue);
+              this.renameItem(nindex, value);
+            } else {
+              xtoast(
+                "Duplicate name",
+                "Sheet already exists with this name",
+                () => {
+                  input.focus();
+                }
+              );
+            }
+          };
+          input.input.on("blur", handleInputEvent);
+          input.input.on("keydown", (event) => {
+            const keyCode = event.keyCode || event.which;
+            if (keyCode === 13) {
+              input.blur();
+            }
+          });
+          item.html("").child(input.el);
+          input.focus();
+        }
       });
     if (active) {
       this.clickSwap(item);

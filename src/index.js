@@ -6,6 +6,7 @@ import Bottombar from "./component/bottombar";
 import { cssPrefix } from "./config";
 import { locale } from "./locale/locale";
 import "./index.less";
+import { SHEET_TO_CELL_REF_REGEX } from "./constants";
 
 class Spreadsheet {
   constructor(selectors, options = {}) {
@@ -24,15 +25,13 @@ class Spreadsheet {
             this.sheet.resetData(d);
           },
           (index) => {
-            const d = this.datas[index];
-            this.sheet.resetData(d);
+            this.selectSheet(index);
           },
           () => {
             this.deleteSheet();
           },
           (index, value) => {
-            this.datas[index].name = value;
-            this.sheet.trigger("change");
+            this.renameSheet(index, value);
           }
         )
       : null;
@@ -50,7 +49,7 @@ class Spreadsheet {
 
   addSheet(name, active = true) {
     const n = name || `sheet${this.sheetIndex}`;
-    const d = new DataProxy(n, this.options);
+    const d = new DataProxy(this, n, this.options);
     d.change = (...args) => {
       this.sheet.trigger("change", ...args);
     };
@@ -59,22 +58,78 @@ class Spreadsheet {
     if (this.bottombar !== null) {
       this.bottombar.addItem(n, active, this.options);
     }
+    if (this.sheetIndex !== 1) {
+      this.sheet.trigger("sheet-change", {
+        action: "ADD",
+        sheet: d,
+      });
+    }
     this.sheetIndex += 1;
     return d;
   }
 
-  deleteSheet() {
+  deleteSheet(fireEvent = true) {
     if (this.bottombar === null) return;
 
     const [oldIndex, nindex] = this.bottombar.deleteItem();
     if (oldIndex >= 0) {
+      const deletedSheet = this.datas[oldIndex];
       this.datas.splice(oldIndex, 1);
       if (nindex >= 0) this.sheet.resetData(this.datas[nindex]);
-      this.sheet.trigger("change");
+      if (fireEvent) {
+        this.sheet.trigger("change");
+        this.sheet.trigger("sheet-change", {
+          action: "DELETE",
+          sheet: deletedSheet,
+        });
+      }
+    }
+    this.reRender();
+  }
+
+  selectSheet(index) {
+    const currentSheet = this.sheet.data;
+    const newSheet = this.datas[index];
+    if (currentSheet.name !== newSheet.name) {
+      this.sheet.resetData(newSheet);
+      this.sheet.trigger("sheet-change", {
+        action: "SELECT",
+        sheet: newSheet,
+      });
     }
   }
 
+  renameSheet(index, newSheetName) {
+    const oldSheetName = this.datas[index].name;
+    this.updateSheetRef(oldSheetName, newSheetName);
+    this.datas[index].name = newSheetName;
+    this.sheet.trigger("change");
+    this.sheet.trigger("sheet-change", {
+      action: "RENAME",
+      sheet: this.datas[index],
+    });
+  }
+
+  updateSheetRef(oldSheetName, newSheetName) {
+    this.datas.forEach((d) => {
+      d.rows.each((ri, row) => {
+        Object.entries(row.cells).forEach(([ci, cell]) => {
+          const text = cell?.text ?? "";
+          const updatedText = text.replace(SHEET_TO_CELL_REF_REGEX, (match) => {
+            const [sheetName] = match.replaceAll("'", "").split("!");
+            if (sheetName === oldSheetName) {
+              return match.replace(oldSheetName, newSheetName);
+            }
+            return match;
+          });
+          if (updatedText !== text) d.rows.setCellText(ri, ci, updatedText);
+        });
+      });
+    });
+  }
+
   loadData(data) {
+    this.reset();
     const ds = Array.isArray(data) ? data : [data];
     if (this.bottombar !== null) {
       this.bottombar.clear();
@@ -128,6 +183,11 @@ class Spreadsheet {
   change(cb) {
     this.sheet.on("change", cb);
     return this;
+  }
+
+  reset() {
+    this.sheetIndex = 1;
+    this.deleteSheet(false);
   }
 
   static locale(lang, message) {

@@ -11,12 +11,14 @@ import { Rows } from "./row";
 import { Cols } from "./col";
 import { Validations } from "./validation";
 import { CellRange } from "./cell_range";
-import { expr2xy, xy2expr } from "./alphabet";
+import { expr2expr, expr2xy, xy2expr } from "./alphabet";
 import { t } from "../locale/locale";
 import {
+  generateUniqueId,
   getStylingForClass,
   parseCssToXDataStyles,
   parseHtmlToText,
+  replaceCellRefWithNew,
 } from "../utils";
 import SheetConfig from "./sheetConfig";
 import CellConfig from "./cellConfig";
@@ -338,7 +340,7 @@ function getCellColByX(x, scrollOffsetx) {
 }
 
 export default class DataProxy {
-  constructor(name, settings) {
+  constructor(rootContext, name, settings) {
     this.settings = helper.merge(defaultSettings, settings || {});
     // save data begin
     this.name = name || "sheet";
@@ -364,6 +366,8 @@ export default class DataProxy {
     this.exceptRowSet = new Set();
     this.sortedRowMap = new Map();
     this.unsortedRowMap = new Map();
+    this.rootContext = rootContext;
+    this.sheetId = this.sheetConfig.sheetId ?? generateUniqueId();
   }
 
   addValidation(mode, ref, validator) {
@@ -970,8 +974,10 @@ export default class DataProxy {
       let si = sri;
       if (type === "row") {
         rows.insert(sri, n);
+        this.updateOtherSheetsFormulaOnInsert(type, sri, n);
       } else if (type === "column") {
         rows.insertColumn(sci, n);
+        this.updateOtherSheetsFormulaOnInsert(type, sci, n);
         si = sci;
         cols.len += n;
         Object.keys(cols._)
@@ -1003,8 +1009,10 @@ export default class DataProxy {
       let size = rsize;
       if (type === "row") {
         rows.delete(sri, eri);
+        this.updateOtherSheetsFormulaOnDelete(type, sri, eri);
       } else if (type === "column") {
         rows.deleteColumn(sci, eci);
+        this.updateOtherSheetsFormulaOnDelete(type, sci, eci);
         si = range.sci;
         size = csize;
         cols.len -= eci - sci + 1;
@@ -1405,6 +1413,7 @@ export default class DataProxy {
       validations,
       autoFilter,
       sheetConfig,
+      sheetId,
     } = this;
     return {
       name,
@@ -1416,6 +1425,92 @@ export default class DataProxy {
       validations: validations.getData(),
       autofilter: autoFilter.getData(),
       sheetConfig: sheetConfig.getData(),
+      sheetId,
     };
+  }
+
+  getRootContext() {
+    return this.rootContext;
+  }
+
+  updateOtherSheetsFormulaOnInsert(type, si, n = 1) {
+    if (type === "row") {
+      this.rootContext.datas.forEach((data) => {
+        if (data.name === this.name) return;
+        data.rows.each((ri, row) => {
+          data.rows.eachCells(ri, (ci, cell) => {
+            if (cell.text && cell.text[0] === "=") {
+              cell.text = replaceCellRefWithNew(
+                cell.text,
+                (word) => expr2expr(word, 0, n, (x, y) => y >= si),
+                {
+                  isSameSheet: false,
+                  sheetName: this.name,
+                }
+              );
+            }
+          });
+        });
+      });
+    } else {
+      this.rootContext.datas.forEach((data) => {
+        if (data.name === this.name) return;
+        data.rows.each((ri, row) => {
+          data.rows.eachCells(ri, (ci, cell) => {
+            if (cell.text && cell.text[0] === "=") {
+              cell.text = replaceCellRefWithNew(
+                cell.text,
+                (word) => expr2expr(word, n, 0, (x) => x >= si),
+                {
+                  isSameSheet: false,
+                  sheetName: this.name,
+                }
+              );
+            }
+          });
+        });
+      });
+    }
+  }
+
+  updateOtherSheetsFormulaOnDelete(type, si, ei) {
+    const n = ei - si + 1;
+    if (type === "row") {
+      this.rootContext.datas.forEach((data) => {
+        if (data.name === this.name) return;
+        data.rows.each((ri, row) => {
+          data.rows.eachCells(ri, (ci, cell) => {
+            if (cell.text && cell.text[0] === "=") {
+              cell.text = replaceCellRefWithNew(
+                cell.text,
+                (word) => expr2expr(word, 0, -n, (x, y) => y > ei),
+                {
+                  isSameSheet: false,
+                  sheetName: this.name,
+                }
+              );
+            }
+          });
+        });
+      });
+    } else {
+      this.rootContext.datas.forEach((data) => {
+        if (data.name === this.name) return;
+        data.rows.each((ri, row) => {
+          data.rows.eachCells(ri, (ci, cell) => {
+            if (cell.text && cell.text[0] === "=") {
+              cell.text = replaceCellRefWithNew(
+                cell.text,
+                (word) => expr2expr(word, -n, 0, (x) => x > ei),
+                {
+                  isSameSheet: false,
+                  sheetName: this.name,
+                }
+              );
+            }
+          });
+        });
+      });
+    }
   }
 }

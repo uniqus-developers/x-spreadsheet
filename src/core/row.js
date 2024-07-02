@@ -1,5 +1,6 @@
 import helper from "./helper";
 import { expr2expr } from "./alphabet";
+import { replaceCellRefWithNew } from "../utils";
 
 class Rows {
   constructor({ len, height }, options = {}) {
@@ -124,7 +125,6 @@ class Rows {
           retrievedText = result;
           formattedText = "";
         }
-        console.log(retrievedText, formattedText, "console");
         cell.text = retrievedText ?? "";
         cell.formattedText = formattedText ?? "";
       } else {
@@ -244,8 +244,12 @@ class Rows {
         nri += n;
         this.eachCells(ri, (ci, cell) => {
           if (cell.text && cell.text[0] === "=") {
-            cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, (word) =>
-              expr2expr(word, 0, n, (x, y) => y >= sri)
+            cell.text = replaceCellRefWithNew(
+              cell.text,
+              (word) => expr2expr(word, 0, n, (x, y) => y >= sri),
+              {
+                isSameSheet: true,
+              }
             );
           }
         });
@@ -267,8 +271,12 @@ class Rows {
         ndata[nri - n] = row;
         this.eachCells(ri, (ci, cell) => {
           if (cell.text && cell.text[0] === "=") {
-            cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, (word) =>
-              expr2expr(word, 0, -n, (x, y) => y > eri)
+            cell.text = replaceCellRefWithNew(
+              cell.text,
+              (word) => expr2expr(word, 0, -n, (x, y) => y > eri),
+              {
+                isSameSheet: true,
+              }
             );
           }
         });
@@ -286,8 +294,12 @@ class Rows {
         if (nci >= sci) {
           nci += n;
           if (cell.text && cell.text[0] === "=") {
-            cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, (word) =>
-              expr2expr(word, n, 0, (x) => x >= sci)
+            cell.text = replaceCellRefWithNew(
+              cell.text,
+              (word) => expr2expr(word, n, 0, (x) => x >= sci),
+              {
+                isSameSheet: true,
+              }
             );
           }
         }
@@ -308,8 +320,12 @@ class Rows {
         } else if (nci > eci) {
           rndata[nci - n] = cell;
           if (cell.text && cell.text[0] === "=") {
-            cell.text = cell.text.replace(/[a-zA-Z]{1,3}\d+/g, (word) =>
-              expr2expr(word, -n, 0, (x) => x > eci)
+            cell.text = replaceCellRefWithNew(
+              cell.text,
+              (word) => expr2expr(word, -n, 0, (x) => x > eci),
+              {
+                isSameSheet: true,
+              }
             );
           }
         }
