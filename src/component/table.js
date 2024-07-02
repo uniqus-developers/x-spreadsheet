@@ -5,6 +5,7 @@ import { formulam } from "../core/formula";
 import { formatm } from "../core/format";
 
 import { Draw, DrawBox, thinLineWidth, npx } from "../canvas/draw";
+import { REF_ERROR } from "../contants";
 // gobal var
 const cellPaddingWidth = 5;
 const tableFixedHeaderCleanStyle = { fillStyle: "#f4f5f8" };
@@ -88,7 +89,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
             );
             return selectedSheet
               ? selectedSheet.getCellTextOrDefault(x, y)
-              : "";
+              : REF_ERROR;
           }
         }
       );

@@ -1,3 +1,4 @@
+import { GENERAL_ERROR, REF_ERROR } from "../contants";
 import { expr2xy, xy2expr } from "./alphabet";
 import { numberCalc } from "./helper";
 import { Parser } from "hot-formula-parser";
@@ -244,6 +245,7 @@ const parserFormulaString = (string, getCellText, cellRender) => {
       /(?:'([^']*)'|\b[A-Za-z0-9]+)\![A-Za-z]+[1-9][0-9]*/g;
 
     try {
+      let isFormulaResolved = false;
       let newFormulaString = "";
       // Removing spaces other than the spaces that are in apostrophes
       newFormulaString = string.replace(spaceRemovalRegex, "");
@@ -253,9 +255,12 @@ const parserFormulaString = (string, getCellText, cellRender) => {
           const [sheetName, cellRef] = match.replaceAll("'", "").split("!");
           const [x, y] = expr2xy(cellRef);
           const text = getCellText(x, y, sheetName);
+          if (text === REF_ERROR) isFormulaResolved = true;
           return text;
         }
       );
+
+      if (isFormulaResolved) return REF_ERROR;
       newFormulaString = newFormulaString.replace(cellRangeRegex, (match) => {
         const cells = rangeToCellConversion(match);
         if (cells?.length) {
@@ -289,10 +294,11 @@ const cellRender = (src, formulaMap, getCellText, cellList = []) => {
     try {
       var parser = new Parser();
       const parsedFormula = parserFormulaString(a, getCellText, cellRender);
+      if (parsedFormula.includes(REF_ERROR)) return REF_ERROR;
       const data = parser.parse(parsedFormula);
       return data?.error ?? data?.result;
     } catch (e) {
-      return "#Error";
+      return GENERAL_ERROR;
     }
 
     //Commented This functionality of formula calculation on X-Spread sheet and doing it by our own way

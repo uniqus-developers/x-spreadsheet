@@ -83,6 +83,7 @@ class Spreadsheet {
         });
       }
     }
+    this.reRender();
   }
 
   selectSheet(index) {
@@ -97,12 +98,34 @@ class Spreadsheet {
     }
   }
 
-  renameSheet(index, value) {
-    this.datas[index].name = value;
+  renameSheet(index, newSheetName) {
+    const oldSheetName = this.datas[index].name;
+    this.updateSheetRef(oldSheetName, newSheetName);
+    this.datas[index].name = newSheetName;
     this.sheet.trigger("change");
     this.sheet.trigger("sheet-change", {
       action: "RENAME",
       sheet: this.datas[index],
+    });
+  }
+
+  updateSheetRef(oldSheetName, newSheetName) {
+    const sheetToCellRefRegex =
+      /(?:'([^']*)'|\b[A-Za-z0-9]+)\![A-Za-z]+[1-9][0-9]*/g;
+    this.datas.forEach((d) => {
+      d.rows.each((ri, row) => {
+        Object.entries(row.cells).forEach(([ci, cell]) => {
+          const text = cell?.text ?? "";
+          const updatedText = text.replace(sheetToCellRefRegex, (match) => {
+            const [sheetName] = match.replaceAll("'", "").split("!");
+            if (sheetName === oldSheetName) {
+              return match.replace(oldSheetName, newSheetName);
+            }
+            return match;
+          });
+          if (updatedText !== text) d.rows.setCellText(ri, ci, updatedText);
+        });
+      });
     });
   }
 
