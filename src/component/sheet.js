@@ -14,6 +14,7 @@ import SortFilter from "./sort_filter";
 import { xtoast } from "./message";
 import { cssPrefix } from "../config";
 import { formulas } from "../core/formula";
+import { constructFormula, getCellName } from "../algorithm/cellInjection";
 
 /**
  * @desc throttle fn
@@ -58,17 +59,41 @@ function scrollbarMove() {
   }
 }
 
+function formulaProgress() {
+  if (!this.editor.formulaCell) return;
+  const single = this.data.isSingleSelected();
+  const text = this.editor.inputText;
+  if (single) {
+    const { ri, ci } = this.data.selector;
+    const cellName = getCellName(ri, ci);
+    const updatedText = constructFormula(text, cellName, false);
+    this.editor.setText(updatedText);
+  } else {
+    const { sri, eri, sci, eci } = this.selector.range;
+    const startCell = getCellName(sri, sci);
+    const endCell = getCellName(eri, eci);
+    const range = `${startCell}:${endCell}`;
+    const updatedText = constructFormula(text, range, true);
+    this.editor.setText(updatedText);
+  }
+}
+
 function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
   if (ri === -1 && ci === -1) return;
   const { table, selector, toolbar, data, contextMenu } = this;
   const cell = data.getCell(ri, ci);
   if (multiple) {
     selector.setEnd(ri, ci, moving);
-    if (!moving) this.trigger("cells-selected", cell, selector.range);
+    if (!moving) {
+      this.trigger("cells-selected", cell, selector.range);
+      formulaProgress.call(this);
+    }
   } else {
     selector.set(ri, ci, indexesUpdated);
-    if (!moving && ri !== -1 && ci !== -1)
+    if (!moving && ri !== -1 && ci !== -1) {
       this.trigger("cell-selected", cell, ri, ci);
+      formulaProgress.call(this);
+    }
   }
   contextMenu.setMode(ri === -1 || ci === -1 ? "row-col" : "range");
   toolbar.reset();
@@ -443,6 +468,7 @@ function editorSetOffset() {
 
 function editorSet() {
   const { editor, data } = this;
+  if (editor.formulaCell) return;
   if (data.settings.mode === "read") return;
   editorSetOffset.call(this);
   editor.setCell(data.getSelectedCell(), data.getSelectedValidator());
@@ -504,15 +530,23 @@ function colResizerFinished(cRect, distance) {
 }
 
 function dataSetCellText(text, state = "finished") {
-  const { data, table } = this;
-  // const [ri, ci] = selector.indexes;
+  const { data, table, editor } = this;
   if (data.settings.mode === "read") return;
-  data.setSelectedCellText(text, state);
-  const { ri, ci } = data.selector;
-  if (state === "finished") {
-    table.render();
-  } else {
-    this.trigger("cell-edited", text, ri, ci);
+  const inputText = editor.inputText;
+  if (editor.formulaCell && state === "finished") {
+    const { ri, ci } = editor.formulaCell;
+    console.log(ri, ci);
+    data.setFormulaCellText(inputText, ri, ci, state);
+    this.trigger("cell-edited", inputText, ri, ci);
+    editor.setFormulaCell(null);
+  } else if (!editor.formulaCell) {
+    data.setSelectedCellText(text, state);
+    const { ri, ci } = data.selector;
+    if (state === "finished") {
+      table.render();
+    } else {
+      this.trigger("cell-edited", text, ri, ci);
+    }
   }
 }
 
@@ -612,7 +646,9 @@ function sheetInitEvents() {
       overlayerMousemove.call(this, evt);
     })
     .on("mousedown", (evt) => {
-      editor.clear();
+      if (!editor.formulaCell) {
+        editor.clear();
+      }
       contextMenu.hide();
       // the left mouse button: mousedown → mouseup → click
       // the right mouse button: mousedown → contenxtmenu → mouseup
@@ -681,6 +717,14 @@ function sheetInitEvents() {
   };
   // editor
   editor.change = (state, itext) => {
+    if (itext.trim()?.startsWith("=")) {
+      const { ri, ci } = this.data.selector;
+      if (!editor.formulaCell) {
+        editor.setFormulaCell({ ri, ci });
+      }
+    } else {
+      editor.setFormulaCell(null);
+    }
     dataSetCellText.call(this, itext, state);
   };
   // modal validation
