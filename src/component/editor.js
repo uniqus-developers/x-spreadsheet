@@ -182,7 +182,7 @@ export default class Editor {
           .on("keydown", (evt) => keydownEventHandler.call(this, evt))),
         (this.textlineEl = h("div", "textline")),
         this.suggest.el,
-        this.datepicker.el,
+        this.datepicker.el
       )
       .on("mousemove.stop", () => {})
       .on("mousedown.stop", () => {});
@@ -194,6 +194,7 @@ export default class Editor {
     this.cell = null;
     this.inputText = "";
     this.change = () => {};
+    this.formulaCell = null;
   }
 
   setFreezeLengths(width, height) {
@@ -279,10 +280,13 @@ export default class Editor {
       }
     }
   }
+  
+  setFormulaCell(cellRef) {
+    this.formulaCell = cellRef;
+  }
 
   setText(text) {
     this.inputText = text;
-    // console.log('text>>:', text);
     setText.call(this, text, text.length);
     resetTextareaSize.call(this);
   }
