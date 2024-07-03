@@ -80,18 +80,22 @@ function formulaProgress() {
 
 function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
   if (ri === -1 && ci === -1) return;
-  const { table, selector, toolbar, data, contextMenu } = this;
+  const { table, selector, toolbar, data, contextMenu, editor } = this;
   const cell = data.getCell(ri, ci);
   if (multiple) {
     selector.setEnd(ri, ci, moving);
     if (!moving) {
-      this.trigger("cells-selected", cell, selector.range);
+      if (!editor.formulaCell) {
+        this.trigger("cells-selected", cell, selector.range);
+      }
       formulaProgress.call(this);
     }
   } else {
     selector.set(ri, ci, indexesUpdated);
     if (!moving && ri !== -1 && ci !== -1) {
-      this.trigger("cell-selected", cell, ri, ci);
+      if (!editor.formulaCell) {
+        this.trigger("cell-selected", cell, ri, ci);
+      }
       formulaProgress.call(this);
     }
   }
