@@ -50,6 +50,7 @@ declare module "x-data-spreadsheet" {
     valueFormatter?: (metaData: FormatterMeta) => string;
     valueSetter?: (metaData: FormatterMeta) => string;
     editValueFormatter?: (metaData: FormatterMeta) => string;
+    additionalContextMenu?: AdditionalContextMenu[];
   }
 
   export type CELL_SELECTED = "cell-selected";
@@ -58,6 +59,17 @@ declare module "x-data-spreadsheet" {
   export type TOOLBAR_ACTION = "toolbar-action";
   export type CONTEXT_MENU_ACTION = "context-menu-action";
   export type SHEET_CHANGE = "sheet-change";
+
+  export interface AdditionalContextMenu {
+    key: string;
+    title: string;
+    callback?: (
+      ri: number,
+      ci: number,
+      range: CellRangeType,
+      cellMeta: CellData
+    ) => void;
+  }
 
   export interface FormatterMeta {
     value: string;

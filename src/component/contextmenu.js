@@ -49,15 +49,32 @@ function buildMenuItem(item) {
       this.itemClick(item.key);
       this.hide();
     })
-    .children(item.title(), h("div", "label").child(item.label || ""));
+    .children(
+      typeof item.title === "function" ? item.title() : item.title ?? "",
+      h("div", "label").child(item.label || "")
+    );
 }
 
 function buildMenu() {
-  return menuItems.map((it) => buildMenuItem.call(this, it));
+  const additionalContextMenu = this.additionalContextMenu;
+  const buildInMenus = menuItems.map((it) => buildMenuItem.call(this, it));
+  if (additionalContextMenu?.length) {
+    additionalContextMenu.unshift({ key: "divider" });
+  }
+  const additionalMenus = additionalContextMenu.map((it) =>
+    buildMenuItem.call(this, it)
+  );
+  return [...buildInMenus, ...(additionalMenus ?? [])];
 }
 
 export default class ContextMenu {
-  constructor(sheetContext, viewFn, isHide = false) {
+  constructor(
+    sheetContext,
+    viewFn,
+    isHide = false,
+    additionalContextMenu = []
+  ) {
+    this.additionalContextMenu = additionalContextMenu;
     this.menuItems = buildMenu.call(this);
     this.el = h("div", `${cssPrefix}-contextmenu`)
       .children(...this.menuItems)

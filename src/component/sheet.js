@@ -741,7 +741,15 @@ function sheetInitEvents() {
   };
   // contextmenu
   contextMenu.itemClick = (type) => {
-    // console.log('type:', type);
+    const additionalContextMenus = this.options.additionalContextMenu;
+    if (additionalContextMenus?.length) {
+      const match = additionalContextMenus?.find((menu) => menu.key === type);
+      if (match) {
+        const { ri, ci, range } = this.data.selector;
+        const cell = this.data.getSelectedCell();
+        match.callback?.call?.(ri, ci, range, cell);
+      }
+    }
     if (type === "validation") {
       modalValidation.setValue(this.data.getSelectedValidation());
     } else if (type === "copy") {
@@ -973,7 +981,8 @@ export default class Sheet {
     this.contextMenu = new ContextMenu(
       this,
       () => this.getRect(),
-      !showContextmenu
+      !showContextmenu,
+      options.additionalContextMenu
     );
     // selector
     this.selector = new Selector(data);
