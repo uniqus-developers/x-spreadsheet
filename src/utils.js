@@ -1,3 +1,5 @@
+import { CELL_REF_REPLACE_REGEX, SHEET_TO_CELL_REF_REGEX } from "./constants";
+
 export const getStylingForClass = (styleTag, className) => {
   const cssRules = styleTag?.sheet?.cssRules || styleTag?.sheet?.rules;
   for (let i = 0; i < cssRules?.length; i++) {
@@ -232,3 +234,32 @@ export const parseHtmlToText = (function () {
     return o;
   };
 })();
+
+export const generateUniqueId = () => {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36);
+  return timestamp + random;
+};
+
+// Function to match the pattern and replace it
+export const replaceCellRefWithNew = (str, getNewCell, opts) => {
+  const { isSameSheet, sheetName } = opts;
+  const newStr = str.replace(
+    isSameSheet ? CELL_REF_REPLACE_REGEX : SHEET_TO_CELL_REF_REGEX,
+    (word) => {
+      const parts = word.split("!");
+      if (parts.length > 1) {
+        if (parts[0].replaceAll("'", "") === sheetName || isSameSheet) {
+          const newCell = getNewCell(parts[1]);
+          return `${parts[0]}!${newCell}`;
+        } else {
+          return word;
+        }
+      } else if (isSameSheet) {
+        const newCell = getNewCell(parts[0]);
+        return newCell;
+      }
+    }
+  );
+  return newStr;
+};
