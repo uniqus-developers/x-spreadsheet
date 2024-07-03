@@ -335,7 +335,7 @@ class Draw {
     const { ctx, data } = this;
     ctx.lineWidth = thinLineWidth;
     ctx.strokeStyle =
-      data.sheetConfig.gridLine === false ? color ?? "#ffffff" : color;
+      !!data.sheetConfig?.gridLine === false ? color ?? "#ffffff" : color;
     // console.log('style:', style);
     if (style === "medium") {
       ctx.lineWidth = npx(2) - 0.5;

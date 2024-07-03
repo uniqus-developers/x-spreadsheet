@@ -7,6 +7,7 @@ import { cssPrefix } from "./config";
 import { locale } from "./locale/locale";
 import "./index.less";
 import { SHEET_TO_CELL_REF_REGEX } from "./constants";
+import { readExcelFile, stox } from "./utils";
 
 class Spreadsheet {
   constructor(selectors, options = {}) {
@@ -192,6 +193,15 @@ class Spreadsheet {
 
   static locale(lang, message) {
     locale(lang, message);
+  }
+
+  async importWorkbook(file, sheets = []) {
+    const workbook = await readExcelFile(file);
+    const parsedWorkbook = stox(workbook);
+    parsedWorkbook?.forEach((wsheet) => {
+      const d = this.addSheet(wsheet.name, false);
+      d.setData(wsheet);
+    });
   }
 }
 
