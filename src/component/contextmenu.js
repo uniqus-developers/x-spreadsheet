@@ -35,11 +35,16 @@ const menuItems = [
   { key: "cell-non-editable", title: tf("contextmenu.cellnoneditable") },
 ];
 
+function buildSubMenuItems(items) {
+  const subMenus = items.map((it) => buildMenuItem.call(this, it));
+  return subMenus;
+}
+
 function buildMenuItem(item) {
   if (item.key === "divider") {
     return h("div", `${cssPrefix}-item divider`);
   }
-  return h("div", `${cssPrefix}-item`)
+  const ele = h("div", `${cssPrefix}-item`)
     .on("click", () => {
       const range = this.sheet.selector.range;
       this.sheet?.trigger?.("context-menu-action", {
@@ -53,6 +58,45 @@ function buildMenuItem(item) {
       typeof item.title === "function" ? item.title() : item.title ?? "",
       h("div", "label").child(item.label || "")
     );
+
+  if (item.subMenus) {
+    const arrowIcon = h("div", `${cssPrefix}-icon label `).child(
+      h("div", `${cssPrefix}-icon-img arrow-right`)
+    );
+    ele.child(arrowIcon);
+    const subMenus = buildSubMenuItems.call(this, item.subMenus);
+    const subMenuEl = h("div", `${cssPrefix}-context-sub-menu`)
+      .children(...subMenus)
+      .hide();
+    ele
+      .child(subMenuEl)
+      .on("mouseover", () => {
+        const rect = ele.box();
+        const subMenuElBox = subMenuEl.box();
+        const view = this.viewFn();
+        const totalWidth = subMenuElBox.width + rect.x + rect.width;
+        let left = rect.left;
+        let top = rect.top;
+        if (totalWidth + rect.width > view.width) {
+          left = left - 200;
+        } else {
+          left = left + 200;
+        }
+        const subMenuHeight = item.subMenus.length * 50;
+        const totalHeight = subMenuHeight + rect.y + rect.height;
+        if (totalHeight + subMenuHeight > view.height) {
+          top = rect.top - subMenuHeight / 2;
+        }
+        subMenuEl.css("left", `${left}px`);
+        subMenuEl.css("top", `${top}px`);
+        subMenuEl.show();
+      })
+      .on("mouseout", () => {
+        subMenuEl.hide();
+      });
+  }
+
+  return ele;
 }
 
 function buildMenu() {

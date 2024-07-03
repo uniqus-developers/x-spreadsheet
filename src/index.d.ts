@@ -69,6 +69,7 @@ declare module "x-data-spreadsheet" {
       range: CellRangeType,
       cellMeta: CellData
     ) => void;
+    subMenus: AdditionalContextMenu[];
   }
 
   export interface FormatterMeta {
