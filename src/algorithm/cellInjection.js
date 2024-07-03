@@ -1,7 +1,7 @@
 const constructFormula = (string, cell, isRange, append) => {
   const lastChar = string?.slice(-1);
   if (lastChar) {
-    const operationArray = ["+", "-", "*", "/", "=", ",", "("];
+    const operationArray = ["+", "-", "*", "/", "=", ",", "(","!"];
     let maxIndex = -1;
     let indexObj = {};
     operationArray.forEach((operator) => {
