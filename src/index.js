@@ -195,13 +195,20 @@ class Spreadsheet {
     locale(lang, message);
   }
 
-  async importWorkbook(file, sheets = []) {
-    const workbook = await readExcelFile(file);
-    const parsedWorkbook = stox(workbook);
-    parsedWorkbook?.forEach((wsheet) => {
-      const d = this.addSheet(wsheet.name, false);
-      d.setData(wsheet);
-    });
+  async importWorkbook(data) {
+    const { file, selectedSheets } = data;
+    if (file && selectedSheets?.length) {
+      const parsedWorkbook = stox(file);
+      parsedWorkbook?.forEach((wsheet) => {
+        if (wsheet) {
+          const { name } = wsheet;
+          if (name && selectedSheets.includes(name)) {
+            const d = this.addSheet(name, false);
+            d.setData(wsheet);
+          }
+        }
+      });
+    }
   }
 }
 
