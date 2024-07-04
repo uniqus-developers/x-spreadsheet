@@ -112,12 +112,7 @@ function buildMenu() {
 }
 
 export default class ContextMenu {
-  constructor(
-    sheetContext,
-    viewFn,
-    isHide = false,
-    extendedContextMenu = []
-  ) {
+  constructor(sheetContext, viewFn, isHide = false, extendedContextMenu = []) {
     this.extendedContextMenu = extendedContextMenu;
     this.menuItems = buildMenu.call(this);
     this.el = h("div", `${cssPrefix}-contextmenu`)

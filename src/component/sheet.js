@@ -743,7 +743,14 @@ function sheetInitEvents() {
   contextMenu.itemClick = (type) => {
     const extendedContextMenus = this.options.extendedContextMenu;
     if (extendedContextMenus?.length) {
-      const match = extendedContextMenus?.find((menu) => menu.key === type);
+      const flattenedMenu = extendedContextMenus.reduce((acc, item) => {
+        acc.push({ key: item.key, title: item.title, callback: item.callback });
+        if (item.subMenus) {
+          acc = acc.concat(item.subMenus);
+        }
+        return acc;
+      }, []);
+      const match = flattenedMenu?.find((menu) => menu.key === type);
       if (match) {
         const { ri, ci, range } = this.data.selector;
         const cell = this.data.getSelectedCell();
