@@ -100,12 +100,12 @@ function buildMenuItem(item) {
 }
 
 function buildMenu() {
-  const additionalContextMenu = this.additionalContextMenu;
+  const extendedContextMenu = this.extendedContextMenu;
   const buildInMenus = menuItems.map((it) => buildMenuItem.call(this, it));
-  if (additionalContextMenu?.length) {
-    additionalContextMenu.unshift({ key: "divider" });
+  if (extendedContextMenu?.length) {
+    extendedContextMenu.unshift({ key: "divider" });
   }
-  const additionalMenus = additionalContextMenu.map((it) =>
+  const additionalMenus = extendedContextMenu.map((it) =>
     buildMenuItem.call(this, it)
   );
   return [...buildInMenus, ...(additionalMenus ?? [])];
@@ -116,9 +116,9 @@ export default class ContextMenu {
     sheetContext,
     viewFn,
     isHide = false,
-    additionalContextMenu = []
+    extendedContextMenu = []
   ) {
-    this.additionalContextMenu = additionalContextMenu;
+    this.extendedContextMenu = extendedContextMenu;
     this.menuItems = buildMenu.call(this);
     this.el = h("div", `${cssPrefix}-contextmenu`)
       .children(...this.menuItems)

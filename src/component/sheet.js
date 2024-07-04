@@ -741,9 +741,9 @@ function sheetInitEvents() {
   };
   // contextmenu
   contextMenu.itemClick = (type) => {
-    const additionalContextMenus = this.options.additionalContextMenu;
-    if (additionalContextMenus?.length) {
-      const match = additionalContextMenus?.find((menu) => menu.key === type);
+    const extendedContextMenus = this.options.extendedContextMenu;
+    if (extendedContextMenus?.length) {
+      const match = extendedContextMenus?.find((menu) => menu.key === type);
       if (match) {
         const { ri, ci, range } = this.data.selector;
         const cell = this.data.getSelectedCell();
@@ -982,7 +982,7 @@ export default class Sheet {
       this,
       () => this.getRect(),
       !showContextmenu,
-      options.additionalContextMenu
+      options.extendedContextMenu
     );
     // selector
     this.selector = new Selector(data);
