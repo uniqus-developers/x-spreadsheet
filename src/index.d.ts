@@ -58,6 +58,7 @@ declare module "x-data-spreadsheet" {
   export type TOOLBAR_ACTION = "toolbar-action";
   export type CONTEXT_MENU_ACTION = "context-menu-action";
   export type SHEET_CHANGE = "sheet-change";
+  export type PASTED_CLIPBOARD = "pasted-clipboard";
 
   export interface FormatterMeta {
     value: string;
@@ -74,6 +75,11 @@ declare module "x-data-spreadsheet" {
   export interface SheetChangeType {
     action: string;
     sheet: any;
+  }
+
+  export interface ToolbarOrContextActionType {
+    action: any[];
+    range: CellRangeType;
   }
 
   export type CellMerge = [number, number];
@@ -96,13 +102,14 @@ declare module "x-data-spreadsheet" {
     ): void;
     (
       evnt: TOOLBAR_ACTION,
-      callback: (action: any[], range: CellRangeType) => void
+      callback: (data: ToolbarOrContextActionType) => void
     ): void;
     (
       evnt: CONTEXT_MENU_ACTION,
-      callback: (action: any[], range: CellRangeType) => void
+      callback: (data: ToolbarOrContextActionType) => void
     ): void;
     (evnt: SHEET_CHANGE, callback: (data: SheetChangeType) => void): void;
+    (evnt: PASTED_CLIPBOARD, callback: (data: any) => void): void;
   }
 
   export interface CellRangeType {
