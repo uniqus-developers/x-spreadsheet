@@ -351,9 +351,14 @@ const parseExcelStyleToHTML = (styling, theme) => {
           switch (property) {
             case "bgColor":
             case "fgColor":
-              if (value?.rgb) parsedStyles["background-color"] = value.rgb;
-              else if (value?.argb) {
-                parsedStyles["background-color"] = value.argb;
+              if (value?.rgb) {
+                parsedStyles["background-color"] = value.rgb.startsWith("#")
+                  ? value.rgb
+                  : `#${value.rgb}`;
+              } else if (value?.argb) {
+                parsedStyles["background-color"] = value.argb.startsWith("#")
+                  ? `#${value.argb.slice(3)}`
+                  : `#${value.argb.slice(2)}`;
               } else if (value?.theme && Object.hasOwn(theme, value.theme))
                 parsedStyles["background-color"] =
                   `#${theme[value.theme].rgb}` ?? "#ffffff";
@@ -369,9 +374,15 @@ const parseExcelStyleToHTML = (styling, theme) => {
               parsedStyles["font-weight"] = value ? "bold" : "normal";
               break;
             case "color":
-              if (value?.rgb) parsedStyles["color"] = value.rgb;
-              else if (value?.argb) parsedStyles["color"] = value.argb;
-              else if (value?.theme && Object.hasOwn(theme, value.theme)) {
+              if (value?.rgb) {
+                parsedStyles["color"] = value.rgb.startsWith("#")
+                  ? value.rgb
+                  : `#${value.rgb}`;
+              } else if (value?.argb) {
+                parsedStyles["color"] = value.argb.startsWith("#")
+                  ? `#${value.argb.slice(3)}`
+                  : `#${value.argb.slice(2)}`;
+              } else if (value?.theme && Object.hasOwn(theme, value.theme)) {
                 parsedStyles["color"] =
                   `#${theme[value.theme].rgb}` ?? "#000000";
               }
