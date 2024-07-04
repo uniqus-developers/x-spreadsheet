@@ -555,6 +555,26 @@ const rgbaToRgb = (hexColor) => {
   return newHexColor.toUpperCase(); // Convert to uppercase as per original Python function
 };
 
+const getNewSheetName = (name, existingNames) => {
+  let numericPart = name.match(/\d+$/);
+  let baseName = name.replace(/\d+$/, "");
+
+  if (!numericPart) {
+    numericPart = "1";
+  } else {
+    numericPart = String(parseInt(numericPart[0], 10) + 1);
+  }
+
+  let newName = baseName + numericPart;
+
+  while (existingNames.includes(newName)) {
+    numericPart = String(parseInt(numericPart, 10) + 1);
+    newName = baseName + numericPart;
+  }
+
+  return newName;
+};
+
 export {
   getStylingForClass,
   parseCssToXDataStyles,
@@ -564,4 +584,5 @@ export {
   readExcelFile,
   stox,
   rgbaToRgb,
+  getNewSheetName,
 };

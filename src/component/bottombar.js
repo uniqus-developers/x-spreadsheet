@@ -163,11 +163,11 @@ export default class Bottombar {
     this.moreEl.reset(this.dataNames);
   }
 
-  renameItem(index, value) {
+  renameItem(index, value, skipSheetsTill = null) {
     this.dataNames.splice(index, 1, value);
     this.moreEl.reset(this.dataNames);
     this.items[index].html("").child(value);
-    this.updateFunc(index, value);
+    this.updateFunc(index, value, skipSheetsTill);
   }
 
   clear() {

@@ -65,7 +65,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
   const cellMeta = data.getCellMetaOrDefault(nrindex, cindex);
   const dbox = getDrawBox(data, rindex, cindex, yoffset);
   dbox.bgcolor = style.bgcolor;
-  
+
   draw.rect(dbox, () => {
     // render text
     let cellText = "";
@@ -74,13 +74,13 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         cell.text || "",
         formulam,
         (y, x, sheetName = data.name) => {
-          if (!sheetName || sheetName === data.name)
+          if (!sheetName || sheetName.toLowerCase() === data.name.toLowerCase())
             return data.getCellTextOrDefault(x, y);
           else {
             const rootContext = data.getRootContext();
             const sheets = rootContext.datas;
             const selectedSheet = sheets?.find(
-              (sheet) => sheet.name === sheetName
+              (sheet) => sheet.name.toLowerCase() === sheetName.toLowerCase()
             );
             return selectedSheet
               ? selectedSheet.getCellTextOrDefault(x, y)
@@ -127,7 +127,6 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
     dbox.setBorders(style.border);
     draw.strokeBorders(dbox);
   }
-
 }
 
 function renderAutofilter(viewRange) {

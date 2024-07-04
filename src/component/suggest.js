@@ -141,11 +141,14 @@ export default class Suggest {
           this.itemClick(it);
         });
 
+        inputLabel.on("click", (event) => {
+          event.stopPropagation();
+        });
+
         const item = h("div", `${cssPrefix}-item`)
           .children(checkBoxInput, inputLabel)
           .on("click.stop", () => {
             inputLabel.el.click();
-            this.itemClick(it);
           });
         return item;
       } else {
