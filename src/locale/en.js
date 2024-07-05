@@ -23,7 +23,8 @@ export default {
     autofilter: "Filter",
     formula: "Functions",
     more: "More",
-    grid:"Grid",
+    grid: "Grid",
+    import: "Import",
   },
   contextmenu: {
     copy: "Copy",
@@ -112,6 +113,7 @@ export default {
     remove: "Remove",
     save: "Save",
     ok: "OK",
+    import: "Import",
   },
   sort: {
     desc: "Sort Z -> A",

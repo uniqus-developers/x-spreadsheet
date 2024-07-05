@@ -11,6 +11,33 @@ const CELL_REF_REPLACE_REGEX = /(?:\b[A-Za-z0-9_]+\b!)?[A-Za-z]+\d+\b/g;
 
 const PX_TO_PT = 0.75;
 
+const AVAILABLE_FEATURES = [
+  "import",
+  "undo",
+  "redo",
+  "print",
+  "paintFormat",
+  "clearFormat",
+  "format",
+  "font",
+  "fontSize",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "textColor",
+  "fillColor",
+  "border",
+  "merge",
+  "grid",
+  "align",
+  "vAlign",
+  "textWrap",
+  "freeze",
+  "autoFilter",
+  "formula",
+];
+
 export {
   REF_ERROR,
   GENERAL_ERROR,
@@ -20,4 +47,5 @@ export {
   SHEET_TO_CELL_REF_REGEX,
   CELL_REF_REPLACE_REGEX,
   PX_TO_PT,
+  AVAILABLE_FEATURES,
 };

@@ -6,13 +6,17 @@ import Bottombar from "./component/bottombar";
 import { cssPrefix } from "./config";
 import { locale } from "./locale/locale";
 import "./index.less";
-import { SHEET_TO_CELL_REF_REGEX } from "./constants";
+import { AVAILABLE_FEATURES, SHEET_TO_CELL_REF_REGEX } from "./constants";
 import { getNewSheetName, stox } from "./utils";
 
 class Spreadsheet {
   constructor(selectors, options = {}) {
     let targetEl = selectors;
-    this.options = { showBottomBar: true, ...options };
+    this.options = {
+      showBottomBar: true,
+      allowMultipleSheets: true,
+      ...options,
+    };
     this.sheetIndex = 1;
     this.datas = [];
     if (typeof selectors === "string") {
@@ -20,6 +24,7 @@ class Spreadsheet {
     }
     this.bottombar = this.options.showBottomBar
       ? new Bottombar(
+          this.options.allowMultipleSheets,
           () => {
             if (this.options.mode === "read") return;
             const d = this.addSheet();
@@ -242,4 +247,4 @@ if (window) {
 }
 
 export default Spreadsheet;
-export { spreadsheet };
+export { spreadsheet, AVAILABLE_FEATURES };
