@@ -9,6 +9,8 @@ const SHEET_TO_CELL_REF_REGEX =
   /(?:'([^']*)'|\b[A-Za-z0-9]+)\![A-Za-z]+[1-9][0-9]*/g;
 const CELL_REF_REPLACE_REGEX = /(?:\b[A-Za-z0-9_]+\b!)?[A-Za-z]+\d+\b/g;
 
+const PX_TO_PT = 0.75;
+
 export {
   REF_ERROR,
   GENERAL_ERROR,
@@ -17,4 +19,5 @@ export {
   SPACE_REMOVAL_REGEX,
   SHEET_TO_CELL_REF_REGEX,
   CELL_REF_REPLACE_REGEX,
+  PX_TO_PT,
 };

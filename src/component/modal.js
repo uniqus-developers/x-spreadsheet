@@ -13,9 +13,9 @@ export default class Modal {
       .children(
         h("div", `${cssPrefix}-modal-header`).children(
           new Icon("close").on("click.stop", () => this.hide()),
-          this.title,
+          this.title
         ),
-        h("div", `${cssPrefix}-modal-content`).children(...content),
+        h("div", `${cssPrefix}-modal-content`).children(...content)
       )
       .hide();
   }
@@ -23,6 +23,7 @@ export default class Modal {
   show() {
     // dimmer
     this.dimmer = h("div", `${cssPrefix}-dimmer active`);
+    if (this.el?.el) document.body.appendChild(this.el.el);
     document.body.appendChild(this.dimmer.el);
     const { width, height } = this.el.show().box();
     const { clientHeight, clientWidth } = document.documentElement;

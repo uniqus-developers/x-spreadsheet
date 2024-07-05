@@ -30,6 +30,7 @@ import { h } from "../element";
 import { cssPrefix } from "../../config";
 import { bind } from "../event";
 import CellConfigButtons from "./cellConfigButtons";
+import Import from "./import";
 
 function buildDivider() {
   return h("div", `${cssPrefix}-toolbar-divider`);
@@ -123,6 +124,8 @@ export default class Toolbar {
     this.sheet = sheetContext;
     const style = data.defaultStyle();
     this.items = [
+      [new Import()],
+      buildDivider(),
       [
         (this.undoEl = new Undo()),
         (this.redoEl = new Redo()),

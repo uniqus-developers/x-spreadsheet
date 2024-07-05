@@ -6,13 +6,13 @@ body {
   line-height: normal;
   user-select: none;
   -moz-user-select: none;
-  font-family: 'Lato', 'Source Sans Pro', Roboto, Helvetica, Arial, sans-serif;
+  font-family: "Lato", "Source Sans Pro", Roboto, Helvetica, Arial, sans-serif;
   box-sizing: content-box;
   background: #fff;
   -webkit-font-smoothing: antialiased;
 }
 .x-spreadsheet textarea {
-  font: 400 13px Arial, 'Lato', 'Source Sans Pro', Roboto, Helvetica, sans-serif;
+  font: 400 13px Arial, "Lato", "Source Sans Pro", Roboto, Helvetica, sans-serif;
 }
 .x-spreadsheet-sheet {
   position: relative;
@@ -235,7 +235,7 @@ body {
 .x-spreadsheet-selector .hide-input input {
   padding: 0;
   width: 0;
-  border: none!important;
+  border: none !important;
 }
 .x-spreadsheet-selector .x-spreadsheet-selector-area {
   position: absolute;
@@ -286,7 +286,7 @@ body {
   resize: none;
   text-align: start;
   overflow-y: hidden;
-  font: 400 13px Arial, 'Lato', 'Source Sans Pro', Roboto, Helvetica, sans-serif;
+  font: 400 13px Arial, "Lato", "Source Sans Pro", Roboto, Helvetica, sans-serif;
   color: inherit;
   white-space: normal;
   word-wrap: break-word;
@@ -336,12 +336,12 @@ body {
 }
 .x-spreadsheet-item.state,
 .x-spreadsheet-header.state {
-  padding-left: 35px!important;
+  padding-left: 35px !important;
   position: relative;
 }
 .x-spreadsheet-item.state:before,
 .x-spreadsheet-header.state:before {
-  content: '';
+  content: "";
   position: absolute;
   width: 10px;
   height: 10px;
@@ -368,7 +368,7 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  opacity: 0!important;
+  opacity: 0 !important;
   outline: 0;
   z-index: -1;
 }
@@ -611,7 +611,7 @@ body {
 .x-spreadsheet-calendar .calendar-body td > .cell.active,
 .x-spreadsheet-calendar .calendar-body td > .cell.active:hover {
   background: #ecf6fd;
-  color: #2185D0;
+  color: #2185d0;
 }
 .x-spreadsheet-calendar .calendar-body td > .cell.disabled {
   pointer-events: none;
@@ -644,7 +644,7 @@ body {
   font-weight: 700;
   padding: 0.75em 1em;
   color: rgba(0, 0, 0, 0.6);
-  background: #E0E1E2;
+  background: #e0e1e2;
   text-decoration: none;
   font-family: "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
   outline: none;
@@ -655,12 +655,12 @@ body {
 }
 .x-spreadsheet-button.active,
 .x-spreadsheet-button:hover {
-  background-color: #C0C1C2;
+  background-color: #c0c1c2;
   color: rgba(0, 0, 0, 0.8);
 }
 .x-spreadsheet-button.primary {
   color: #fff;
-  background-color: #2185D0;
+  background-color: #2185d0;
 }
 .x-spreadsheet-button.primary:hover,
 .x-spreadsheet-button.primary.active {
@@ -794,7 +794,7 @@ form fieldset select {
   line-height: 1.25em;
   min-width: 360px;
   color: rgba(0, 0, 0, 0.87);
-  font-family: 'Lato', 'Source Sans Pro', Roboto, Helvetica, Arial, sans-serif;
+  font-family: "Lato", "Source Sans Pro", Roboto, Helvetica, Arial, sans-serif;
   border-radius: 4px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   background-color: #fff;
@@ -825,7 +825,7 @@ form fieldset select {
   background: rgba(0, 0, 0, 0.08);
 }
 .x-spreadsheet-toast-header {
-  color: #F2711C;
+  color: #f2711c;
 }
 .x-spreadsheet-modal-header {
   border-bottom: 1px solid #e0e2e4;
@@ -859,7 +859,7 @@ form fieldset select {
   line-height: 0;
 }
 .x-spreadsheet-icon .x-spreadsheet-icon-img {
-  background-image: url(58eaeb4e52248a5c75936c6f4c33a370.svg);
+  background-image: url(d6ae8c4e5d2a92c50bf10583aad2d141.svg);
   position: absolute;
   width: 262px;
   height: 444px;
@@ -1048,6 +1048,10 @@ form fieldset select {
 .x-spreadsheet-icon .x-spreadsheet-icon-img.grid {
   left: -162px;
   top: -36px;
+}
+.x-spreadsheet-icon .x-spreadsheet-icon-img.import {
+  left: -18px;
+  top: -18px;
 }
 
 

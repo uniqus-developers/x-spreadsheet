@@ -68,12 +68,20 @@ function inputKeydownHandler(evt) {
 }
 
 export default class Suggest {
-  constructor(items, itemClick, width = "200px") {
+  constructor(
+    items,
+    itemClick,
+    isMultiSelect = false,
+    selectedItems,
+    width = "200px"
+  ) {
     this.filterItems = [];
     this.items = items;
     this.el = h("div", `${cssPrefix}-suggest`).css("width", width).hide();
     this.itemClick = itemClick;
     this.itemIndex = -1;
+    this.isMultiSelect = isMultiSelect;
+    this.selectedItems = selectedItems;
   }
 
   setOffset(v) {
@@ -93,11 +101,15 @@ export default class Suggest {
     // this.search('');
   }
 
+  setSelectedItems(items) {
+    this.selectedItems = items;
+  }
+
   search(word) {
     let { items } = this;
     if (!/^\s*$/.test(word)) {
       items = items.filter((it) =>
-        (it.key || it).startsWith(word.toUpperCase()),
+        (it.key || it).startsWith(word.toUpperCase())
       );
     }
     items = items.map((it) => {
@@ -109,16 +121,48 @@ export default class Suggest {
       } else {
         title = it;
       }
-      const item = h("div", `${cssPrefix}-item`)
-        .child(title)
-        .on("click.stop", () => {
+      if (this.isMultiSelect) {
+        const checkBoxInput = h("input", `${cssPrefix}-item-checkbox`);
+        checkBoxInput
+          .attr("type", "checkbox")
+          .attr("id", it.key)
+          .attr("name", it.key)
+          .attr("value", it.key);
+
+        if (this.selectedItems?.includes?.(it.key))
+          checkBoxInput.attr("checked", true);
+
+        const inputLabel = h("label", `${cssPrefix}-item-label`);
+        inputLabel.attr("for", it.key);
+        inputLabel.child(title);
+
+        checkBoxInput.on("click", (event) => {
+          event.stopPropagation();
           this.itemClick(it);
-          this.hide();
         });
-      if (it.label) {
-        item.child(h("div", "label").html(it.label));
+
+        inputLabel.on("click", (event) => {
+          event.stopPropagation();
+        });
+
+        const item = h("div", `${cssPrefix}-item`)
+          .children(checkBoxInput, inputLabel)
+          .on("click.stop", () => {
+            inputLabel.el.click();
+          });
+        return item;
+      } else {
+        const item = h("div", `${cssPrefix}-item`)
+          .child(title)
+          .on("click.stop", () => {
+            this.itemClick(it);
+            this.hide();
+          });
+        if (it.label) {
+          item.child(h("div", "label").html(it.label));
+        }
+        return item;
       }
-      return item;
     });
     this.filterItems = items;
     if (items.length <= 0) {

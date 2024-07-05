@@ -73,13 +73,13 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         cell.text || "",
         formulam,
         (y, x, sheetName = data.name) => {
-          if (!sheetName || sheetName === data.name)
+          if (!sheetName || sheetName.toLowerCase() === data.name.toLowerCase())
             return data.getCellTextOrDefault(x, y);
           else {
             const rootContext = data.getRootContext();
             const sheets = rootContext.datas;
             const selectedSheet = sheets?.find(
-              (sheet) => sheet.name === sheetName
+              (sheet) => sheet.name.toLowerCase() === sheetName.toLowerCase()
             );
             return selectedSheet
               ? selectedSheet.getCellTextOrDefault(x, y)

@@ -7,6 +7,7 @@ import { cssPrefix } from "./config";
 import { locale } from "./locale/locale";
 import "./index.less";
 import { SHEET_TO_CELL_REF_REGEX } from "./constants";
+import { getNewSheetName, stox } from "./utils";
 
 class Spreadsheet {
   constructor(selectors, options = {}) {
@@ -99,19 +100,22 @@ class Spreadsheet {
     }
   }
 
-  renameSheet(index, newSheetName) {
+  renameSheet(index, newSheetName, skipSheetsTill = null) {
     const oldSheetName = this.datas[index].name;
-    this.updateSheetRef(oldSheetName, newSheetName);
+    this.updateSheetRef(oldSheetName, newSheetName, skipSheetsTill);
     this.datas[index].name = newSheetName;
-    this.sheet.trigger("change");
-    this.sheet.trigger("sheet-change", {
-      action: "RENAME",
-      sheet: this.datas[index],
-    });
+    if (skipSheetsTill === null) {
+      this.sheet.trigger("change");
+      this.sheet.trigger("sheet-change", {
+        action: "RENAME",
+        sheet: this.datas[index],
+      });
+    }
   }
 
-  updateSheetRef(oldSheetName, newSheetName) {
-    this.datas.forEach((d) => {
+  updateSheetRef(oldSheetName, newSheetName, skipSheetsTill = null) {
+    this.datas.forEach((d, index) => {
+      if (skipSheetsTill && index <= skipSheetsTill) return;
       d.rows.each((ri, row) => {
         Object.entries(row.cells).forEach(([ci, cell]) => {
           const text = cell?.text ?? "";
@@ -192,6 +196,41 @@ class Spreadsheet {
 
   static locale(lang, message) {
     locale(lang, message);
+  }
+
+  async importWorkbook(data) {
+    const existingSheetsName = Array.from(this.bottombar?.dataNames ?? []);
+    const existingSheetsCount = existingSheetsName.length;
+    const { file, selectedSheets } = data;
+    if (file && selectedSheets?.length) {
+      const parsedWorkbook = stox(file);
+      parsedWorkbook?.forEach((wsheet) => {
+        if (wsheet) {
+          const { name } = wsheet;
+          if (name && selectedSheets.includes(name)) {
+            const d = this.addSheet(name, false);
+            d.setData(wsheet);
+          }
+        }
+      });
+    }
+    const sheetNames = this.bottombar?.dataNames ?? [];
+    const sheetsCount = sheetNames.length ?? 0;
+
+    for (let i = existingSheetsCount; i < sheetsCount; i++) {
+      const addedSheetName = sheetNames[i];
+      const isUnique = existingSheetsName.every(
+        (sheetName) => sheetName.toLowerCase() !== addedSheetName.toLowerCase()
+      );
+      if (!isUnique) {
+        const newSheetName = getNewSheetName(
+          addedSheetName,
+          existingSheetsName
+        );
+        existingSheetsName.push(newSheetName);
+        this.bottombar.renameItem(i, newSheetName, existingSheetsCount);
+      }
+    }
   }
 }
 
