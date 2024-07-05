@@ -1,5 +1,6 @@
 declare module "x-data-spreadsheet" {
   export interface ExtendToolbarOption {
+    id?: string;
     tip?: string;
     el?: HTMLElement;
     icon?: string;
@@ -51,6 +52,8 @@ declare module "x-data-spreadsheet" {
     valueSetter?: (metaData: FormatterMeta) => string;
     editValueFormatter?: (metaData: FormatterMeta) => string;
     extendedContextMenu?: ExtendedContextMenu[];
+    allowMultipleSheets?: boolean;
+    disableFeatures?: string[];
   }
 
   export type CELL_SELECTED = "cell-selected";
@@ -79,6 +82,7 @@ declare module "x-data-spreadsheet" {
   }
 
   export interface CellConfigButton {
+    id?: string;
     tag: string;
     tip?: string;
     icon?: string;
