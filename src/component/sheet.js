@@ -743,7 +743,22 @@ function sheetInitEvents() {
   };
   // contextmenu
   contextMenu.itemClick = (type) => {
-    // console.log('type:', type);
+    const extendedContextMenus = this.options.extendedContextMenu;
+    if (extendedContextMenus?.length) {
+      const flattenedMenu = extendedContextMenus.reduce((acc, item) => {
+        acc.push({ key: item.key, title: item.title, callback: item.callback });
+        if (item.subMenus) {
+          acc = acc.concat(item.subMenus);
+        }
+        return acc;
+      }, []);
+      const match = flattenedMenu?.find((menu) => menu.key === type);
+      if (match) {
+        const { ri, ci, range } = this.data.selector;
+        const cell = this.data.getSelectedCell();
+        match.callback?.call?.(this, ri, ci, range, cell);
+      }
+    }
     if (type === "validation") {
       modalValidation.setValue(this.data.getSelectedValidation());
     } else if (type === "copy") {
@@ -975,7 +990,8 @@ export default class Sheet {
     this.contextMenu = new ContextMenu(
       this,
       () => this.getRect(),
-      !showContextmenu
+      !showContextmenu,
+      options.extendedContextMenu
     );
     // selector
     this.selector = new Selector(data);

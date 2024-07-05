@@ -522,6 +522,7 @@ body {
   }
 }
 
+.@{css-prefix}-context-sub-menu,
 .@{css-prefix}-suggest,
 .@{css-prefix}-contextmenu,
 .@{css-prefix}-sort-filter {
@@ -532,6 +533,14 @@ body {
   width: 260px;
   pointer-events: auto;
   overflow: auto;
+}
+
+.@{css-prefix}-contextmenu{
+  overflow-x: hidden;
+}
+
+.@{css-prefix}-context-sub-menu{
+  position: fixed;
 }
 
 .@{css-prefix}-suggest {
@@ -1059,6 +1068,10 @@ form fieldset {
   .@{css-prefix}-toolbar {
     display: none;
   }
+}
+
+.icon-right-position{
+  margin-left: 50px;
 }
 
 .@{css-prefix}-icon {

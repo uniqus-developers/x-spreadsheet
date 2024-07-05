@@ -372,6 +372,7 @@ body {
   outline: 0;
   z-index: -1;
 }
+.x-spreadsheet-context-sub-menu,
 .x-spreadsheet-suggest,
 .x-spreadsheet-contextmenu,
 .x-spreadsheet-sort-filter {
@@ -382,6 +383,12 @@ body {
   width: 260px;
   pointer-events: auto;
   overflow: auto;
+}
+.x-spreadsheet-contextmenu {
+  overflow-x: hidden;
+}
+.x-spreadsheet-context-sub-menu {
+  position: fixed;
 }
 .x-spreadsheet-suggest {
   width: 200px;
@@ -835,6 +842,9 @@ form fieldset select {
   .x-spreadsheet-toolbar {
     display: none;
   }
+}
+.icon-right-position {
+  margin-left: 50px;
 }
 .x-spreadsheet-icon {
   width: 18px;
