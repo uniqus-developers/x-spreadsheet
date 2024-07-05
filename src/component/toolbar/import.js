@@ -52,7 +52,7 @@ export default class Import extends IconItem {
         this.file = null;
         modal.hide();
       }),
-      new Button("save", "primary").on("click", () => {
+      new Button("import", "primary").on("click", () => {
         const selectedSheets = SelectFormField.input.selectedItems ?? [];
         if (!this.file || selectedSheets.length < 1) {
           modal.hide();
