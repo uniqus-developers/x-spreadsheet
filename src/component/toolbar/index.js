@@ -217,7 +217,7 @@ export default class Toolbar {
       },
     ]);
 
-    const { disableFeatures } = this.data?.settings ?? {
+    const { disableFeatures = [] } = this.data?.settings ?? {
       disableFeatures: [],
     };
 
