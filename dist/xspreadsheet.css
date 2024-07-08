@@ -417,6 +417,7 @@ body {
 }
 .x-spreadsheet-toolbar,
 .x-spreadsheet-bottombar {
+  box-sizing: border-box;
   height: 40px;
   padding: 0 30px;
   text-align: left;
