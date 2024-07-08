@@ -17,6 +17,11 @@ class Spreadsheet {
       allowMultipleSheets: true,
       ...options,
     };
+    if (this.options?.mode === "read") {
+      this.options.showToolbar = false;
+      this.options.allowMultipleSheets = false;
+      this.options.showContextmenu = false;
+    }
     this.sheetIndex = 1;
     this.datas = [];
     if (typeof selectors === "string") {

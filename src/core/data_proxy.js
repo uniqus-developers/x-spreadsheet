@@ -536,8 +536,8 @@ export default class DataProxy {
                   }
                   const cellClassName = td?.getAttribute("class");
                   const cellStyleString = `${td?.getAttribute("style") ?? ""};${getStylingForClass(htmlStyles, cellClassName)}`;
-                  const cellStyle = parseCssToXDataStyles(cellStyleString);
-
+                  const cellStyle =
+                    parseCssToXDataStyles(cellStyleString)?.parsedStyles ?? {};
                   const { width, height } = cellStyle?.dimensions ?? {};
                   delete cellStyle.dimensions;
                   if (width && this.getColWidth(startColumn) < width) {
@@ -727,6 +727,10 @@ export default class DataProxy {
           ) {
             cstyle[property] = value;
             cell.style = this.addStyle(cstyle);
+          } else if (property === "editable") {
+            cell[property] = value;
+            cell.cellMeta = cell?.cellMeta ?? {};
+            cell.cellMeta[property] = value;
           } else {
             cell[property] = value;
           }
