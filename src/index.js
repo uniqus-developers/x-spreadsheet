@@ -27,6 +27,18 @@ class Spreadsheet {
     if (typeof selectors === "string") {
       targetEl = document.querySelector(selectors);
     }
+
+    if (!this.options.view && targetEl) {
+      this.options.view = {
+        width: () => {
+          return targetEl.clientWidth;
+        },
+        height: () => {
+          return targetEl.clientHeight;
+        },
+      };
+    }
+
     this.bottombar = this.options.showBottomBar
       ? new Bottombar(
           this.options.allowMultipleSheets,
