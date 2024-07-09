@@ -29,4 +29,9 @@ export default class FormInput {
   blur() {
     this.input.el.blur();
   }
+
+  attr(attribute, value) {
+    this.input.attr(attribute, value);
+    return this;
+  }
 }

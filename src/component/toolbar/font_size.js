@@ -1,7 +1,7 @@
 import DropdownItem from "./dropdown_item";
 import DropdownFontsize from "../dropdown_fontsize";
 
-export default class Format extends DropdownItem {
+export default class FontSize extends DropdownItem {
   constructor() {
     super("font-size");
   }

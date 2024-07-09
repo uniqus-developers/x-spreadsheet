@@ -614,6 +614,8 @@ function toolbarChange(type, value) {
   } else if (cellConfigButtons?.find((config) => config.tag === type)) {
     data.setSelectedCellAttr(type, value);
     sheetReset.call(this);
+  } else if (type === "import") {
+    this.data?.rootContext?.importWorkbook(value);
   } else {
     data.setSelectedCellAttr(type, value);
     if (type === "formula" && !data.selector.multiple()) {

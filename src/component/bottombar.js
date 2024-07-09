@@ -72,6 +72,7 @@ class ContextMenu {
 
 export default class Bottombar {
   constructor(
+    allowMultipleSheets,
     addFunc = () => {},
     swapFunc = () => {},
     deleteFunc = () => {},
@@ -89,15 +90,18 @@ export default class Bottombar {
     });
     this.contextMenu = new ContextMenu();
     this.contextMenu.itemClick = deleteFunc;
-    this.el = h("div", `${cssPrefix}-bottombar`).children(
-      this.contextMenu.el,
-      (this.menuEl = h("ul", `${cssPrefix}-menu`).child(
-        h("li", "").children(
+    const menuChildrens = allowMultipleSheets
+      ? [
           new Icon("add").on("click", () => {
             addFunc();
           }),
-          h("span", "").child(this.moreEl)
-        )
+          h("span", "").child(this.moreEl),
+        ]
+      : [h("span", "").child(this.moreEl)];
+    this.el = h("div", `${cssPrefix}-bottombar`).children(
+      this.contextMenu.el,
+      (this.menuEl = h("ul", `${cssPrefix}-menu`).child(
+        h("li", "").children(...menuChildrens)
       ))
     );
   }
@@ -163,11 +167,11 @@ export default class Bottombar {
     this.moreEl.reset(this.dataNames);
   }
 
-  renameItem(index, value) {
+  renameItem(index, value, skipSheetsTill = null) {
     this.dataNames.splice(index, 1, value);
     this.moreEl.reset(this.dataNames);
     this.items[index].html("").child(value);
-    this.updateFunc(index, value);
+    this.updateFunc(index, value, skipSheetsTill);
   }
 
   clear() {

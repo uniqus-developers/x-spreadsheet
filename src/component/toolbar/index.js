@@ -30,6 +30,8 @@ import { h } from "../element";
 import { cssPrefix } from "../../config";
 import { bind } from "../event";
 import CellConfigButtons from "./cellConfigButtons";
+import Import from "./import";
+import { generateUniqueId } from "../../utils";
 
 function buildDivider() {
   return h("div", `${cssPrefix}-toolbar-divider`);
@@ -124,56 +126,72 @@ export default class Toolbar {
     const style = data.defaultStyle();
     this.items = [
       [
-        (this.undoEl = new Undo()),
-        (this.redoEl = new Redo()),
-        new Print(),
-        (this.paintformatEl = new Paintformat()),
-        (this.clearformatEl = new Clearformat()),
+        {
+          id: "import",
+          btn: new Import(),
+        },
       ],
-      buildDivider(),
-      [(this.formatEl = new Format())],
-      buildDivider(),
-      [(this.fontEl = new Font()), (this.fontSizeEl = new FontSize())],
-      buildDivider(),
       [
-        (this.boldEl = new Bold()),
-        (this.italicEl = new Italic()),
-        (this.underlineEl = new Underline()),
-        (this.strikeEl = new Strike()),
-        (this.textColorEl = new TextColor(style.color)),
+        { id: "undo", btn: (this.undoEl = new Undo()) },
+        { id: "redo", btn: (this.redoEl = new Redo()) },
+        { id: "print", btn: new Print() },
+        { id: "paintFormat", btn: (this.paintformatEl = new Paintformat()) },
+        { id: "clearFormat", btn: (this.clearformatEl = new Clearformat()) },
       ],
-      buildDivider(),
+      [{ id: "format", btn: (this.formatEl = new Format()) }],
       [
-        (this.fillColorEl = new FillColor(style.bgcolor)),
-        (this.borderEl = new Border()),
-        (this.mergeEl = new Merge()),
-        (this.gridEl = new Grid()),
+        { id: "font", btn: (this.fontEl = new Font()) },
+        { id: "fontSize", btn: (this.fontSizeEl = new FontSize()) },
       ],
-      buildDivider(),
       [
-        (this.alignEl = new Align(style.align)),
-        (this.valignEl = new Valign(style.valign)),
-        (this.textwrapEl = new Textwrap()),
+        { id: "bold", btn: (this.boldEl = new Bold()) },
+        { id: "italic", btn: (this.italicEl = new Italic()) },
+        { id: "underline", btn: (this.underlineEl = new Underline()) },
+        { id: "strike", btn: (this.strikeEl = new Strike()) },
+        {
+          id: "textColor",
+          btn: (this.textColorEl = new TextColor(style.color)),
+        },
       ],
-      buildDivider(),
       [
-        (this.freezeEl = new Freeze()),
-        (this.autofilterEl = new Autofilter()),
-        (this.formulaEl = new Formula()),
+        {
+          id: "fillColor",
+          btn: (this.fillColorEl = new FillColor(style.bgcolor)),
+        },
+        { id: "border", btn: (this.borderEl = new Border()) },
+        { id: "merge", btn: (this.mergeEl = new Merge()) },
+        { id: "grid", btn: (this.gridEl = new Grid()) },
+      ],
+      [
+        { id: "align", btn: (this.alignEl = new Align(style.align)) },
+        { id: "vAlign", btn: (this.valignEl = new Valign(style.valign)) },
+        { id: "textWrap", btn: (this.textwrapEl = new Textwrap()) },
+      ],
+      [
+        { id: "freeze", btn: (this.freezeEl = new Freeze()) },
+        { id: "autoFilter", btn: (this.autofilterEl = new Autofilter()) },
+        { id: "formula", btn: (this.formulaEl = new Formula()) },
       ],
     ];
 
     const { extendToolbar = {} } = data.settings;
 
     if (extendToolbar.left && extendToolbar.left.length > 0) {
-      this.items.unshift(buildDivider());
-      const btns = extendToolbar.left.map(genBtn.bind(this));
-
+      const btns = extendToolbar.left.map((toolbarBtn) => {
+        return {
+          id: toolbarBtn.id,
+          btn: genBtn.call(this, toolbarBtn),
+        };
+      });
       this.items.unshift(btns);
     }
     if (extendToolbar.right && extendToolbar.right.length > 0) {
-      this.items.push(buildDivider());
-      const btns = extendToolbar.right.map(genBtn.bind(this));
+      const btns = extendToolbar.right.map((toolbarBtn) => {
+        return {
+          id: toolbarBtn.id,
+          btn: genBtn.call(this, toolbarBtn),
+        };
+      });
       this.items.push(btns);
     }
 
@@ -181,17 +199,51 @@ export default class Toolbar {
     if (cellConfigButtons?.length) {
       const configButtons = cellConfigButtons.map((config) => {
         if (config.tag) {
-          return (this[`${config.tag}El`] = new CellConfigButtons(config));
+          return {
+            id: config.id,
+            btn: (this[`${config.tag}El`] = new CellConfigButtons(config)),
+          };
         }
       });
       if (configButtons?.length) {
-        this.items.push(buildDivider());
         this.items.push(configButtons);
       }
     }
 
-    this.items.push([(this.moreEl = new More())]);
+    this.items.push([
+      {
+        id: generateUniqueId(),
+        btn: (this.moreEl = new More()),
+      },
+    ]);
 
+    const { disableFeatures = [] } = this.data?.settings ?? {
+      disableFeatures: [],
+    };
+
+    const preparedItems = [];
+    this.items.forEach((item) => {
+      const filteredItems = [];
+      item.forEach((subItem) => {
+        if (subItem.btn) {
+          if (subItem.id && disableFeatures.includes(subItem.id)) return;
+          else {
+            if (
+              subItem.id === "import" &&
+              !this.data?.settings?.allowMultipleSheets
+            )
+              return;
+            filteredItems.push(subItem.btn);
+          }
+        }
+      });
+      if (filteredItems.length && preparedItems.length) {
+        preparedItems.push(buildDivider());
+      }
+      preparedItems.push(filteredItems);
+    });
+
+    this.items = preparedItems;
     this.el = h("div", `${cssPrefix}-toolbar`);
     this.btns = h("div", `${cssPrefix}-toolbar-btns`);
 

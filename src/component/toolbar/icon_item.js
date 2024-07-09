@@ -6,10 +6,14 @@ export default class IconItem extends Item {
     return super
       .element()
       .child(new Icon(this.tag))
-      .on("click", () => this.change(this.tag));
+      .on("click", () => this.click());
   }
 
   setState(disabled) {
     this.el.disabled(disabled);
+  }
+
+  click(fireChange = true) {
+    if (fireChange) this.change(this.tag);
   }
 }

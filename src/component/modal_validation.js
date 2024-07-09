@@ -13,14 +13,15 @@ export default class ModalValidation extends Modal {
   constructor() {
     const mf = new FormField(
       new FormSelect(
+        false,
         "cell",
         ["cell"], // cell|row|column
         "100%",
-        (it) => t(`dataValidation.modeType.${it}`),
+        (it) => t(`dataValidation.modeType.${it}`)
       ),
       { required: true },
       `${t("dataValidation.range")}:`,
-      fieldLabelWidth,
+      fieldLabelWidth
     );
     const rf = new FormField(new FormInput("120px", "E3 or E3:F12"), {
       required: true,
@@ -28,27 +29,29 @@ export default class ModalValidation extends Modal {
     });
     const cf = new FormField(
       new FormSelect(
+        false,
         "list",
         ["list", "number", "date", "phone", "email"],
         "100%",
         (it) => t(`dataValidation.type.${it}`),
-        (it) => this.criteriaSelected(it),
+        (it) => this.criteriaSelected(it)
       ),
       { required: true },
       `${t("dataValidation.criteria")}:`,
-      fieldLabelWidth,
+      fieldLabelWidth
     );
 
     // operator
     const of = new FormField(
       new FormSelect(
+        false,
         "be",
         ["be", "nbe", "eq", "neq", "lt", "lte", "gt", "gte"],
         "160px",
         (it) => t(`dataValidation.operator.${it}`),
-        (it) => this.criteriaOperatorSelected(it),
+        (it) => this.criteriaOperatorSelected(it)
       ),
-      { required: true },
+      { required: true }
     ).hide();
     // min, max
     const minvf = new FormField(new FormInput("70px", "10"), {
@@ -75,12 +78,12 @@ export default class ModalValidation extends Modal {
         minvf.el,
         maxvf.el,
         vf.el,
-        svf.el,
+        svf.el
       ),
       h("div", `${cssPrefix}-buttons`).children(
         new Button("cancel").on("click", () => this.btnClick("cancel")),
         new Button("remove").on("click", () => this.btnClick("remove")),
-        new Button("save", "primary").on("click", () => this.btnClick("save")),
+        new Button("save", "primary").on("click", () => this.btnClick("save"))
       ),
     ]);
     this.mf = mf;

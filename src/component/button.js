@@ -6,6 +6,6 @@ export default class Button extends Element {
   // type: primary
   constructor(title, type = "") {
     super("div", `${cssPrefix}-button ${type}`);
-    this.child(t(`button.${title}`));
+    this.child(t(`button.${title}`) ?? title);
   }
 }
