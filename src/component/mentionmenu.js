@@ -64,7 +64,7 @@ function inputKeydownHandler(evt) {
 }
 
 export default class MentionMenu {
-  constructor(menuConfig, itemClick, width = "200px") {
+  constructor(menuConfig = {}, itemClick, width = "200px") {
     this.filterItems = [];
     this.items = [];
     this.trigger = menuConfig.trigger;
