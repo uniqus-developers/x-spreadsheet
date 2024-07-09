@@ -52,11 +52,6 @@ declare module "x-data-spreadsheet" {
     valueSetter?: (metaData: FormatterMeta) => string;
     editValueFormatter?: (metaData: FormatterMeta) => string;
     extendedContextMenu?: ExtendedContextMenu[];
-    mentionProgress?: {
-      trigger: string;
-      stepCount?: number;
-      itemCall?: (word: string) => Promise;
-    };
     allowMultipleSheets?: boolean;
     disableFeatures?: string[];
   }

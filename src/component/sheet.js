@@ -539,6 +539,7 @@ function dataSetCellText(text, state = "finished") {
   const inputText = editor.inputText;
   if (editor.formulaCell && state === "finished") {
     const { ri, ci } = editor.formulaCell;
+    console.log(ri, ci);
     data.setFormulaCellText(inputText, ri, ci, state);
     this.trigger("cell-edited", inputText, ri, ci);
     editor.setFormulaCell(null);
