@@ -51,6 +51,11 @@ declare module "x-data-spreadsheet" {
     valueSetter?: (metaData: FormatterMeta) => string;
     editValueFormatter?: (metaData: FormatterMeta) => string;
     extendedContextMenu?: ExtendedContextMenu[];
+    mentionProgress?: {
+      trigger: string;
+      stepCount?: number;
+      itemCall?: (word: string) => Promise;
+    };
   }
 
   export type CELL_SELECTED = "cell-selected";

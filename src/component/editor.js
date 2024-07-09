@@ -3,7 +3,7 @@ import { h } from "./element";
 import Suggest from "./suggest";
 import Datepicker from "./datepicker";
 import { cssPrefix } from "../config";
-// import { mouseMoveUp } from '../event';
+import MentionMenu from "./mentionmenu";
 
 function resetTextareaSize() {
   const { inputText } = this;
@@ -56,7 +56,7 @@ function keydownEventHandler(evt) {
 function inputEventHandler(evt) {
   const v = evt.target.value;
   // console.log(evt, 'v:', v);
-  const { suggest, textlineEl, validator } = this;
+  const { suggest, textlineEl, validator, mention, trigger } = this;
   const { cell } = this;
   if (cell !== null) {
     if (
@@ -76,6 +76,15 @@ function inputEventHandler(evt) {
           suggest.search(v.substring(start + 1));
         } else {
           suggest.hide();
+        }
+      }
+      if (trigger) {
+        const textBlock = v.split(" ");
+        const triggerBlock = textBlock[textBlock?.length - 1];
+        if (triggerBlock.startsWith(trigger)) {
+          mention.search(triggerBlock);
+        } else {
+          mention.hide();
         }
       }
       textlineEl.html(v);
@@ -98,6 +107,15 @@ function inputEventHandler(evt) {
         suggest.search(v.substring(start + 1));
       } else {
         suggest.hide();
+      }
+      if (trigger) {
+        const textBlock = v.split(" ");
+        const triggerBlock = textBlock[textBlock?.length - 1];
+        if (triggerBlock.startsWith(trigger)) {
+          mention.search(triggerBlock);
+        } else {
+          mention.hide();
+        }
       }
     }
     textlineEl.html(v);
@@ -159,6 +177,25 @@ function dateFormat(d) {
   return `${d.getFullYear()}-${month}-${date}`;
 }
 
+function mentionInputHandler(item) {
+  const { value } = item;
+  const containsJoiner = this.inputText?.includes(".");
+  let lastText = "";
+  if (containsJoiner) {
+    const lastIndex = this.inputText.lastIndexOf(".");
+    if (lastIndex !== -1) {
+      lastText = this.inputText?.substring(0, lastIndex + 1);
+    } else {
+      lastText = this.trigger;
+    }
+  } else {
+    lastText = this.trigger;
+  }
+  this.inputText = `${lastText}${value}`?.replaceAll(" ", "_");
+  const position = this.inputText?.length;
+  setText.call(this, this.inputText, position);
+}
+
 export default class Editor {
   constructor(formulas, viewFn, rowHeight, options = {}) {
     this.options = options;
@@ -167,6 +204,10 @@ export default class Editor {
     this.formulas = formulas;
     this.suggest = new Suggest(formulas, (it) => {
       suggestItemClick.call(this, it);
+    });
+    this.trigger = options.mentionProgress?.trigger;
+    this.mention = new MentionMenu(options.mentionProgress, (item) => {
+      mentionInputHandler.call(this, item);
     });
     this.datepicker = new Datepicker();
     this.datepicker.change((d) => {
@@ -182,12 +223,14 @@ export default class Editor {
           .on("keydown", (evt) => keydownEventHandler.call(this, evt))),
         (this.textlineEl = h("div", "textline")),
         this.suggest.el,
-        this.datepicker.el
+        this.datepicker.el,
+        this.mention.el
       )
       .on("mousemove.stop", () => {})
       .on("mousedown.stop", () => {});
     this.el = h("div", `${cssPrefix}-editor`).child(this.areaEl).hide();
     this.suggest.bindInputEvents(this.textEl);
+    this.mention.bindInputEvents(this.textEl);
 
     this.areaOffset = null;
     this.freeze = { w: 0, h: 0 };
@@ -219,7 +262,7 @@ export default class Editor {
   }
 
   setOffset(offset, suggestPosition = "top") {
-    const { textEl, areaEl, suggest, freeze, el } = this;
+    const { textEl, areaEl, suggest, freeze, el, mention } = this;
     if (offset) {
       this.areaOffset = offset;
       const { left, top, width, height, l, t } = offset;
@@ -246,6 +289,8 @@ export default class Editor {
       sOffset[suggestPosition] = height;
       suggest.setOffset(sOffset);
       suggest.hide();
+      mention.setOffset(sOffset);
+      mention.hide();
     }
   }
 
@@ -280,7 +325,7 @@ export default class Editor {
       }
     }
   }
-  
+
   setFormulaCell(cellRef) {
     this.formulaCell = cellRef;
   }

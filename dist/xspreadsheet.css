@@ -1049,6 +1049,11 @@ form fieldset select {
   left: -162px;
   top: -36px;
 }
+.x-spreadsheet-loader {
+  min-height: 40px;
+  margin-top: 20px;
+  margin-left: 40%;
+}
 
 
 /*# sourceMappingURL=xspreadsheet.css.map*/
