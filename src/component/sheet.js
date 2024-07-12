@@ -79,7 +79,6 @@ function formulaProgress() {
 }
 
 function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
-  if (ri === -1 && ci === -1) return;
   const { table, selector, toolbar, data, contextMenu, editor } = this;
   const cell = data.getCell(ri, ci);
   if (multiple) {
@@ -872,6 +871,10 @@ function sheetInitEvents() {
         case 73:
           // ctrl + I
           toolbar.trigger("italic");
+          break;
+        case 65:
+          // ctrl + A
+          selector.set(-1, -1, true);
           break;
         default:
           break;
