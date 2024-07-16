@@ -739,6 +739,12 @@ export default class DataProxy {
     });
   }
 
+  setCellState(ri, ci, editable = true) {
+    const { rows } = this;
+    const cell = rows.getCellOrNew(ri, ci);
+    cell.editable = editable;
+  }
+
   // state: input | finished
   setFormulaCellText(text, ri, ci, state = "input") {
     const { autoFilter, rows } = this;
