@@ -55,7 +55,7 @@ declare module "x-data-spreadsheet" {
     mentionProgress?: {
       trigger: string;
       stepCount?: number;
-      itemCall?: (word: string) => Promise;
+      itemCall?: (word: string) => Promise<any>;
     };
     allowMultipleSheets?: boolean;
     disableFeatures?: string[];
