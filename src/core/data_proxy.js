@@ -22,6 +22,7 @@ import {
 } from "../utils";
 import SheetConfig from "./sheetConfig";
 import CellConfig from "./cellConfig";
+import Variable from "./variable";
 
 // private methods
 /*
@@ -354,6 +355,7 @@ export default class DataProxy {
     this.validations = new Validations();
     this.hyperlinks = {};
     this.comments = {};
+    this.variables = new Variable(rootContext);
     // save data end
 
     // don't save object
