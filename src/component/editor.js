@@ -53,10 +53,32 @@ function keydownEventHandler(evt) {
   if (keyCode === 13 && !altKey) evt.preventDefault();
 }
 
+function mentionMenuSearch(text) {
+  const { textEl, trigger, mention } = this;
+  const caretPos = textEl.el.selectionStart;
+  let start = caretPos - 1;
+  while (start >= 0 && /\S/.test(text[start])) {
+    start--;
+  }
+  start++;
+
+  let end = caretPos;
+  while (end < text.length && /\S/.test(text[end])) {
+    end++;
+  }
+
+  let currentWord = text.slice(start, end);
+  if (currentWord?.startsWith(trigger)) {
+    mention.search(currentWord);
+  } else {
+    mention.hide();
+  }
+}
+
 function inputEventHandler(evt) {
   const v = evt.target.value;
   // console.log(evt, 'v:', v);
-  const { suggest, textlineEl, validator, mention, trigger } = this;
+  const { suggest, textlineEl, validator, mention, trigger, textEl } = this;
   const { cell } = this;
   if (cell !== null) {
     if (
@@ -79,10 +101,8 @@ function inputEventHandler(evt) {
         }
       }
       if (trigger) {
-        const textBlock = v.split(" ");
-        const triggerBlock = textBlock[textBlock?.length - 1];
-        if (triggerBlock.startsWith(trigger)) {
-          mention.search(triggerBlock);
+        if (v?.includes(trigger)) {
+          mentionMenuSearch.call(this, v);
         } else {
           mention.hide();
         }
@@ -109,10 +129,8 @@ function inputEventHandler(evt) {
         suggest.hide();
       }
       if (trigger) {
-        const textBlock = v.split(" ");
-        const triggerBlock = textBlock[textBlock?.length - 1];
-        if (triggerBlock.startsWith(trigger)) {
-          mention.search(triggerBlock);
+        if (v?.includes(trigger)) {
+          mentionMenuSearch.call(this, v);
         } else {
           mention.hide();
         }
@@ -179,20 +197,39 @@ function dateFormat(d) {
 
 function mentionInputHandler(item) {
   const { value } = item;
-  const containsJoiner = this.inputText?.includes(".");
-  let lastText = "";
-  if (containsJoiner) {
-    const lastIndex = this.inputText.lastIndexOf(".");
-    if (lastIndex !== -1) {
-      lastText = this.inputText?.substring(0, lastIndex + 1);
-    } else {
-      lastText = this.trigger;
-    }
-  } else {
-    lastText = this.trigger;
+  const { textEl } = this;
+  const caretPos = textEl.el.selectionStart;
+  const text = this.inputText;
+  let start = caretPos - 1;
+  while (start >= 0 && /\S/.test(text[start])) {
+    start--;
   }
-  this.inputText = `${lastText}${value}`?.replaceAll(" ", "_");
-  const position = this.inputText?.length;
+  start++;
+
+  let end = caretPos;
+  while (end < text.length && /\S/.test(text[end])) {
+    end++;
+  }
+
+  let currentWord = text.slice(start, end);
+
+  let word = "";
+  if (currentWord?.includes(this.trigger) && !currentWord?.includes(".")) {
+    word = `#${value}`;
+  } else if (
+    currentWord?.includes(this.trigger) &&
+    currentWord?.includes(".")
+  ) {
+    const index = currentWord.lastIndexOf(".");
+    const lastText = currentWord.substring(0, index + 1);
+    word = `${lastText}${value}`;
+  }
+
+  let newText =
+    text.slice(0, start) + `${word?.replaceAll(" ", "_")}` + text.slice(end);
+
+  this.inputText = newText;
+  const position = start + word?.length ?? this.inputText?.length;
   setText.call(this, this.inputText, position);
 }
 

@@ -1047,11 +1047,13 @@ export default class Sheet {
     this.print.resetData(data);
     this.selector.resetData(data);
     this.table.resetData(data);
+    this.trigger("grid-load", data);
   }
 
   loadData(data) {
     this.data.setData(data);
     sheetReset.call(this);
+    this.trigger("grid-load", data);
     return this;
   }
 
