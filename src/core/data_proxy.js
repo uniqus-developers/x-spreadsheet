@@ -1436,6 +1436,28 @@ export default class DataProxy {
     return this;
   }
 
+  getVariables() {
+    const { rows, rootContext } = this;
+    const trigger = rootContext?.options?.mentionProgress?.trigger;
+    const rowData = rows._;
+    const map = new Set();
+    if (trigger) {
+      let regex = new RegExp(`\\${trigger}\\S*`, "g");
+      for (let rowIndex in rowData) {
+        const cells = rowData[rowIndex]?.cells;
+        for (let cellIndex in cells) {
+          const cell = cells[cellIndex];
+          const text = cell.text;
+          text.replaceAll(regex, (match) => {
+            const newMatch = match?.toLowerCase();
+            map.add(newMatch);
+          });
+        }
+      }
+    }
+    return map;
+  }
+
   getData() {
     const {
       name,

@@ -265,14 +265,13 @@ class Draw {
     const trigger = this.options.mentionProgress?.trigger;
     if (trigger && mtxt?.includes(trigger)) {
       const map = this.data.variables.map;
-      let regex = new RegExp(`\\${trigger}\\w+`, "g");
+      let regex = new RegExp(`\\${trigger}\\S*`, 'g');
       mtxt = mtxt.replace(regex, (match) => {
         const newMatch = match?.toLowerCase();
         const value = map[newMatch];
         if (value) {
           return value;
         } else {
-          this.data.variables.storeVariable(newMatch, null);
           return match;
         }
       });
