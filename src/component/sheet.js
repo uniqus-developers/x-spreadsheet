@@ -1025,6 +1025,7 @@ export default class Sheet {
     sheetReset.call(this);
     // init selector [0, 0]
     selectorSet.call(this, false, 0, 0);
+    if (this.options.mode === "read") this.selector.hide();
   }
 
   on(eventName, func) {
@@ -1093,5 +1094,9 @@ export default class Sheet {
       left: cols.indexWidth,
       top: rows.height,
     };
+  }
+
+  selectCell(ri, ci) {
+    selectorSet.call(this, false, ri, ci);
   }
 }
