@@ -254,6 +254,10 @@ class Spreadsheet {
       }
     }
   }
+
+  selectCell(ri, ci) {
+    this.sheet.selectCell(ri, ci);
+  }
 }
 
 const spreadsheet = (el, options = {}) => new Spreadsheet(el, options);

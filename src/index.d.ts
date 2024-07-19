@@ -277,6 +277,12 @@ declare module "x-data-spreadsheet" {
      * @param message
      */
     static locale(lang: string, message: object): void;
+    /**
+     * selects the cell
+     * @param rowIndex
+     * @param colIndex
+     */
+    selectCell(rowIndex: number, colIndex: number): void;
   }
   global {
     interface Window {
