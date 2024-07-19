@@ -258,7 +258,7 @@ const replaceCellRefWithNew = (str, getNewCell, opts) => {
     (word) => {
       const parts = word.split("!");
       if (parts.length > 1) {
-        if (parts[0].replaceAll("'", "") === sheetName || isSameSheet) {
+        if (parts[0].replaceAll("'", "") === sheetName) {
           const newCell = getNewCell(parts[1]);
           return `${parts[0]}!${newCell}`;
         } else {

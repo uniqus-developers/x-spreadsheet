@@ -348,7 +348,7 @@ export default class DataProxy {
     this.freeze = [0, 0];
     this.styles = []; // Array<Style>
     this.merges = new Merges(); // [CellRange, ...]
-    this.rows = new Rows(this.settings.row, this.settings);
+    this.rows = new Rows(this, this.settings.row, this.settings);
     this.cols = new Cols(this.settings.col);
     this.sheetConfig = new SheetConfig(this.name, this.settings);
     this.cellConfig = new CellConfig(this.name, this.settings);
@@ -1001,15 +1001,18 @@ export default class DataProxy {
   }
 
   // type: row | column
-  insert(type, n = 1) {
+  insert(type) {
     this.changeData(() => {
-      const { sri, sci } = this.selector.range;
+      const { sri, eri, sci, eci } = this.selector.range;
       const { rows, merges, cols } = this;
       let si = sri;
+      let n = 1;
       if (type === "row") {
+        n = eri - sri + 1;
         rows.insert(sri, n);
         this.updateOtherSheetsFormulaOnInsert(type, sri, n);
       } else if (type === "column") {
+        n = eci - sci + 1;
         rows.insertColumn(sci, n);
         this.updateOtherSheetsFormulaOnInsert(type, sci, n);
         si = sci;

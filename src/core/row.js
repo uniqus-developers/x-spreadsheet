@@ -3,12 +3,13 @@ import { expr2expr } from "./alphabet";
 import { replaceCellRefWithNew } from "../utils";
 
 class Rows {
-  constructor({ len, height }, options = {}) {
+  constructor(dataProxyContext, { len, height }, options = {}) {
     this.options = options;
     this._ = {};
     this.len = len;
     // default row height
     this.height = height;
+    this.data = dataProxyContext;
   }
 
   getHeight(ri) {
@@ -248,6 +249,7 @@ class Rows {
               cell.text,
               (word) => expr2expr(word, 0, n, (x, y) => y >= sri),
               {
+                sheetName: this.data.name,
                 isSameSheet: true,
               }
             );
@@ -275,6 +277,7 @@ class Rows {
               cell.text,
               (word) => expr2expr(word, 0, -n, (x, y) => y > eri),
               {
+                sheetName: this.data.name,
                 isSameSheet: true,
               }
             );
@@ -298,6 +301,7 @@ class Rows {
               cell.text,
               (word) => expr2expr(word, n, 0, (x) => x >= sci),
               {
+                sheetName: this.data.name,
                 isSameSheet: true,
               }
             );
@@ -324,6 +328,7 @@ class Rows {
               cell.text,
               (word) => expr2expr(word, -n, 0, (x) => x > eci),
               {
+                sheetName: this.data.name,
                 isSameSheet: true,
               }
             );
