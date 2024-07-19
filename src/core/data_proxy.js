@@ -1153,9 +1153,28 @@ export default class DataProxy {
     return this.rows.getCell(ri, ci);
   }
 
+  resolveDynamicVariable(text) {
+    const trigger = this.settings?.mentionProgress?.trigger;
+    if (trigger && text?.includes?.(trigger)) {
+      let regex = new RegExp(`\\${trigger}\\S*`, "g");
+      const map = this?.variables?.map ?? {};
+      text = text.replace(regex, (match) => {
+        const newMatch = match?.toLowerCase();
+        const value = map[newMatch];
+        if (value) {
+          return value;
+        } else {
+          return match;
+        }
+      });
+    }
+    return text;
+  }
+
   getCellTextOrDefault(ri, ci) {
     const cell = this.getCell(ri, ci);
-    return cell && cell.text ? cell.text : "";
+    const text = cell && cell.text ? cell.text : "";
+    return this.resolveDynamicVariable.call(this, text);
   }
 
   getCellStyle(ri, ci) {

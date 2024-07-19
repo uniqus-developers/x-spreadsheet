@@ -231,6 +231,7 @@ function mentionInputHandler(item) {
   this.inputText = newText;
   const position = start + word?.length ?? this.inputText?.length;
   setText.call(this, this.inputText, position);
+  resetTextareaSize.call(this);
 }
 
 export default class Editor {
