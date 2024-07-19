@@ -274,7 +274,7 @@ const parserFormulaString = (string, getCellText, cellRender) => {
           if (text.startsWith("=")) {
             return cellRender(text, [], getCellText);
           } else {
-            return text;
+            return isNaN(Number(text)) ? `"${text}"` : text;
           }
         } else {
           return 0;

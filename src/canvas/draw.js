@@ -261,21 +261,8 @@ class Draw {
   }
 
   text(mtxt, box, attr = {}, textWrap = true, cellMeta = {}) {
+    mtxt = this.data.resolveDynamicVariable.call(this.data, mtxt);
     mtxt = this.textConfigOperation(mtxt, cellMeta);
-    const trigger = this.options.mentionProgress?.trigger;
-    if (trigger && mtxt?.includes(trigger)) {
-      const map = this.data.variables.map;
-      let regex = new RegExp(`\\${trigger}\\S*`, 'g');
-      mtxt = mtxt.replace(regex, (match) => {
-        const newMatch = match?.toLowerCase();
-        const value = map[newMatch];
-        if (value) {
-          return value;
-        } else {
-          return match;
-        }
-      });
-    }
     const { ctx } = this;
     const { align, valign, font, color, strike, underline } = attr;
     const tx = box.textx(align);
