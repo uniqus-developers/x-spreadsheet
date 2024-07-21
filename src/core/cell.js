@@ -256,7 +256,7 @@ const parserFormulaString = (string, getCellText, cellRender) => {
           const [x, y] = expr2xy(cellRef);
           const text = getCellText(x, y, sheetName);
           if (text === REF_ERROR) isFormulaResolved = true;
-          return text;
+          return isNaN(Number(text)) ? `"${text}"` : text;
         }
       );
 
