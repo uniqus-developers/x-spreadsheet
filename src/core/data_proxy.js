@@ -1207,8 +1207,9 @@ export default class DataProxy {
   }
 
   setCellData(ri, ci, data) {
-    const { rows } = this;
+    const { rows, rootContext } = this;
     rows.setCell(ri, ci, data);
+    rootContext?.sheet?.table?.render?.();
   }
 
   // state: input | finished
