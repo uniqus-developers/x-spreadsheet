@@ -1005,12 +1005,19 @@ export default class DataProxy {
     this.changeData(() => {
       const { sri, eri, sci, eci } = this.selector.range;
       const { rows, merges, cols } = this;
+      const trigger = this?.rootContext?.sheet?.trigger;
       let si = sri;
       let n = 1;
       if (type === "row") {
         n = eri - sri + 1;
         rows.insert(sri, n);
         this.updateOtherSheetsFormulaOnInsert(type, sri, n);
+        trigger?.call(this?.rootContext?.sheet, "row-column-operation", {
+          on: type,
+          type: "INSERT",
+          count: n,
+          startIndex: sri,
+        });
       } else if (type === "column") {
         n = eci - sci + 1;
         rows.insertColumn(sci, n);
@@ -1026,6 +1033,12 @@ export default class DataProxy {
               delete cols._[col];
             }
           });
+        trigger?.call(this?.rootContext?.sheet, "row-column-operation", {
+          on: type,
+          type: "INSERT",
+          count: n,
+          startIndex: sci,
+        });
       }
       merges.shift(type, si, n, (ri, ci, rn, cn) => {
         const cell = rows.getCell(ri, ci);
@@ -1041,12 +1054,19 @@ export default class DataProxy {
       const { rows, merges, selector, cols } = this;
       const { range } = selector;
       const { sri, sci, eri, eci } = selector.range;
+      const trigger = this?.rootContext?.sheet?.trigger;
       const [rsize, csize] = selector.range.size();
       let si = sri;
       let size = rsize;
       if (type === "row") {
         rows.delete(sri, eri);
         this.updateOtherSheetsFormulaOnDelete(type, sri, eri);
+        trigger?.call(this?.rootContext?.sheet, "row-column-operation", {
+          on: type,
+          type: "DELETE",
+          count: eri - sri + 1,
+          startIndex: sri,
+        });
       } else if (type === "column") {
         rows.deleteColumn(sci, eci);
         this.updateOtherSheetsFormulaOnDelete(type, sci, eci);
@@ -1059,6 +1079,12 @@ export default class DataProxy {
             if (col > eci) cols._[col - (eci - sci + 1)] = cols._[col];
             delete cols._[col];
           }
+        });
+        trigger?.call(this?.rootContext?.sheet, "row-column-operation", {
+          on: type,
+          type: "DELETE",
+          count: eci - sci + 1,
+          startIndex: sci,
         });
       }
       // console.log('type:', type, ', si:', si, ', size:', size);

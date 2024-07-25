@@ -70,6 +70,7 @@ declare module "x-data-spreadsheet" {
   export type PASTED_CLIPBOARD = "pasted-clipboard";
   export type GRID_LOAD = "grid-load";
   export type CELL_EDIT_FINISHED = "cell-edit-finished";
+  export type ROW_COLUMN_OPERATION = "row-column-operation";
 
   export interface ExtendedContextMenu {
     key: string;
@@ -136,9 +137,20 @@ declare module "x-data-spreadsheet" {
     (evnt: PASTED_CLIPBOARD, callback: (data: any) => void): void;
     (evnt: GRID_LOAD, callback: (data: any) => void): void;
     (
+      evnt: ROW_COLUMN_OPERATION,
+      callback: (data: RowColumnOperationProp) => void
+    ): void;
+    (
       evnt: CELL_EDIT_FINISHED,
       callback: (text: string, rowIndex: number, colIndex: number) => void
     ): void;
+  }
+
+  export interface RowColumnOperationProp {
+    on: string;
+    type: string;
+    startIndex: number;
+    count: number;
   }
 
   export interface CellRangeType {
