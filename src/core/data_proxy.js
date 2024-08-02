@@ -1502,7 +1502,7 @@ export default class DataProxy {
         for (let cellIndex in cells) {
           const cell = cells[cellIndex];
           const text = cell.text;
-          text.replaceAll(regex, (match) => {
+          text?.replaceAll?.(regex, (match) => {
             const newMatch = match?.toLowerCase();
             map.add(newMatch);
           });
