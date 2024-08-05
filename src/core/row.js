@@ -69,6 +69,7 @@ class Rows {
 
   getOrNew(ri) {
     this._[ri] = this._[ri] || { cells: {} };
+    if (ri >= this.len) this.len += 1;
     return this._[ri];
   }
 
@@ -93,6 +94,7 @@ class Rows {
   getCellOrNew(ri, ci) {
     const row = this.getOrNew(ri);
     row.cells[ci] = row.cells[ci] || {};
+    if (ci >= this?.data?.cols?.len) this.data.cols.len += 1;
     return row.cells[ci];
   }
 
