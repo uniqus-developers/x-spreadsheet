@@ -56,7 +56,7 @@ export function stringAt(index) {
  * @returns {number}
  */
 export function indexAt(str) {
-  str = str.toLocaleUpperCase();
+  str = str?.toLocaleUpperCase?.() ?? str;
   let ret = 0;
   for (let i = 0; i !== str.length; ++i)
     ret = 26 * ret + str.charCodeAt(i) - 64;
