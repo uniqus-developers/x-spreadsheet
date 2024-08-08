@@ -534,13 +534,20 @@ function colResizerFinished(cRect, distance) {
 
 function dataSetCellText(text, state = "finished") {
   const { data, table, editor } = this;
+  const trigger = data?.settings?.mentionProgress?.trigger;
   if (data.settings.mode === "read") return;
   const inputText = editor.inputText;
   if (editor.formulaCell && state === "finished") {
     const { ri, ci } = editor.formulaCell;
     data.setFormulaCellText(inputText, ri, ci, state);
     this.trigger("cell-edited", inputText, ri, ci);
+    this.trigger("cell-edit-finished", text, ri, ci);
     editor.setFormulaCell(null);
+  } else if (state === "finished" && text?.trim?.().startsWith(trigger)) {
+    const { ri, ci } = data.selector;
+    data.setFormulaCellText(inputText, ri, ci, state);
+    this.trigger("cell-edited", inputText, ri, ci);
+    this.trigger("cell-edit-finished", text, ri, ci);
   } else if (!editor.formulaCell) {
     data.setSelectedCellText(text, state);
     const { ri, ci } = data.selector;
