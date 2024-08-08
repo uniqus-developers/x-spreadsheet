@@ -671,7 +671,9 @@ function sheetInitEvents() {
       }
     })
     .on("mousewheel.stop", (evt) => {
-      overlayerMousescroll.call(this, evt);
+      const { className } = evt.target;
+      if (className === `${cssPrefix}-overlayer`)
+        overlayerMousescroll.call(this, evt);
     })
     .on("mouseout", (evt) => {
       const { offsetX, offsetY } = evt;

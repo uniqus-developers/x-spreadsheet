@@ -18,7 +18,7 @@ export default class Dropdown extends Element {
       .css("width", width)
       .hide();
 
-    if (childrenCount > 30) {
+    if (childrenCount > 30 || childrenCount === 0) {
       this.contentEl.css("max-height", "400px").css("overflow", "auto");
     }
 
