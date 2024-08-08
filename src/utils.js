@@ -5,6 +5,9 @@ import {
   CELL_REF_REPLACE_REGEX,
   SHEET_TO_CELL_REF_REGEX,
 } from "./constants";
+import { fonts } from "./core/font";
+
+const avialableFonts = Object.keys(fonts());
 
 const getStylingForClass = (styleTag, className) => {
   const cssRules = styleTag?.sheet?.cssRules || styleTag?.sheet?.rules;
@@ -58,13 +61,15 @@ const parseCssToXDataStyles = (styleString) => {
             value === "bold";
           break;
         case "font-size":
-          fontStyles["size"] = parsePtOrPxValue(value);
+          fontStyles["size"] = parsePtOrPxValue(value, property);
           break;
         case "font-style":
           fontStyles["italic"] = value === "italic";
           break;
         case "font-family":
-          fontStyles["name"] = value;
+          const appliedFont =
+            avialableFonts.find((font) => value.includes(font)) ?? "Arial";
+          fontStyles["name"] = appliedFont;
           break;
         case "border":
         case "border-top":
@@ -199,13 +204,15 @@ const parseBorderProperties = (styles) => {
   return { ...parsedBorders, ...others };
 };
 
-const parsePtOrPxValue = (value) => {
+const parsePtOrPxValue = (value, property = null) => {
   let parsedValue = value;
   if (value) {
     if (value.includes("px")) {
       parsedValue = Math.ceil(Number(value.split("px")[0]));
     } else if (value.includes("pt")) {
-      parsedValue = Math.ceil(Number(value.split("pt")[0]) / PX_TO_PT);
+      if (property === "font-size")
+        parsedValue = Math.ceil(Number(value.split("pt")[0]));
+      else parsedValue = Math.ceil(Number(value.split("pt")[0]) / PX_TO_PT);
     }
   }
   return parsedValue;
@@ -388,7 +395,8 @@ const parseExcelStyleToHTML = (styling, theme) => {
               }
               break;
             case "sz":
-              const convertedValue = Number(value) / PX_TO_PT;
+            case "size":
+              const convertedValue = Number(value) ?? 11;
               parsedStyles["font-size"] = `${convertedValue}px`;
               break;
             case "italic":
@@ -408,6 +416,16 @@ const parseExcelStyleToHTML = (styling, theme) => {
           }
         });
         break;
+      case "dimensions":
+        Object.keys(style)?.forEach((property) => {
+          const value = style[property];
+          switch (property) {
+            case "height":
+            case "width":
+              parsedStyles[property] = value;
+              break;
+          }
+        });
     }
   });
 
@@ -425,10 +443,26 @@ const addStylesToWorkbook = (styles, workbook) => {
     if (Object.hasOwn(styles, sheetName)) {
       Object.entries(styles[sheetName]).forEach(([cellAddress, cellStyle]) => {
         if (Object.hasOwn(worksheet, cellAddress)) {
+          const { r, c } = XLSX.utils.decode_cell(cellAddress);
+          const dimensions = {};
+
+          const height =
+            workbook?.["!rows"]?.[r]?.hpt ?? worksheet?.["!rows"]?.[r]?.hpx;
+          const width =
+            workbook?.["!cols"]?.[c]?.wpt ?? worksheet?.["!cols"]?.[c]?.wpx;
+
+          if (height) dimensions.height = `${height / 0.75}px`;
+          if (width) dimensions.width = `${width / 0.75}px`;
+
+          const cellStylesWithDimensions = {
+            ...(cellStyle ?? {}),
+            dimensions,
+          };
+
           worksheet[cellAddress] = {
             ...worksheet[cellAddress],
             s: parseExcelStyleToHTML(
-              cellStyle ?? {},
+              cellStylesWithDimensions,
               wb.Themes?.themeElements?.clrScheme ?? {}
             ),
           };
