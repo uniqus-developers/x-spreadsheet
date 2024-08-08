@@ -1,7 +1,6 @@
 import { stringAt } from "../core/alphabet";
 import { getFontSizePxByPt } from "../core/font";
 import _cell from "../core/cell";
-import { formulam } from "../core/formula";
 import { formatm } from "../core/format";
 
 import { Draw, DrawBox, thinLineWidth, npx } from "../canvas/draw";
@@ -47,7 +46,7 @@ function renderCellBorders(bboxes, translateFunc) {
 */
 
 export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
-  const { sortedRowMap, rows, cols } = data;
+  const { sortedRowMap, rows, cols, settings } = data;
   if (rows.isHide(rindex) || cols.isHide(cindex)) return;
   let nrindex = rindex;
   if (sortedRowMap.has(rindex)) {
@@ -60,7 +59,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
   if ("editable" in cell && cell.editable === false) {
     frozen = true;
   }
-
+  const trigger = settings?.mentionProgress?.trigger;
   const style = data.getCellStyleOrDefault(nrindex, cindex);
   const cellMeta = data.getCellMetaOrDefault(nrindex, cindex);
   const dbox = getDrawBox(data, rindex, cindex, yoffset);
@@ -68,13 +67,12 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
   draw.rect(dbox, () => {
     // render text
     let cellText = "";
-    if (!data.settings.evalPaused) {
+    if (!data.settings.evalPaused && cell.f) {
       cellText = _cell.render(
-        cell.text || "",
-        formulam,
+        cell.f || "",
         (y, x, sheetName = data.name) => {
           if (!sheetName || sheetName.toLowerCase() === data.name.toLowerCase())
-            return data.getCellTextOrDefault(x, y);
+            return data.getCellFormulaOrTextOrDefault(x, y);
           else {
             const rootContext = data.getRootContext();
             const sheets = rootContext.datas;
@@ -82,21 +80,24 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
               (sheet) => sheet.name.toLowerCase() === sheetName.toLowerCase()
             );
             return selectedSheet
-              ? selectedSheet.getCellTextOrDefault(x, y)
+              ? selectedSheet.getCellFormulaOrTextOrDefault(x, y)
               : REF_ERROR;
           }
-        }
+        },
+        (text) => {
+          data.resolveDynamicVariable.call(data, text);
+        },
+        trigger
       );
+      cell.text = cellText;
     } else {
       cellText = cell.text || "";
     }
     if (style.format) {
-      // console.log(data.formatm, '>>', cell.format);
       cellText = formatm[style.format].render(cellText);
     }
     const font = Object.assign({}, style.font);
     font.size = getFontSizePxByPt(font.size);
-    // console.log('style:', style);
     draw.text(
       cellText,
       dbox,
