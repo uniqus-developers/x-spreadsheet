@@ -447,9 +447,9 @@ const addStylesToWorkbook = (styles, workbook) => {
           const dimensions = {};
 
           const height =
-            workbook?.["!rows"]?.[r]?.hpt ?? worksheet?.["!rows"]?.[r]?.hpx;
+            worksheet?.["!rows"]?.[r]?.hpt ?? worksheet?.["!rows"]?.[r]?.hpx;
           const width =
-            workbook?.["!cols"]?.[c]?.wpt ?? worksheet?.["!cols"]?.[c]?.wpx;
+            worksheet?.["!cols"]?.[c]?.wpt ?? worksheet?.["!cols"]?.[c]?.wpx;
 
           if (height) dimensions.height = `${height / 0.75}px`;
           if (width) dimensions.width = `${width / 0.75}px`;
