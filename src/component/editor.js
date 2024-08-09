@@ -102,6 +102,7 @@ function inputEventHandler(evt) {
       }
       if (trigger) {
         if (v?.includes(trigger)) {
+          suggest.hide()
           mentionMenuSearch.call(this, v);
         } else {
           mention.hide();
@@ -130,6 +131,7 @@ function inputEventHandler(evt) {
       }
       if (trigger) {
         if (v?.includes(trigger)) {
+          suggest.hide()
           mentionMenuSearch.call(this, v);
         } else {
           mention.hide();
@@ -344,7 +346,7 @@ export default class Editor {
       text =
         editValueFormatter({ ...this, cell }) ?? ((cell && cell.text) || "");
     } else {
-      text = (cell && cell.text) || "";
+      text = cell ? cell.f || cell.text : "";
     }
     this.setText(text);
 
