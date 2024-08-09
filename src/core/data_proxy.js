@@ -1201,19 +1201,19 @@ export default class DataProxy {
         }
       });
     }
-    return { text, resolved };
+    return { text: text, resolved: resolved };
   }
 
   getCellTextOrDefault(ri, ci) {
     const cell = this.getCell(ri, ci);
     const text = cell && cell.text ? cell.text : "";
-    return this.resolveDynamicVariable.call(this, text)?.text
+    return this.resolveDynamicVariable.call(this, text)?.text;
   }
 
   getCellFormulaOrTextOrDefault(ri, ci) {
     const cell = this.getCell(ri, ci);
     const text = cell && cell.f ? cell.f : cell.text ? cell.text : "";
-    return this.resolveDynamicVariable.call(this, text)?.text
+    return this.resolveDynamicVariable.call(this, text)?.text;
   }
 
   getCellStyle(ri, ci) {
