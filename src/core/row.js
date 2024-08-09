@@ -128,8 +128,10 @@ class Rows {
         }
         cell.text = retrievedText ?? "";
         cell.w = formattedText ?? "";
+        cell.f = "";
       } else {
         cell.text = text;
+        cell.f = "";
       }
     }
   }
