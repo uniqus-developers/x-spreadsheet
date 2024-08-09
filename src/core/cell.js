@@ -1,6 +1,7 @@
 import {
   CELL_RANGE_REGEX,
   CELL_REF_REGEX,
+  DYNAMIC_VARIABLE_ERROR,
   GENERAL_ERROR,
   REF_ERROR,
   SHEET_TO_CELL_REF_REGEX,
@@ -242,13 +243,35 @@ const rangeToCellConversion = (range) => {
   return cells;
 };
 
-const parserFormulaString = (string, getCellText, cellRender) => {
+const parserFormulaString = (
+  string,
+  getCellText,
+  cellRender,
+  getDynamicVariable,
+  trigger
+) => {
   if (string?.length) {
     try {
       let isFormulaResolved = false;
-      let newFormulaString = "";
+      let newFormulaString = string;
+      let dynamicVariableError = false;
+      if (trigger) {
+        let dynamicVariableRegEx = new RegExp(`\\${trigger}\\S*`, "g");
+        newFormulaString = newFormulaString.replace(
+          dynamicVariableRegEx,
+          (match) => {
+            const { text, resolved } = getDynamicVariable(match);
+            if (resolved) {
+              return text;
+            } else {
+              dynamicVariableError = true;
+            }
+          }
+        );
+      }
+      if (dynamicVariableError) return DYNAMIC_VARIABLE_ERROR;
       // Removing spaces other than the spaces that are in apostrophes
-      newFormulaString = string.replace(SPACE_REMOVAL_REGEX, "");
+      newFormulaString = newFormulaString.replace(SPACE_REMOVAL_REGEX, "");
       newFormulaString = newFormulaString.replace(
         SHEET_TO_CELL_REF_REGEX,
         (match) => {
@@ -271,8 +294,8 @@ const parserFormulaString = (string, getCellText, cellRender) => {
         const [x, y] = expr2xy(match);
         const text = getCellText(x, y);
         if (text) {
-          if (text.startsWith("=")) {
-            return cellRender(text, [], getCellText);
+          if (text?.startsWith?.("=")) {
+            return cellRender(text, getCellText, getDynamicVariable, trigger);
           } else {
             return isNaN(Number(text)) ? `"${text}"` : text;
           }
@@ -288,15 +311,22 @@ const parserFormulaString = (string, getCellText, cellRender) => {
   return string;
 };
 
-const cellRender = (src, formulaMap, getCellText, cellList = []) => {
+const cellRender = (src, getCellText, getDynamicVariable, trigger) => {
   if (src[0] === "=") {
     const a = src.substring(1);
     try {
       var parser = new Parser();
-      const parsedFormula = parserFormulaString(a, getCellText, cellRender);
+      const parsedFormula = parserFormulaString(
+        a,
+        getCellText,
+        cellRender,
+        getDynamicVariable,
+        trigger
+      );
+
       if (parsedFormula.includes(REF_ERROR)) return REF_ERROR;
       const data = parser.parse(parsedFormula);
-      return data?.error ?? data?.result;
+      return data?.error?.replace("#", "") ?? data?.result;
     } catch (e) {
       return GENERAL_ERROR;
     }
@@ -313,6 +343,10 @@ const cellRender = (src, formulaMap, getCellText, cellList = []) => {
     //     cellRender(getCellText(x, y), formulaMap, getCellText, cellList),
     //   cellList
     // );
+  }
+  if (src[0] === trigger) {
+    const { text, resolved } = getDynamicVariable(src);
+    return resolved ? text ?? src : DYNAMIC_VARIABLE_ERROR;
   }
   return src;
 };
