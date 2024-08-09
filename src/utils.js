@@ -446,13 +446,11 @@ const addStylesToWorkbook = (styles, workbook) => {
           const { r, c } = XLSX.utils.decode_cell(cellAddress);
           const dimensions = {};
 
-          const height =
-            worksheet?.["!rows"]?.[r]?.hpt ?? worksheet?.["!rows"]?.[r]?.hpx;
-          const width =
-            worksheet?.["!cols"]?.[c]?.wpt ?? worksheet?.["!cols"]?.[c]?.wpx;
+          const height = worksheet?.["!rows"]?.[r]?.hpt;
+          const width = worksheet?.["!cols"]?.[c]?.wpx;
 
           if (height) dimensions.height = `${height / 0.75}px`;
-          if (width) dimensions.width = `${width / 0.75}px`;
+          if (width) dimensions.width = `${width}px`;
 
           const cellStylesWithDimensions = {
             ...(cellStyle ?? {}),
