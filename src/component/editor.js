@@ -102,6 +102,7 @@ function inputEventHandler(evt) {
       }
       if (trigger) {
         if (v?.includes(trigger)) {
+          suggest.hide()
           mentionMenuSearch.call(this, v);
         } else {
           mention.hide();
@@ -130,6 +131,7 @@ function inputEventHandler(evt) {
       }
       if (trigger) {
         if (v?.includes(trigger)) {
+          suggest.hide()
           mentionMenuSearch.call(this, v);
         } else {
           mention.hide();
