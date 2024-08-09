@@ -1205,13 +1205,13 @@ export default class DataProxy {
   }
 
   getCellTextOrDefault(ri, ci) {
-    const cell = this.getCell(ri, ci);
+    const cell = this.getCell(ri, ci) ?? {};
     const text = cell && cell.text ? cell.text : "";
     return this.resolveDynamicVariable.call(this, text)?.text;
   }
 
   getCellFormulaOrTextOrDefault(ri, ci) {
-    const cell = this.getCell(ri, ci);
+    const cell = this.getCell(ri, ci) ?? {};
     const text = cell && cell.f ? cell.f : cell.text ? cell.text : "";
     return this.resolveDynamicVariable.call(this, text)?.text;
   }
