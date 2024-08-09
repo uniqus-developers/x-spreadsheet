@@ -38,6 +38,8 @@ export default class Import extends IconItem {
       100
     );
 
+    SelectFormField.el.css("display", "flex").css("align-items", "center");
+
     const InputFormFieldWrapper = h("div", `${cssPrefix}-form-fields`).children(
       InputFormField.el
     );

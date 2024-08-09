@@ -77,7 +77,11 @@ export default class Suggest {
   ) {
     this.filterItems = [];
     this.items = items;
-    this.el = h("div", `${cssPrefix}-suggest`).css("width", width).hide();
+    this.el = h("div", `${cssPrefix}-suggest`)
+      .css("width", width)
+      .css("max-height", "400px")
+      .css("overflow", "auto")
+      .hide();
     this.itemClick = itemClick;
     this.itemIndex = -1;
     this.isMultiSelect = isMultiSelect;
@@ -122,7 +126,10 @@ export default class Suggest {
         title = it;
       }
       if (this.isMultiSelect) {
-        const checkBoxInput = h("input", `${cssPrefix}-item-checkbox`);
+        const checkBoxInput = h("input", `${cssPrefix}-item-checkbox`).css(
+          "margin-right",
+          "8px"
+        );
         checkBoxInput
           .attr("type", "checkbox")
           .attr("id", it.key)
@@ -146,6 +153,7 @@ export default class Suggest {
         });
 
         const item = h("div", `${cssPrefix}-item`)
+          .css("display", "flex")
           .children(checkBoxInput, inputLabel)
           .on("click.stop", () => {
             inputLabel.el.click();

@@ -90,7 +90,7 @@ const defaultSettings = {
   showBottomBar: true,
   row: {
     len: 100,
-    height: 25,
+    height: 20,
   },
   col: {
     len: 26,
@@ -108,7 +108,7 @@ const defaultSettings = {
     color: "#0a0a0a",
     font: {
       name: "Arial",
-      size: 10,
+      size: 11,
       bold: false,
       italic: false,
     },

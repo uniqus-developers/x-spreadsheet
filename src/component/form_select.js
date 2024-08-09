@@ -45,7 +45,9 @@ export default class FormSelect {
     );
     this.el
       .children(
-        (this.itemEl = h("div", "input-text").html(this.getTitle(key))),
+        (this.itemEl = h("div", "input-text")
+          .css("overflow", "hidden")
+          .html(this.getTitle(key))),
         this.suggest.el
       )
       .on("click", () => this.show());

@@ -250,15 +250,14 @@ function overlayerMousescroll(evt) {
       }
     }
   };
-  const tempY = Math.abs(deltaY);
-  const tempX = Math.abs(deltaX);
-  const temp = Math.max(tempY, tempX);
-  // console.log('event:', evt);
+  const absDeltaY = Math.abs(deltaY);
+  const absDeltaX = Math.abs(deltaX);
+
   // detail for windows/mac firefox vertical scroll
   if (/Firefox/i.test(window.navigator.userAgent))
     throttle(moveY(evt.detail), 50);
-  if (temp === tempX) throttle(moveX(deltaX), 50);
-  if (temp === tempY) throttle(moveY(deltaY), 50);
+  if (absDeltaY > absDeltaX && absDeltaX == 0) throttle(moveY(deltaY), 50);
+  if (absDeltaX > absDeltaY && absDeltaY == 0) throttle(moveX(deltaX), 50);
 }
 
 function overlayerTouch(direction, distance) {
@@ -679,7 +678,9 @@ function sheetInitEvents() {
       }
     })
     .on("mousewheel.stop", (evt) => {
-      overlayerMousescroll.call(this, evt);
+      const { className } = evt.target;
+      if (className === `${cssPrefix}-overlayer`)
+        overlayerMousescroll.call(this, evt);
     })
     .on("mouseout", (evt) => {
       const { offsetX, offsetY } = evt;
