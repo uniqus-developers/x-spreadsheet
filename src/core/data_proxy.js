@@ -1269,6 +1269,10 @@ export default class DataProxy {
     validations.validate(ri, ci, text);
   }
 
+  setCellProperty(ri, ci, key, value) {
+    this.rows(ri, ci, key, value);
+  }
+
   freezeIsActive() {
     const [ri, ci] = this.freeze;
     return ri > 0 || ci > 0;
