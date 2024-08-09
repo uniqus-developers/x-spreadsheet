@@ -85,7 +85,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
           }
         },
         (text) => {
-          data.resolveDynamicVariable.call(data, text);
+          return data.resolveDynamicVariable.call(data, text);
         },
         trigger
       );
