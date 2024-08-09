@@ -4,6 +4,7 @@ import {
   PX_TO_PT,
   CELL_REF_REPLACE_REGEX,
   SHEET_TO_CELL_REF_REGEX,
+  INDEXED_COLORS,
 } from "./constants";
 import { fonts } from "./core/font";
 
@@ -348,6 +349,11 @@ const parseExcelStyleToHTML = (styling, theme) => {
               if (value?.style && value.rgb)
                 parsedStyles[`border-${side}`] =
                   `1px ${value.style} ${value.rgb};`;
+              else if (value?.color?.indexed) {
+                const color = INDEXED_COLORS[value.color.indexed] ?? "#000000";
+                parsedStyles[`border-${side}`] =
+                  `1px ${value.style ?? "solid"} ${color}`;
+              }
               break;
           }
         });
@@ -369,6 +375,10 @@ const parseExcelStyleToHTML = (styling, theme) => {
               } else if (value?.theme && Object.hasOwn(theme, value.theme))
                 parsedStyles["background-color"] =
                   `#${theme[value.theme].rgb}` ?? "#ffffff";
+              else if (value?.color?.indexed) {
+                const color = INDEXED_COLORS[value.color.indexed] ?? "#ffffff";
+                parsedStyles[`background-color`] = color;
+              }
               break;
           }
         });
@@ -392,6 +402,9 @@ const parseExcelStyleToHTML = (styling, theme) => {
               } else if (value?.theme && Object.hasOwn(theme, value.theme)) {
                 parsedStyles["color"] =
                   `#${theme[value.theme].rgb}` ?? "#000000";
+              } else if (value?.color?.indexed) {
+                const color = INDEXED_COLORS[value.color.indexed] ?? "#000000";
+                parsedStyles[`color`] = color;
               }
               break;
             case "sz":
