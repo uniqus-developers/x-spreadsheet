@@ -7,6 +7,7 @@ import {
   INDEXED_COLORS,
 } from "./constants";
 import { fonts } from "./core/font";
+import { npx } from "./canvas/draw";
 
 const avialableFonts = Object.keys(fonts());
 
@@ -620,6 +621,32 @@ const getNewSheetName = (name, existingNames) => {
   return newName;
 };
 
+const getRowHeightForTextWrap = (ctx, textWrap, biw, text, fontSize) => {
+  const txts = `${text}`.split("\n");
+  const ntxts = [];
+  txts.forEach((it) => {
+    const txtWidth = ctx.measureText(it).width;
+    if (textWrap && txtWidth > npx(biw)) {
+      let textLine = { w: 0, len: 0, start: 0 };
+      for (let i = 0; i < it.length; i += 1) {
+        if (textLine.w >= npx(biw)) {
+          ntxts.push(it.substr(textLine.start, textLine.len));
+          textLine = { w: 0, len: 0, start: i };
+        }
+        textLine.len += 1;
+        textLine.w += ctx.measureText(it[i]).width + 1;
+      }
+      if (textLine.len > 0) {
+        ntxts.push(it.substr(textLine.start, textLine.len));
+      }
+    } else {
+      ntxts.push(it);
+    }
+  });
+  const rowHeight = ntxts.length * (fontSize + 2);
+  return rowHeight;
+};
+
 export {
   getStylingForClass,
   parseCssToXDataStyles,
@@ -630,4 +657,5 @@ export {
   stox,
   rgbaToRgb,
   getNewSheetName,
+  getRowHeightForTextWrap,
 };
