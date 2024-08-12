@@ -15,6 +15,7 @@ import { expr2expr, expr2xy, xy2expr } from "./alphabet";
 import { t } from "../locale/locale";
 import {
   generateUniqueId,
+  getRowHeightForTextWrap,
   getStylingForClass,
   parseCssToXDataStyles,
   parseHtmlToText,
@@ -23,6 +24,10 @@ import {
 import SheetConfig from "./sheetConfig";
 import CellConfig from "./cellConfig";
 import Variable from "./variable";
+import { DEFAULT_ROW_HEIGHT } from "../constants";
+import { getFontSizePxByPt } from "./font";
+import { getDrawBox } from "../component/table";
+import { npx } from "../canvas/draw";
 
 // private methods
 /*
@@ -90,7 +95,7 @@ const defaultSettings = {
   showBottomBar: true,
   row: {
     len: 100,
-    height: 20,
+    height: DEFAULT_ROW_HEIGHT,
   },
   col: {
     len: 26,
@@ -727,6 +732,34 @@ export default class DataProxy {
             property === "color" ||
             property === "bgcolor"
           ) {
+            if (property === "textwrap") {
+              const cellStyle = this.getCellStyleOrDefault(ri, ci);
+              const drawBox = getDrawBox(this, ri, ci);
+              const draw = this.rootContext.sheet.table.draw;
+              const font = Object.assign({}, cellStyle.font);
+              font.size = getFontSizePxByPt(font.size);
+              draw?.attr({
+                align: cellStyle.align,
+                valign: cellStyle.valign,
+                font: `${font.italic ? "italic" : ""} ${font.bold ? "bold" : ""} ${npx(font.size)}px ${font.name}`,
+                color: cellStyle.color,
+                strike: cellStyle.strike,
+                underline: cellStyle.underline,
+              });
+              const rowHeight = getRowHeightForTextWrap(
+                draw.ctx,
+                value,
+                drawBox.innerWidth(),
+                cell.text,
+                font.size
+              );
+              if (!this.rows.isHeightChanged)
+                this.rows.setHeight(
+                  ri,
+                  rowHeight ? rowHeight : DEFAULT_ROW_HEIGHT,
+                  true
+                );
+            }
             cstyle[property] = value;
             cell.style = this.addStyle(cstyle);
           } else if (property === "editable") {

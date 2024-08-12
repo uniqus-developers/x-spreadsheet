@@ -10,6 +10,7 @@ class Rows {
     // default row height
     this.height = height;
     this.data = dataProxyContext;
+    this.isHeightChanged = false;
   }
 
   getHeight(ri) {
@@ -21,9 +22,10 @@ class Rows {
     return this.height;
   }
 
-  setHeight(ri, v) {
+  setHeight(ri, v, isTextWrap = false) {
     const row = this.getOrNew(ri);
     row.height = v;
+    if (!isTextWrap) this.isHeightChanged = true;
   }
 
   unhide(idx) {
