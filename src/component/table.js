@@ -25,7 +25,7 @@ function tableFixedHeaderStyle() {
   };
 }
 
-function getDrawBox(data, rindex, cindex, yoffset = 0) {
+export function getDrawBox(data, rindex, cindex, yoffset = 0) {
   const { left, top, width, height } = data.cellRect(rindex, cindex);
   return new DrawBox(left, top + yoffset, width, height, cellPaddingWidth);
 }

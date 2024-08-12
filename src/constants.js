@@ -106,6 +106,8 @@ const INDEXED_COLORS = {
   64: "#000000",
 };
 
+const DEFAULT_ROW_HEIGHT = 20;
+
 export {
   REF_ERROR,
   GENERAL_ERROR,
@@ -117,4 +119,5 @@ export {
   PX_TO_PT,
   AVAILABLE_FEATURES,
   INDEXED_COLORS,
+  DEFAULT_ROW_HEIGHT,
 };
