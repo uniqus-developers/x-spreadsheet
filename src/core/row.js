@@ -131,10 +131,19 @@ class Rows {
           formattedText = "";
         }
         cell.text = retrievedText ?? "";
-        cell.formattedText = formattedText ?? "";
+        cell.w = formattedText ?? "";
+        cell.f = "";
       } else {
         cell.text = text;
+        cell.f = "";
       }
+    }
+  }
+
+  setCellProperty(ri, ci, key, value) {
+    const cell = this.getCellOrNew(ri, ci);
+    if (key) {
+      cell[key] = value;
     }
   }
 
