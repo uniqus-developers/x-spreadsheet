@@ -8,13 +8,21 @@ const baseFonts = [
   { key: "Arial", title: "Arial" },
   { key: "Times New Roman", title: "Times New Roman" },
   { key: "Georgia", title: "Georgia" },
-  { key: "Montserrat", title: "Montserrat" },
-  { key: "Helvetica", title: "Helvetica" },
-  { key: "Source Sans Pro", title: "Source Sans Pro" },
-  { key: "Comic Sans MS", title: "Comic Sans MS" },
   { key: "Courier New", title: "Courier New" },
   { key: "Verdana", title: "Verdana" },
-  { key: "Lato", title: "Lato" },
+  { key: "Calibri", title: "Calibri" },
+  {
+    key: "Tahoma",
+    title: "Tahoma",
+  },
+  {
+    key: "Garamond",
+    title: "Garamond",
+  },
+  {
+    key: "Book Antiqua",
+    title: "Book Antiqua",
+  },
 ];
 
 /** default fontSize list
