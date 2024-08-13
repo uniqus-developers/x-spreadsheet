@@ -1223,8 +1223,7 @@ export default class DataProxy {
       let regex = new RegExp(`\\${trigger}\\S*`, "g");
       const map = this?.variables?.map ?? {};
       text = text.replace(regex, (match) => {
-        const newMatch = match?.toLowerCase();
-        const value = map[newMatch];
+        const value = map[match];
         if (value) {
           resolved = true;
           return value;
@@ -1553,8 +1552,7 @@ export default class DataProxy {
           const cell = cells[cellIndex];
           const text = cell.f ?? cell.text;
           text?.replaceAll?.(regex, (match) => {
-            const newMatch = match?.toLowerCase();
-            map.add(newMatch);
+            map.add(match);
           });
         }
       }
