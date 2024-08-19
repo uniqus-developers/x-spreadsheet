@@ -580,8 +580,6 @@ const stox = (wb) => {
     out.push(o);
   });
 
-  console.log("PARSED DATA", JSON.parse(JSON.stringify(out)));
-
   return out;
 };
 
