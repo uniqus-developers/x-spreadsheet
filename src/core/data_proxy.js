@@ -495,95 +495,114 @@ export default class DataProxy {
   }
 
   pasteFromSystemClipboard(evt, resetSheet, eventTrigger) {
-    const { selector } = this;
-    const htmlContent = evt?.clipboardData?.getData("text/html");
+    try {
+      const { selector } = this;
+      const htmlContent = evt?.clipboardData?.getData("text/html");
+      navigator.clipboard
+        .read()
+        .then((data) => {
+          data.forEach((item) => {
+            if (item?.types?.includes("text/html")) {
+              const parser = new DOMParser();
+              const htmlDocument = parser.parseFromString(
+                htmlContent,
+                "text/html"
+              );
+              const htmlStyles =
+                htmlDocument?.getElementsByTagName("style")?.[0];
+              const htmlBody = htmlDocument?.getElementsByTagName("body")?.[0];
+              const tableContent = htmlBody?.querySelectorAll("table");
 
-    navigator.clipboard
-      .read()
-      .then((data) => {
-        data.forEach((item) => {
-          if (item?.types?.includes("text/html")) {
-            const parser = new DOMParser();
-            const htmlDocument = parser.parseFromString(
-              htmlContent,
-              "text/html"
-            );
-            const htmlStyles = htmlDocument?.getElementsByTagName("style")?.[0];
-            const htmlBody = htmlDocument?.getElementsByTagName("body")?.[0];
-            const tableContent = htmlBody?.querySelectorAll("table");
+              tableContent?.forEach((table) => {
+                const tBody = table?.querySelector("tbody");
+                const trs = tBody?.querySelectorAll("tr");
+                let startRow = selector.ri;
+                trs?.forEach((tr) => {
+                  let startColumn = selector.ci;
+                  const tds = tr?.querySelectorAll("td");
+                  tds?.forEach((td) => {
+                    const cellContent = parseHtmlToText(td?.innerHTML ?? "");
 
-            tableContent?.forEach((table) => {
-              const tBody = table?.querySelector("tbody");
-              const trs = tBody?.querySelectorAll("tr");
-              let startRow = selector.ri;
-              trs?.forEach((tr) => {
-                let startColumn = selector.ci;
-                const tds = tr?.querySelectorAll("td");
-                tds?.forEach((td) => {
-                  const cellContent = parseHtmlToText(td?.innerHTML ?? "");
+                    const mergedCellRange = this.merges.getFirstIncludes(
+                      startRow,
+                      startColumn
+                    );
 
-                  const mergedCellRange = this.merges.getFirstIncludes(
-                    startRow,
-                    startColumn
-                  );
+                    if (mergedCellRange) {
+                      for (
+                        let k = startColumn;
+                        k <= mergedCellRange.eci;
+                        k += 1
+                      )
+                        startColumn += 1;
+                    }
 
-                  if (mergedCellRange) {
-                    for (let k = startColumn; k <= mergedCellRange.eci; k += 1)
-                      startColumn += 1;
-                  }
+                    this.setCellText(
+                      startRow,
+                      startColumn,
+                      cellContent,
+                      "input"
+                    );
+                    const rowSpan = Number(td?.getAttribute("rowspan") ?? 1);
+                    const colSpan = Number(td?.getAttribute("colspan") ?? 1);
+                    if (rowSpan - 1 !== 0 || colSpan - 1 !== 0) {
+                      this.setCellMerge(startRow, startColumn, [
+                        rowSpan - 1,
+                        colSpan - 1,
+                      ]);
+                    }
+                    const cellClassName = td?.getAttribute("class");
+                    const cellStyleString = `${td?.getAttribute("style") ?? ""};${getStylingForClass(htmlStyles, cellClassName)}`;
+                    const cellStyle =
+                      parseCssToXDataStyles(cellStyleString)?.parsedStyles ??
+                      {};
+                    const { width, height } = cellStyle?.dimensions ?? {};
+                    delete cellStyle.dimensions;
+                    if (width && this.getColWidth(startColumn) < width) {
+                      this.setColWidth(startColumn, width);
+                    }
+                    if (height && this.getRowHeight(startRow) < height) {
+                      this.setRowHeight(startRow, height);
+                    }
+                    const cell = this.getCell(startRow, startColumn);
+                    if (cell) cell.style = this.addStyle(cellStyle);
 
-                  this.setCellText(startRow, startColumn, cellContent, "input");
-                  const rowSpan = Number(td?.getAttribute("rowspan") ?? 1);
-                  const colSpan = Number(td?.getAttribute("colspan") ?? 1);
-                  if (rowSpan - 1 !== 0 || colSpan - 1 !== 0) {
-                    this.setCellMerge(startRow, startColumn, [
-                      rowSpan - 1,
-                      colSpan - 1,
-                    ]);
-                  }
-                  const cellClassName = td?.getAttribute("class");
-                  const cellStyleString = `${td?.getAttribute("style") ?? ""};${getStylingForClass(htmlStyles, cellClassName)}`;
-                  const cellStyle =
-                    parseCssToXDataStyles(cellStyleString)?.parsedStyles ?? {};
-                  const { width, height } = cellStyle?.dimensions ?? {};
-                  delete cellStyle.dimensions;
-                  if (width && this.getColWidth(startColumn) < width) {
-                    this.setColWidth(startColumn, width);
-                  }
-                  if (height && this.getRowHeight(startRow) < height) {
-                    this.setRowHeight(startRow, height);
-                  }
-                  const cell = this.getCell(startRow, startColumn);
-                  if (cell) cell.style = this.addStyle(cellStyle);
-
-                  startColumn += colSpan;
+                    startColumn += colSpan;
+                  });
+                  startRow += 1;
                 });
-                startRow += 1;
-              });
-            });
-            resetSheet();
-            eventTrigger(this.rows.getData());
-          } else if (item?.types?.includes("text/plain")) {
-            navigator.clipboard.readText().then((content) => {
-              const contentToPaste = this.parseClipboardContent(content);
-              let startRow = selector.ri;
-              contentToPaste.forEach((row) => {
-                let startColumn = selector.ci;
-                row.forEach((cellContent) => {
-                  this.setCellText(startRow, startColumn, cellContent, "input");
-                  startColumn += 1;
-                });
-                startRow += 1;
               });
               resetSheet();
               eventTrigger(this.rows.getData());
-            });
-          }
+            } else if (item?.types?.includes("text/plain")) {
+              navigator.clipboard.readText().then((content) => {
+                const contentToPaste = this.parseClipboardContent(content);
+                let startRow = selector.ri;
+                contentToPaste.forEach((row) => {
+                  let startColumn = selector.ci;
+                  row.forEach((cellContent) => {
+                    this.setCellText(
+                      startRow,
+                      startColumn,
+                      cellContent,
+                      "input"
+                    );
+                    startColumn += 1;
+                  });
+                  startRow += 1;
+                });
+                resetSheet();
+                eventTrigger(this.rows.getData());
+              });
+            }
+          });
+        })
+        .catch((err) => {
+          console.error("Failed to read clipboard contents: ", err);
         });
-      })
-      .catch((err) => {
-        console.error("Failed to read clipboard contents: ", err);
-      });
+    } catch (err) {
+      console.error("Pasting error: ", err);
+    }
   }
 
   parseClipboardContent(clipboardContent) {
@@ -642,9 +661,10 @@ export default class DataProxy {
     else [sri, eri] = [nri, cri];
     if (nci > cci) [sci, eci] = [cci, nci];
     else [sci, eci] = [nci, cci];
-    selector.range = merges.union(new CellRange(sri, sci, eri, eci));
-    selector.range = merges.union(selector.range);
-    // console.log('selector.range:', selector.range);
+    if (ri !== -1 && ci !== -1) {
+      selector.range = merges.union(new CellRange(sri, sci, eri, eci));
+      selector.range = merges.union(selector.range);
+    }
     return selector.range;
   }
 
@@ -746,17 +766,21 @@ export default class DataProxy {
                 strike: cellStyle.strike,
                 underline: cellStyle.underline,
               });
-              const rowHeight = getRowHeightForTextWrap(
-                draw.ctx,
-                value,
-                drawBox.innerWidth(),
-                cell.text,
-                font.size
-              );
+              const rowHeight = value
+                ? getRowHeightForTextWrap(
+                    draw.ctx,
+                    value,
+                    drawBox.innerWidth(),
+                    cell.text,
+                    font.size
+                  )
+                : DEFAULT_ROW_HEIGHT;
               if (!this.rows.isHeightChanged)
                 this.rows.setHeight(
                   ri,
-                  rowHeight ? rowHeight : DEFAULT_ROW_HEIGHT,
+                  rowHeight && rowHeight > DEFAULT_ROW_HEIGHT
+                    ? rowHeight
+                    : DEFAULT_ROW_HEIGHT,
                   true
                 );
             }
