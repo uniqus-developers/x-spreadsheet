@@ -187,6 +187,7 @@ body {
   right: 15px;
   overflow-x: scroll;
   overflow-y: hidden;
+  z-index: 12;
 }
 .x-spreadsheet-scrollbar.horizontal > div {
   height: 1px;

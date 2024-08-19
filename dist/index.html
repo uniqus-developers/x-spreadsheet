@@ -111,13 +111,17 @@
             },
             { name: "sheet-test", rows: rows10 },
           ])
-          .change((cdata) => {});
+          .change((cdata) => {
+            // console.log("HEY THERE", cdata);
+          });
 
-        xs.on("cell-selected", (cell, ri, ci) => {})
+        xs.on("cells-selected", (cell, range) => {
+          console.log("CELLS_SELECTED", range);
+        })
           .on("cell-edited", (text, ri, ci) => {})
           .on("pasted-clipboard", (data) => {})
           .on("grid-load", (text, ri, ci) => {
-            console.log("grid-load", xs.sheet.data.getVariables());
+            // console.log("grid-load", xs.sheet.data.getVariables());
           });
       }
     </script>
