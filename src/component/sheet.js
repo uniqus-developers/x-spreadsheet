@@ -763,7 +763,7 @@ function sheetInitEvents() {
       if (match) {
         const { ri, ci, range } = this.data.selector;
         const cell = this.data.getSelectedCell();
-        match.callback?.call?.(this, ri, ci, range, cell);
+        match.callback?.call?.(this, ri, ci, range, cell, match);
       }
     }
     if (type === "validation") {
