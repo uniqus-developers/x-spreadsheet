@@ -334,7 +334,7 @@ class Draw {
 
   border(style, color) {
     const { ctx, data } = this;
-    ctx.lineWidth = thinLineWidth;
+    ctx.lineWidth = thinLineWidth();
     ctx.strokeStyle =
       !!data.sheetConfig?.gridLine === false ? color ?? "#ffffff" : color;
     // console.log('style:', style);

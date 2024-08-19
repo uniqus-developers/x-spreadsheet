@@ -119,6 +119,9 @@ const parseCssToXDataStyles = (styleString) => {
           const heightValue = parsePtOrPxValue(value);
           if (heightValue) dimensions.height = heightValue;
           break;
+        case "text-wrap":
+          parsedStyles["textwrap"] = value === "wrap";
+          break;
       }
     });
     parsedStyles["dimensions"] = dimensions;
@@ -335,6 +338,9 @@ const parseExcelStyleToHTML = (styling, theme) => {
               break;
             case "horizontal":
               parsedStyles["text-align"] = value;
+              break;
+            case "wrapText":
+              parsedStyles["text-wrap"] = value ? "wrap" : "nowrap";
               break;
           }
         });
@@ -573,6 +579,8 @@ const stox = (wb) => {
     o.sheetConfig = { gridLine: !gridStatus };
     out.push(o);
   });
+
+  console.log("PARSED DATA", JSON.parse(JSON.stringify(out)));
 
   return out;
 };
