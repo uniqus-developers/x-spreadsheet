@@ -261,7 +261,7 @@ class Draw {
   }
 
   text(mtxt, box, attr = {}, textWrap = true, cellMeta = {}) {
-    mtxt = this.data.resolveDynamicVariable.call(this.data, mtxt);
+    mtxt = this.data.resolveDynamicVariable.call(this.data, mtxt)?.text ?? mtxt;
     mtxt = this.textConfigOperation(mtxt, cellMeta);
     const { ctx } = this;
     const { align, valign, font, color, strike, underline } = attr;

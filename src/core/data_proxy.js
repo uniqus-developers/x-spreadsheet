@@ -807,6 +807,10 @@ export default class DataProxy {
   // state: input | finished
   setFormulaCellText(text, ri, ci, state = "input") {
     const { autoFilter, rows } = this;
+    if (state === "finished") {
+      rows.setCellProperty(ri, ci, "f", text);
+      return;
+    }
     let nri = ri;
     if (this.unsortedRowMap.has(ri)) {
       nri = this.unsortedRowMap.get(ri);
@@ -1238,6 +1242,7 @@ export default class DataProxy {
 
   resolveDynamicVariable(text) {
     const trigger = this.settings?.mentionProgress?.trigger;
+    let resolved = true;
     if (trigger && text?.includes?.(trigger)) {
       let regex = new RegExp(`\\${trigger}\\S*`, "g");
       const map = this?.variables?.map ?? {};
@@ -1245,19 +1250,27 @@ export default class DataProxy {
         const newMatch = match?.toLowerCase();
         const value = map[newMatch];
         if (value) {
+          resolved = true;
           return value;
         } else {
+          resolved = false;
           return match;
         }
       });
     }
-    return text;
+    return { text: text, resolved: resolved };
   }
 
   getCellTextOrDefault(ri, ci) {
-    const cell = this.getCell(ri, ci);
+    const cell = this.getCell(ri, ci) ?? {};
     const text = cell && cell.text ? cell.text : "";
-    return this.resolveDynamicVariable.call(this, text);
+    return this.resolveDynamicVariable.call(this, text)?.text;
+  }
+
+  getCellFormulaOrTextOrDefault(ri, ci) {
+    const cell = this.getCell(ri, ci) ?? {};
+    const text = cell && cell.f ? cell.f : cell.text ? cell.text : "";
+    return this.resolveDynamicVariable.call(this, text)?.text;
   }
 
   getCellStyle(ri, ci) {
@@ -1311,6 +1324,10 @@ export default class DataProxy {
     }
     // validator
     validations.validate(ri, ci, text);
+  }
+
+  setCellProperty(ri, ci, key, value) {
+    this.rows(ri, ci, key, value);
   }
 
   freezeIsActive() {
@@ -1558,7 +1575,7 @@ export default class DataProxy {
         const cells = rowData[rowIndex]?.cells;
         for (let cellIndex in cells) {
           const cell = cells[cellIndex];
-          const text = cell.text;
+          const text = cell.f ?? cell.text;
           text?.replaceAll?.(regex, (match) => {
             const newMatch = match?.toLowerCase();
             map.add(newMatch);
