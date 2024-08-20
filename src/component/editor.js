@@ -9,7 +9,7 @@ function resetTextareaSize() {
   const { inputText } = this;
   if (!/^\s*$/.test(inputText)) {
     const { textlineEl, textEl, areaOffset } = this;
-    const txts = inputText.split("\n");
+    const txts = inputText?.toString?.()?.split?.("\n");
     const maxTxtSize = Math.max(...txts.map((it) => it.length));
     const tlOffset = textlineEl.offset();
     const fontWidth = tlOffset.width / inputText.length;
@@ -102,7 +102,7 @@ function inputEventHandler(evt) {
       }
       if (trigger) {
         if (v?.includes(trigger)) {
-          suggest.hide()
+          suggest.hide();
           mentionMenuSearch.call(this, v);
         } else {
           mention.hide();
@@ -131,7 +131,7 @@ function inputEventHandler(evt) {
       }
       if (trigger) {
         if (v?.includes(trigger)) {
-          suggest.hide()
+          suggest.hide();
           mentionMenuSearch.call(this, v);
         } else {
           mention.hide();
