@@ -1247,7 +1247,8 @@ export default class DataProxy {
       let regex = new RegExp(`\\${trigger}\\S*`, "g");
       const map = this?.variables?.map ?? {};
       text = text.replace(regex, (match) => {
-        const value = map[match];
+        const value =
+          map[match] || map[match?.replaceAll?.(" ", "_")?.toLowerCase?.()];
         if (value) {
           resolved = true;
           return value;
