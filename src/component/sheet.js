@@ -730,7 +730,7 @@ function sheetInitEvents() {
   };
   // editor
   editor.change = (state, itext) => {
-    if (itext.trim()?.startsWith("=")) {
+    if (itext?.trim?.()?.startsWith("=")) {
       const { ri, ci } = this.data.selector;
       if (!editor.formulaCell) {
         editor.setFormulaCell({ ri, ci });
