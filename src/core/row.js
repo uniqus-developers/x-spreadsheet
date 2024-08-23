@@ -121,21 +121,24 @@ class Rows {
       const valueSetter = this.options.valueSetter;
       if (valueSetter) {
         const result = valueSetter({ ...this, text, cell });
-        let retrievedText, formattedText;
+        let retrievedText, formattedText, html;
         if (result && typeof result === "object" && !Array.isArray(result)) {
-          ({ retrievedText, formattedText } = result);
+          ({ retrievedText, formattedText, html } = result);
         } else if (Array.isArray(result)) {
-          [retrievedText, formattedText] = result;
+          [retrievedText, formattedText, html] = result;
         } else {
           retrievedText = result;
           formattedText = "";
+          html = "";
         }
         cell.text = retrievedText ?? "";
         cell.w = formattedText ?? "";
         cell.f = "";
+        cell.h = html ?? "";
       } else {
         cell.text = text;
         cell.f = "";
+        cell.h = "";
       }
     }
   }
@@ -370,6 +373,8 @@ class Rows {
         } else if (what === "text") {
           if (cell.text) delete cell.text;
           if (cell.value) delete cell.value;
+          if (cell.h) cell.h = "";
+          if (cell.w) cell.w = "";
         } else if (what === "format") {
           if (cell.style !== undefined) delete cell.style;
           if (cell.merge) delete cell.merge;
