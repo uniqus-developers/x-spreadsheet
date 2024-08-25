@@ -668,19 +668,49 @@ export default class DataProxy {
     return selector.range;
   }
 
+  getMaximumAvailableIndexes() {
+    const { rows } = this;
+    let maxRow = 0,
+      maxCol = 0;
+    const rowList = rows?._;
+    if (rowList) {
+      for (const rowKey of Object.keys(rowList)) {
+        const numericRowKey = Number(rowKey);
+        if (maxRow <= numericRowKey) {
+          maxRow = numericRowKey;
+        }
+        const cells = rowList[rowKey].cells;
+        if (cells) {
+          for (const cellKey of Object.keys(cells)) {
+            const numericCellKey = Number(cellKey);
+            if (maxCol <= numericCellKey) {
+              maxCol = numericCellKey;
+            }
+          }
+        }
+      }
+    }
+    return { maxRow, maxCol };
+  }
+
   calSelectedRangeByStart(ri, ci) {
-    const { selector, rows, cols, merges } = this;
+    const { selector, rows, cols, merges, settings = {} } = this;
+    const { suppressMaximumSelection } = settings;
+    let maxRow = 0,
+      maxCol = 0;
+    if (suppressMaximumSelection) {
+      ({ maxRow, maxCol } = this.getMaximumAvailableIndexes());
+    }
     let cellRange = merges.getFirstIncludes(ri, ci);
-    // console.log('cellRange:', cellRange, ri, ci, merges);
     if (cellRange === null) {
       cellRange = new CellRange(ri, ci, ri, ci);
       if (ri === -1) {
         cellRange.sri = 0;
-        cellRange.eri = rows.len - 1;
+        cellRange.eri = suppressMaximumSelection ? maxRow : rows.len - 1;
       }
       if (ci === -1) {
         cellRange.sci = 0;
-        cellRange.eci = cols.len - 1;
+        cellRange.eci = suppressMaximumSelection ? maxCol : cols.len - 1;
       }
     }
     selector.range = cellRange;
