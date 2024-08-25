@@ -59,6 +59,7 @@ declare module "x-data-spreadsheet" {
     };
     allowMultipleSheets?: boolean;
     disableFeatures?: string[];
+    suppressMaximumSelection?: boolean;
   }
 
   export type CELL_SELECTED = "cell-selected";
