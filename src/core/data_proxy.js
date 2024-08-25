@@ -676,16 +676,15 @@ export default class DataProxy {
     if (rowList) {
       for (const rowKey of Object.keys(rowList)) {
         const numericRowKey = Number(rowKey);
-        if (maxRow <= numericRowKey) {
+        const cells = rowList[rowKey].cells ?? {};
+        if (maxRow <= numericRowKey && Object.keys(cells)?.length) {
           maxRow = numericRowKey;
         }
-        const cells = rowList[rowKey].cells;
-        if (cells) {
-          for (const cellKey of Object.keys(cells)) {
-            const numericCellKey = Number(cellKey);
-            if (maxCol <= numericCellKey) {
-              maxCol = numericCellKey;
-            }
+
+        for (const cellKey of Object.keys(cells)) {
+          const numericCellKey = Number(cellKey);
+          if (maxCol <= numericCellKey) {
+            maxCol = numericCellKey;
           }
         }
       }
