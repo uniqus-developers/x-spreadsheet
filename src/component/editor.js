@@ -77,8 +77,7 @@ function mentionMenuSearch(text) {
 
 function inputEventHandler(evt) {
   const v = evt.target.value;
-  // console.log(evt, 'v:', v);
-  const { suggest, textlineEl, validator, mention, trigger, textEl } = this;
+  const { suggest, textlineEl, validator, mention, trigger } = this;
   const { cell } = this;
   if (cell !== null) {
     if (
@@ -337,7 +336,6 @@ export default class Editor {
   setCell(cell, validator) {
     if (cell && cell.editable === false) return;
     const editValueFormatter = this.options.editValueFormatter;
-    // console.log('::', validator);
     const { el, datepicker, suggest } = this;
     el.show();
     this.cell = cell;
@@ -349,7 +347,6 @@ export default class Editor {
       text = cell ? cell.f || cell.text : "";
     }
     this.setText(text);
-
     this.validator = validator;
     if (validator) {
       const { type } = validator;
@@ -363,6 +360,10 @@ export default class Editor {
         suggest.setItems(validator.values());
         suggest.search("");
       }
+    }
+    //Added this code to call input handle when we are manually setting value to editor input field
+    if (cell?.text?.length === 1) {
+      inputEventHandler.call(this, { target: { value: text } });
     }
   }
 
