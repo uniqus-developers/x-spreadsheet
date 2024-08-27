@@ -983,6 +983,7 @@ export default class Sheet {
     this.horizontalScrollbar = new Scrollbar(false);
     // editor
     this.editor = new Editor(
+      this.data,
       formulas,
       () => this.getTableOffset(),
       data.rows.height,
@@ -1050,6 +1051,7 @@ export default class Sheet {
     this.print.resetData(data);
     this.selector.resetData(data);
     this.table.resetData(data);
+    this.editor.resetData(data);
     setTimeout(() => {
       this.trigger("grid-load", data);
     });
