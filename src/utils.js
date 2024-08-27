@@ -295,8 +295,8 @@ const readExcelFile = (file) => {
         workbookIns.eachSheet((sheet) => {
           const sheetName = sheet?.name;
           styles[sheetName] = {};
-          sheet.eachRow((row) => {
-            row?.eachCell((cell) => {
+          sheet.eachRow({ includeEmpty: true }, (row) => {
+            row?.eachCell({ includeEmpty: true }, (cell) => {
               const style = cell.style;
               const address = cell.address;
               styles[sheetName][address] = style;
