@@ -4,6 +4,7 @@ import Suggest from "./suggest";
 import Datepicker from "./datepicker";
 import { cssPrefix } from "../config";
 import MentionMenu from "./mentionmenu";
+import { DEFAULT_ROW_HEIGHT } from "../constants";
 
 function resetTextareaSize() {
   const { inputText } = this;
@@ -48,6 +49,8 @@ function keydownEventHandler(evt) {
   if (keyCode !== 13 && keyCode !== 9) evt.stopPropagation();
   if (keyCode === 13 && altKey) {
     insertText.call(this, evt, "\n");
+    const { ri } = this.data?.selector ?? {};
+    this.data.setRowHeight(ri, this.data.getRowHeight(ri) + DEFAULT_ROW_HEIGHT);
     evt.stopPropagation();
   }
   if (keyCode === 13 && !altKey) evt.preventDefault();
@@ -236,11 +239,12 @@ function mentionInputHandler(item) {
 }
 
 export default class Editor {
-  constructor(formulas, viewFn, rowHeight, options = {}) {
+  constructor(data, formulas, viewFn, rowHeight, options = {}) {
     this.options = options;
     this.viewFn = viewFn;
     this.rowHeight = rowHeight;
     this.formulas = formulas;
+    this.data = data;
     this.suggest = new Suggest(formulas, (it) => {
       suggestItemClick.call(this, it);
     });
@@ -375,5 +379,9 @@ export default class Editor {
     this.inputText = text;
     setText.call(this, text, text.length);
     resetTextareaSize.call(this);
+  }
+
+  resetData(d) {
+    this.data = d;
   }
 }
