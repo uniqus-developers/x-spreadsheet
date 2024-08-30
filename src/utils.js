@@ -22,9 +22,11 @@ const getStylingForClass = (styleTag, className) => {
   return "";
 };
 
-const parseCssToXDataStyles = (styleString) => {
+const parseCssToXDataStyles = (styleString, cellType) => {
+  const parsedStyles = {};
+  // By default numbers are right aligned.
+  if (cellType === "n") parsedStyles.align = "right";
   if (styleString) {
-    const parsedStyles = {};
     const fontStyles = {};
     let borderStyles = {};
     const dimensions = {};
@@ -129,7 +131,7 @@ const parseCssToXDataStyles = (styleString) => {
     if (Object.keys(borderStyles).length) parsedStyles["border"] = borderStyles;
     return { parsedStyles, sheetConfig: { gridLine: gridStatus } };
   }
-  return { parsedStyles: {}, sheetConfig: { gridLine: false } };
+  return { parsedStyles, sheetConfig: { gridLine: false } };
 };
 
 const parseBorderProperties = (styles) => {
@@ -529,7 +531,8 @@ const stox = (wb) => {
         cells[j].formattedText = formattedText;
         const cellStyle = ws[cellRef].s ?? "";
         const cellMeta = ws[cellRef].metadata;
-        const parsedData = parseCssToXDataStyles(cellStyle);
+        const cellType = ws[cellRef].t;
+        const parsedData = parseCssToXDataStyles(cellStyle, cellType);
         const parsedCellStyles = parsedData.parsedStyles;
         const sheetConfig = parsedData.sheetConfig;
         if (!gridStatus && sheetConfig?.gridLine) {
@@ -653,6 +656,8 @@ const getRowHeightForTextWrap = (ctx, textWrap, biw, text, fontSize) => {
   return rowHeight;
 };
 
+const deepClone = (data) => JSON.parse(JSON.stringify(data));
+
 export {
   getStylingForClass,
   parseCssToXDataStyles,
@@ -664,4 +669,5 @@ export {
   rgbaToRgb,
   getNewSheetName,
   getRowHeightForTextWrap,
+  deepClone,
 };
