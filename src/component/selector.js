@@ -25,10 +25,10 @@ class SelectorElement {
         this.inputChange(evt.target.value);
       });
       this.el.child(
-        (this.hideInputDiv = h("div", "hide-input").child(this.hideInput)),
+        (this.hideInputDiv = h("div", "hide-input").child(this.hideInput))
       );
       this.el.child(
-        (this.hideInputDiv = h("div", "hide-input").child(this.hideInput)),
+        (this.hideInputDiv = h("div", "hide-input").child(this.hideInput))
       );
     }
     startZIndex += 1;
@@ -315,7 +315,6 @@ export default class Selector {
   }
 
   reset() {
-    // console.log('::::', this.data);
     const { eri, eci } = this.data.selector.range;
     this.setEnd(eri, eci);
   }
