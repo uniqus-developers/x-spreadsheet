@@ -746,19 +746,28 @@ export default class DataProxy {
                 strike: cellStyle.strike,
                 underline: cellStyle.underline,
               });
-              const rowHeight = getRowHeightForTextWrap(
-                draw.ctx,
-                value,
-                drawBox.innerWidth(),
-                cell.text,
-                font.size
-              );
+
+              const oldRowHeight = this.rows.getHeight(ri);
+              const newRowHeight = value
+                ? getRowHeightForTextWrap(
+                    draw.ctx,
+                    value,
+                    drawBox.innerWidth(),
+                    cell.text,
+                    font.size
+                  )
+                : DEFAULT_ROW_HEIGHT;
+
+              const rowHeight = value
+                ? oldRowHeight > newRowHeight
+                  ? oldRowHeight
+                  : newRowHeight > DEFAULT_ROW_HEIGHT
+                    ? newRowHeight
+                    : DEFAULT_ROW_HEIGHT
+                : DEFAULT_ROW_HEIGHT;
+
               if (!this.rows.isHeightChanged)
-                this.rows.setHeight(
-                  ri,
-                  rowHeight ? rowHeight : DEFAULT_ROW_HEIGHT,
-                  true
-                );
+                this.rows.setHeight(ri, rowHeight, true);
             }
             cstyle[property] = value;
             cell.style = this.addStyle(cstyle);
