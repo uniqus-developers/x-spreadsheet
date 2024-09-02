@@ -87,7 +87,9 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         (text) => {
           return data.resolveDynamicVariable.call(data, text);
         },
-        trigger
+        trigger,
+        {},
+        data.name
       );
       cell.text = cellText;
     } else {
