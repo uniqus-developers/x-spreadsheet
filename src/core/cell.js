@@ -1,6 +1,7 @@
 import {
   CELL_RANGE_REGEX,
   CELL_REF_REGEX,
+  CIRCULAR_DEPENDENCY_ERROR,
   DYNAMIC_VARIABLE_ERROR,
   GENERAL_ERROR,
   REF_ERROR,
@@ -248,13 +249,16 @@ const parserFormulaString = (
   getCellText,
   cellRender,
   getDynamicVariable,
-  trigger
+  trigger,
+  formulaCallStack,
+  sheetName
 ) => {
   if (string?.length) {
     try {
       let isFormulaResolved = false;
       let newFormulaString = string;
       let dynamicVariableError = false;
+      let isCircularDependency = false;
       if (trigger) {
         let dynamicVariableRegEx = new RegExp(`\\${trigger}\\S*`, "g");
         newFormulaString = newFormulaString.replace(
@@ -275,9 +279,28 @@ const parserFormulaString = (
       newFormulaString = newFormulaString.replace(
         SHEET_TO_CELL_REF_REGEX,
         (match) => {
-          const [sheetName, cellRef] = match.replaceAll("'", "").split("!");
+          const [linkSheetName, cellRef] = match.replaceAll("'", "").split("!");
           const [x, y] = expr2xy(cellRef);
-          const text = getCellText(x, y, sheetName);
+          const text = getCellText(x, y, linkSheetName);
+          if (text?.startsWith?.("=")) {
+            if (formulaCallStack?.[linkSheetName]?.includes(cellRef))
+              isCircularDependency = true;
+            else {
+              formulaCallStack[linkSheetName] =
+                formulaCallStack[linkSheetName] || [];
+              formulaCallStack[linkSheetName].push(cellRef);
+            }
+            return isCircularDependency
+              ? 0
+              : cellRender(
+                  text,
+                  getCellText,
+                  getDynamicVariable,
+                  trigger,
+                  formulaCallStack,
+                  linkSheetName
+                );
+          }
           if (text === REF_ERROR) isFormulaResolved = true;
           return isNaN(Number(text)) ? `"${text}"` : text;
         }
@@ -290,12 +313,27 @@ const parserFormulaString = (
           return cells;
         }
       });
-      newFormulaString = newFormulaString.replace(CELL_REF_REGEX, (match) => {
-        const [x, y] = expr2xy(match);
+      newFormulaString = newFormulaString.replace(CELL_REF_REGEX, (cellRef) => {
+        const [x, y] = expr2xy(cellRef);
         const text = getCellText(x, y);
         if (text) {
           if (text?.startsWith?.("=")) {
-            return cellRender(text, getCellText, getDynamicVariable, trigger);
+            if (formulaCallStack?.[sheetName]?.includes(cellRef))
+              isCircularDependency = true;
+            else {
+              formulaCallStack[sheetName] = formulaCallStack[sheetName] || [];
+              formulaCallStack[sheetName].push(cellRef);
+            }
+            return isCircularDependency
+              ? 0
+              : cellRender(
+                  text,
+                  getCellText,
+                  getDynamicVariable,
+                  trigger,
+                  formulaCallStack,
+                  sheetName
+                );
           } else {
             return isNaN(Number(text)) ? `"${text}"` : text;
           }
@@ -303,7 +341,9 @@ const parserFormulaString = (
           return 0;
         }
       });
-      return newFormulaString;
+      return isCircularDependency
+        ? CIRCULAR_DEPENDENCY_ERROR
+        : newFormulaString;
     } catch (e) {
       return string;
     }
@@ -311,20 +351,31 @@ const parserFormulaString = (
   return string;
 };
 
-const cellRender = (src, getCellText, getDynamicVariable, trigger) => {
+const cellRender = (
+  src,
+  getCellText,
+  getDynamicVariable,
+  trigger,
+  formulaCallStack = {},
+  sheetName
+) => {
   if (src[0] === "=") {
-    const a = src.substring(1);
+    const formula = src.substring(1);
     try {
       var parser = new Parser();
       const parsedFormula = parserFormulaString(
-        a,
+        formula,
         getCellText,
         cellRender,
         getDynamicVariable,
-        trigger
+        trigger,
+        formulaCallStack,
+        sheetName
       );
 
       if (parsedFormula.includes(REF_ERROR)) return REF_ERROR;
+      else if (parsedFormula.includes(CIRCULAR_DEPENDENCY_ERROR))
+        return CIRCULAR_DEPENDENCY_ERROR;
       const data = parser.parse(parsedFormula);
       return data?.error?.replace("#", "") ?? data?.result;
     } catch (e) {
