@@ -102,13 +102,13 @@ function buildMenuItem(item) {
 function buildMenu() {
   const extendedContextMenu = this.extendedContextMenu;
   const buildInMenus = menuItems.map((it) => buildMenuItem.call(this, it));
+  let additionalMenus = [];
   if (extendedContextMenu?.length) {
-    extendedContextMenu.unshift({ key: "divider" });
+    const extMenu = structuredClone(extendedContextMenu);
+    extMenu.push({ key: "divider" });
+    additionalMenus = extMenu.map((it) => buildMenuItem.call(this, it));
   }
-  const additionalMenus = extendedContextMenu.map((it) =>
-    buildMenuItem.call(this, it)
-  );
-  return [...buildInMenus, ...(additionalMenus ?? [])];
+  return [...(additionalMenus ?? []), ...buildInMenus];
 }
 
 export default class ContextMenu {
