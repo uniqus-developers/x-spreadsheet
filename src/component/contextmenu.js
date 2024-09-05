@@ -104,7 +104,7 @@ function buildMenu() {
   const buildInMenus = menuItems.map((it) => buildMenuItem.call(this, it));
   let additionalMenus = [];
   if (extendedContextMenu?.length) {
-    const extMenu = structuredClone(extendedContextMenu);
+    const extMenu = Array.from(extendedContextMenu)
     extMenu.push({ key: "divider" });
     additionalMenus = extMenu.map((it) => buildMenuItem.call(this, it));
   }
