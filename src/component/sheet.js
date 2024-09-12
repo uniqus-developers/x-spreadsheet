@@ -1112,4 +1112,9 @@ export default class Sheet {
   selectCell(ri, ci) {
     selectorSet.call(this, false, ri, ci);
   }
+
+  selectCellAndFocus(ri, ci) {
+    selectorSet.call(this, false, ri, ci);
+    scrollbarMove.call(this);
+  }
 }

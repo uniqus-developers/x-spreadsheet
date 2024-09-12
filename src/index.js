@@ -263,6 +263,10 @@ class Spreadsheet {
   selectCell(ri, ci) {
     this.sheet.selectCell(ri, ci);
   }
+
+  selectCellAndFocus(ri, ci) {
+    this.sheet.selectCellAndFocus(ri, ci);
+  }
 }
 
 const spreadsheet = (el, options = {}) => new Spreadsheet(el, options);
