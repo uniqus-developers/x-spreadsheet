@@ -92,6 +92,13 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         data.name
       );
       cell.text = cellText;
+      //Below code is temporarily added will be removed once we completely remove froala
+      if(cell.w){
+        cell.w = cellText?.toString?.() ?? cellText
+      }
+      if(cell.h){
+        cell.h = cellText?.toString?.() ?? cellText
+      }
     } else {
       cellText = cell.text || "";
     }
