@@ -1287,6 +1287,7 @@ export default class DataProxy {
           const { value, resolved: isResolved } =
             map[match] || map[variableName];
           resolved = isResolved;
+          resolving = false;
           return value;
         } else {
           resolved = false;
