@@ -1276,23 +1276,27 @@ export default class DataProxy {
 
   resolveDynamicVariable(text) {
     const trigger = this.settings?.mentionProgress?.trigger;
-    let resolved = true;
+    let resolved = false;
+    let resolving = true;
     if (trigger && text?.includes?.(trigger)) {
       let regex = new RegExp(`\\${trigger}\\S*`, "g");
       const map = this?.variables?.map ?? {};
       text = text.replace(regex, (match) => {
-        const value =
-          map[match] || map[match?.replaceAll?.(" ", "_")?.toLowerCase?.()];
-        if (value) {
-          resolved = true;
+        const variableName = match?.replaceAll?.(" ", "_")?.toLowerCase?.();
+        if (map.hasOwnProperty(match) || map.hasOwnProperty(variableName)) {
+          const { value, resolved: isResolved } =
+            map[match] || map[variableName];
+          resolved = isResolved;
+          resolving = false;
           return value;
         } else {
           resolved = false;
+          resolving = true;
           return match;
         }
       });
     }
-    return { text: text, resolved: resolved };
+    return { text: text, resolved: resolved, resolving: resolving };
   }
 
   getCellTextOrDefault(ri, ci) {

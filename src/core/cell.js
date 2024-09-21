@@ -3,6 +3,7 @@ import {
   CELL_REF_REGEX,
   CIRCULAR_DEPENDENCY_ERROR,
   DYNAMIC_VARIABLE_ERROR,
+  DYNAMIC_VARIABLE_RESOLVING,
   GENERAL_ERROR,
   REF_ERROR,
   SHEET_TO_CELL_REF_REGEX,
@@ -259,21 +260,21 @@ const parserFormulaString = (
       let newFormulaString = string;
       let dynamicVariableError = false;
       let isCircularDependency = false;
+      let isVariableResolving = false;
       if (trigger) {
         let dynamicVariableRegEx = new RegExp(`\\${trigger}\\S*`, "g");
         newFormulaString = newFormulaString.replace(
           dynamicVariableRegEx,
           (match) => {
-            const { text, resolved } = getDynamicVariable(match);
-            if (resolved) {
-              return text;
-            } else {
-              dynamicVariableError = true;
-            }
+            const { text, resolved, resolving } = getDynamicVariable(match);
+            if (resolving) isVariableResolving = true;
+            else if (resolved) return text;
+            else dynamicVariableError = true;
           }
         );
       }
-      if (dynamicVariableError) return DYNAMIC_VARIABLE_ERROR;
+      if (isVariableResolving) return DYNAMIC_VARIABLE_RESOLVING;
+      else if (dynamicVariableError) return DYNAMIC_VARIABLE_ERROR;
       // Removing spaces other than the spaces that are in apostrophes
       newFormulaString = newFormulaString.replace(SPACE_REMOVAL_REGEX, "");
       newFormulaString = newFormulaString.replace(
