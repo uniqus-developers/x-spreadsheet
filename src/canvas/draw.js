@@ -68,15 +68,15 @@ class DrawBox {
     return x;
   }
 
-  texty(align, h) {
+  texty(align, h, textStart) {
     const { height, padding } = this;
     let { y } = this;
     if (align === "top") {
-      y += padding;
+      y += padding + textStart;
     } else if (align === "middle") {
-      y += height / 2 - h / 2;
+      y += height / 2 - h / 2 + textStart;
     } else if (align === "bottom") {
-      y += height - padding - h;
+      y += height - padding - h + textStart;
     }
     return y;
   }
@@ -297,9 +297,11 @@ class Draw {
         ntxts.push(it);
       }
     });
-    const txtHeight = (ntxts.length - 1) * (font.size + 2);
-    let ty = box.texty(valign, txtHeight);
-    ntxts.forEach((txt) => {
+
+    const txtHeight = (ntxts.length - 1) * Number(font.size) + 2;
+    ntxts.forEach((txt, index) => {
+      let textStart = txtHeight * index;
+      let ty = box.texty(valign, txtHeight, textStart);
       const txtWidth = ctx.measureText(txt).width;
       this.fillText(txt, tx, ty);
       if (strike) {
@@ -336,7 +338,7 @@ class Draw {
     const { ctx, data } = this;
     ctx.lineWidth = thinLineWidth();
     ctx.strokeStyle =
-      !!data.sheetConfig?.gridLine === false ? color ?? "#ffffff" : color;
+      !!data.sheetConfig?.gridLine === false ? (color ?? "#ffffff") : color;
     // console.log('style:', style);
     if (style === "medium") {
       ctx.lineWidth = npx(2) - 0.5;
