@@ -397,8 +397,12 @@ const cellRender = (
     // );
   }
   if (src[0] === trigger) {
-    const { text, resolved } = getDynamicVariable(src);
-    return resolved ? text ?? src : DYNAMIC_VARIABLE_ERROR;
+    const { text, resolved, resolving } = getDynamicVariable(src);
+    return resolving
+      ? DYNAMIC_VARIABLE_RESOLVING
+      : resolved
+        ? text ?? src
+        : DYNAMIC_VARIABLE_ERROR;
   }
   return src;
 };
