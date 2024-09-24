@@ -264,6 +264,7 @@ class Draw {
     mtxt = this.data.resolveDynamicVariable.call(this.data, mtxt)?.text ?? mtxt;
     mtxt = this.textConfigOperation(mtxt, cellMeta);
     const { ctx } = this;
+    attr = this.options.cellStyleProvider?.(attr, cellMeta) ?? attr;
     const { align, valign, font, color, strike, underline } = attr;
     const tx = box.textx(align);
     ctx.save();
