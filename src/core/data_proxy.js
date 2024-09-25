@@ -15,6 +15,7 @@ import { expr2expr, expr2xy, xy2expr } from "./alphabet";
 import { t } from "../locale/locale";
 import {
   generateUniqueId,
+  getNumberFormatFromStyles,
   getRowHeightForTextWrap,
   getStylingForClass,
   parseCssToXDataStyles,
@@ -512,6 +513,7 @@ export default class DataProxy {
                 htmlDocument?.getElementsByTagName("style")?.[0];
               const htmlBody = htmlDocument?.getElementsByTagName("body")?.[0];
               const tableContent = htmlBody?.querySelectorAll("table");
+              const numberFormats = getNumberFormatFromStyles(htmlStyles);
 
               tableContent?.forEach((table) => {
                 const tBody = table?.querySelector("tbody");
@@ -565,7 +567,13 @@ export default class DataProxy {
                       this.setRowHeight(startRow, height);
                     }
                     const cell = this.getCell(startRow, startColumn);
-                    if (cell) cell.style = this.addStyle(cellStyle);
+                    if (cell) {
+                      cell.style = this.addStyle(cellStyle);
+                      if (numberFormats.hasOwnProperty(cellClassName)) {
+                        cell.t = "n";
+                        cell.z = numberFormats[cellClassName];
+                      }
+                    }
 
                     startColumn += colSpan;
                   });
