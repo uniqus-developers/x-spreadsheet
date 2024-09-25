@@ -25,7 +25,7 @@ import {
 import SheetConfig from "./sheetConfig";
 import CellConfig from "./cellConfig";
 import Variable from "./variable";
-import { DEFAULT_ROW_HEIGHT } from "../constants";
+import { ACCOUNTING_FORMAT_REGEX, DEFAULT_ROW_HEIGHT } from "../constants";
 import { getFontSizePxByPt } from "./font";
 import { getDrawBox } from "../component/table";
 import { npx } from "../canvas/draw";
@@ -524,6 +524,11 @@ export default class DataProxy {
                   const tds = tr?.querySelectorAll("td");
                   tds?.forEach((td) => {
                     const cellContent = parseHtmlToText(td?.innerHTML ?? "");
+                    const rawCellContent = ACCOUNTING_FORMAT_REGEX.test(
+                      cellContent
+                    )
+                      ? cellContent.replace(/[^\d.]/g, "")
+                      : cellContent;
 
                     const mergedCellRange = this.merges.getFirstIncludes(
                       startRow,
@@ -542,7 +547,7 @@ export default class DataProxy {
                     this.setCellText(
                       startRow,
                       startColumn,
-                      cellContent,
+                      rawCellContent,
                       "input"
                     );
                     const rowSpan = Number(td?.getAttribute("rowspan") ?? 1);
@@ -571,9 +576,12 @@ export default class DataProxy {
                       if (numberFormats.hasOwnProperty(cellClassName)) {
                         cell.t = "n";
                         cell.z = numberFormats[cellClassName];
+                        cell.w = cellContent;
                         cellStyle.align = "right";
-                      } else if (!isNaN(Number(cellContent))) {
+                        if (cellContent === "-") cell.text = 0;
+                      } else if (!isNaN(Number(rawCellContent))) {
                         cellStyle.align = "right";
+                        if (cellContent === "-") cell.text = 0;
                       }
                       cell.style = this.addStyle(cellStyle);
                     }

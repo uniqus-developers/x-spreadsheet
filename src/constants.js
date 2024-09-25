@@ -11,6 +11,7 @@ const SPACE_REMOVAL_REGEX = /\s+(?=(?:[^']*'[^']*')*[^']*$)/g;
 const SHEET_TO_CELL_REF_REGEX =
   /(?:'([^']*)'|\b[A-Za-z0-9]+)\![A-Za-z]+[1-9][0-9]*/g;
 const CELL_REF_REPLACE_REGEX = /(?:\b[A-Za-z0-9_]+\b!)?[A-Za-z]+\d+\b/g;
+const ACCOUNTING_FORMAT_REGEX = /^\s*[€£¥₹$¢₱₦₩]?[\s]*\(?[\d,]+(\.\d+)?\)?$/;
 
 const PX_TO_PT = 0.75;
 
@@ -126,4 +127,5 @@ export {
   DYNAMIC_VARIABLE_ERROR,
   CIRCULAR_DEPENDENCY_ERROR,
   DYNAMIC_VARIABLE_RESOLVING,
+  ACCOUNTING_FORMAT_REGEX,
 };
