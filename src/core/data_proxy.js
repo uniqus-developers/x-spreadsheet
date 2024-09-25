@@ -568,11 +568,14 @@ export default class DataProxy {
                     }
                     const cell = this.getCell(startRow, startColumn);
                     if (cell) {
-                      cell.style = this.addStyle(cellStyle);
                       if (numberFormats.hasOwnProperty(cellClassName)) {
                         cell.t = "n";
                         cell.z = numberFormats[cellClassName];
+                        cellStyle.align = "right";
+                      } else if (!isNaN(Number(cellContent))) {
+                        cellStyle.align = "right";
                       }
+                      cell.style = this.addStyle(cellStyle);
                     }
 
                     startColumn += colSpan;

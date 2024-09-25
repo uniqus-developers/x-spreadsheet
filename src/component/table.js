@@ -93,15 +93,23 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
       );
       cell.text = cellText;
       //Below code is temporarily added will be removed once we completely remove froala
-      if(cell.w){
-        cell.w = cellText?.toString?.() ?? cellText
+      if (cell.w) {
+        cell.w = cellText?.toString?.() ?? cellText;
       }
-      if(cell.h){
-        cell.h = cellText?.toString?.() ?? cellText
+      if (cell.h) {
+        cell.h = cellText?.toString?.() ?? cellText;
       }
     } else {
       cellText = cell.text || "";
     }
+
+    if (!isNaN(Number(cellText))) {
+      if (cell.style !== 0 && !cell.style) {
+        style.align = "right";
+        cell.style = data.addStyle(style);
+      }
+    }
+
     if (style.format) {
       cellText = formatm[style.format].render(cellText);
     }
