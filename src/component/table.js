@@ -100,7 +100,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         cell.h = cellText?.toString?.() ?? cellText;
       }
     } else {
-      cellText = cell.text || "";
+      cellText = cell.text ?? "";
     }
 
     if (!isNaN(Number(cellText))) {

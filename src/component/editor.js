@@ -114,7 +114,7 @@ function inputEventHandler(evt) {
       resetTextareaSize.call(this);
       this.change("input", v);
     } else {
-      evt.target.value = cell.text || "";
+      evt.target.value = cell.text ?? "";
     }
   } else {
     this.inputText = v;
@@ -345,10 +345,9 @@ export default class Editor {
     this.cell = cell;
     let text = "";
     if (editValueFormatter) {
-      text =
-        editValueFormatter({ ...this, cell }) ?? ((cell && cell.text) || "");
+      text = editValueFormatter({ ...this, cell }) ?? cell?.text ?? "";
     } else {
-      text = cell ? cell.f || cell.text || "" : "";
+      text = cell.f !== "" ? cell.f : cell.text ?? "";
     }
     this.setText(text);
     this.validator = validator;
