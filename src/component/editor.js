@@ -348,7 +348,7 @@ export default class Editor {
       text =
         editValueFormatter({ ...this, cell }) ?? ((cell && cell.text) || "");
     } else {
-      text = cell ? cell.f || cell.text : "";
+      text = cell ? cell.f || cell.text || "" : "";
     }
     this.setText(text);
     this.validator = validator;
