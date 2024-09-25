@@ -658,6 +658,25 @@ const getRowHeightForTextWrap = (ctx, textWrap, biw, text, fontSize) => {
 
 const deepClone = (data) => JSON.parse(JSON.stringify(data));
 
+const getNumberFormatFromStyles = (styleTag) => {
+  const styleContent = styleTag.innerHTML;
+
+  const regex = /\.([^ \{]+)\s*{[^}]*mso-number-format:([^}]+)}/g;
+  let match;
+  const results = {};
+
+  while ((match = regex.exec(styleContent)) !== null) {
+    const className = match[1].replace("\n\t", ""); // Class name
+    const msoNumberFormat = match[2] // format value
+      .trim()
+      .replaceAll("\\", "")
+      .replaceAll("0022", "")
+      .replaceAll('"', "");
+    results[className] = msoNumberFormat?.slice(0, -1)?.trim() ?? "";
+  }
+  return results;
+};
+
 export {
   getStylingForClass,
   parseCssToXDataStyles,
@@ -670,4 +689,5 @@ export {
   getNewSheetName,
   getRowHeightForTextWrap,
   deepClone,
+  getNumberFormatFromStyles,
 };
