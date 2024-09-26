@@ -524,11 +524,25 @@ export default class DataProxy {
                   const tds = tr?.querySelectorAll("td");
                   tds?.forEach((td) => {
                     const cellContent = parseHtmlToText(td?.innerHTML ?? "");
-                    const rawCellContent = ACCOUNTING_FORMAT_REGEX.test(
-                      cellContent
-                    )
-                      ? cellContent.replace(/[^\d.]/g, "")
-                      : cellContent;
+                    let rawCellContent = cellContent;
+                    let isNegative = false;
+                    let isAccountingFormat = false;
+                    if (cellContent[0] === "-") {
+                      isNegative = true;
+                      rawCellContent = cellContent.substring(
+                        1,
+                        cellContent.length
+                      );
+                    }
+                    if (ACCOUNTING_FORMAT_REGEX.test(rawCellContent)) {
+                      isAccountingFormat = true;
+                      isNegative =
+                        isNegative ||
+                        rawCellContent.includes("(") ||
+                        rawCellContent.includes("-");
+                      rawCellContent = rawCellContent.replace(/[^\d.]/g, "");
+                      if (isNegative) rawCellContent = `-${rawCellContent}`;
+                    }
 
                     const mergedCellRange = this.merges.getFirstIncludes(
                       startRow,
@@ -547,7 +561,7 @@ export default class DataProxy {
                     this.setCellText(
                       startRow,
                       startColumn,
-                      rawCellContent,
+                      isAccountingFormat ? rawCellContent : cellContent,
                       "input"
                     );
                     const rowSpan = Number(td?.getAttribute("rowspan") ?? 1);
@@ -580,6 +594,8 @@ export default class DataProxy {
                         cellStyle.align = "right";
                         if (cellContent === "-") cell.text = 0;
                       } else if (!isNaN(Number(rawCellContent))) {
+                        cell.t = "n";
+                        cell.w = cellContent;
                         cellStyle.align = "right";
                         if (cellContent === "-") cell.text = 0;
                       }
