@@ -1117,4 +1117,27 @@ export default class Sheet {
     selectorSet.call(this, false, ri, ci);
     scrollbarMove.call(this);
   }
+
+  selectCellsAndFocus(range) {
+    const { sri, eri, sci, eci } = range ?? {};
+    if (
+      isNaN(parseInt(sri)) ||
+      isNaN(parseInt(eri)) ||
+      isNaN(parseInt(sci)) ||
+      isNaN(parseInt(eci))
+    ) {
+      return;
+    }
+    if (sri === eri && sci === eci) selectorSet.call(this, false, sri, sci);
+    else {
+      selectorSet.call(this, false, sri, sci);
+      for (let ri = sri; ri <= eri; ri++) {
+        for (let ci = sci; ci <= eci; ci++) {
+          selectorSet.call(this, true, ri, ci, true, true);
+        }
+      }
+      selectorSet.call(this, true, eri, eci, true, false);
+    }
+    scrollbarMove.call(this);
+  }
 }
