@@ -375,6 +375,7 @@ class Rows {
           if (cell.value) delete cell.value;
           if (cell.h) cell.h = "";
           if (cell.w) cell.w = "";
+          if (cell.f) cell.f = "";
         } else if (what === "format") {
           if (cell.style !== undefined) delete cell.style;
           if (cell.merge) delete cell.merge;
