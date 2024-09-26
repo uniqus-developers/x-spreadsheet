@@ -240,7 +240,7 @@ class Draw {
     textWrap: text wrapping
   */
   textConfigOperation(text, cellMeta) {
-    if (text) {
+    if (text === 0 || text) {
       const valueFormatter = this.options.valueFormatter;
       const numberConfig = this.options.numberConfig ?? {};
       if (valueFormatter) {
