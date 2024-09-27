@@ -10,7 +10,7 @@ function resetTextareaSize() {
   const { inputText } = this;
   if (!/^\s*$/.test(inputText)) {
     const { textlineEl, textEl, areaOffset } = this;
-    const txts = inputText.split("\n");
+    const txts = inputText?.toString?.()?.split?.("\n");
     const maxTxtSize = Math.max(...txts.map((it) => it.length));
     const tlOffset = textlineEl.offset();
     const fontWidth = tlOffset.width / inputText.length;
@@ -80,8 +80,7 @@ function mentionMenuSearch(text) {
 
 function inputEventHandler(evt) {
   const v = evt.target.value;
-  // console.log(evt, 'v:', v);
-  const { suggest, textlineEl, validator, mention, trigger, textEl } = this;
+  const { suggest, textlineEl, validator, mention, trigger } = this;
   const { cell } = this;
   if (cell !== null) {
     if (
@@ -115,7 +114,7 @@ function inputEventHandler(evt) {
       resetTextareaSize.call(this);
       this.change("input", v);
     } else {
-      evt.target.value = cell.text || "";
+      evt.target.value = cell.text ?? "";
     }
   } else {
     this.inputText = v;
@@ -341,19 +340,16 @@ export default class Editor {
   setCell(cell, validator) {
     if (cell && cell.editable === false) return;
     const editValueFormatter = this.options.editValueFormatter;
-    // console.log('::', validator);
     const { el, datepicker, suggest } = this;
     el.show();
     this.cell = cell;
     let text = "";
     if (editValueFormatter) {
-      text =
-        editValueFormatter({ ...this, cell }) ?? ((cell && cell.text) || "");
+      text = editValueFormatter({ ...this, cell }) ?? cell?.text ?? "";
     } else {
-      text = (cell && cell.text) || "";
+      text = cell.f !== "" ? cell.f : cell.text ?? "";
     }
     this.setText(text);
-
     this.validator = validator;
     if (validator) {
       const { type } = validator;
@@ -367,6 +363,10 @@ export default class Editor {
         suggest.setItems(validator.values());
         suggest.search("");
       }
+    }
+    //Added this code to call input handle when we are manually setting value to editor input field
+    if (cell?.text?.length === 1) {
+      inputEventHandler.call(this, { target: { value: text } });
     }
   }
 

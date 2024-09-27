@@ -182,6 +182,7 @@ body {
   right: 0;
   background-color: #f4f5f8;
   opacity: 0.9;
+  z-index: 16;
 }
 .x-spreadsheet-scrollbar.horizontal {
   right: 15px;
@@ -859,7 +860,7 @@ form fieldset select {
   line-height: 0;
 }
 .x-spreadsheet-icon .x-spreadsheet-icon-img {
-  background-image: url(957cb48da2959f72ce2b9fd72a493d5a.svg);
+  background-image: url(8f5473837511e38cdc21b3c12162e5c5.svg);
   position: absolute;
   width: 262px;
   height: 444px;

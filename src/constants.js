@@ -1,5 +1,9 @@
-const REF_ERROR = "#REF!";
-const GENERAL_ERROR = "#ERROR";
+const REF_ERROR = "REF!";
+const GENERAL_ERROR = "ERROR!";
+const VALUE_ERROR = "VALUE!";
+const DYNAMIC_VARIABLE_ERROR = "DYNAMIC_VARIABLE_ERROR!";
+const CIRCULAR_DEPENDENCY_ERROR = "CIRCULAR_DEPENDENCY_ERROR!";
+const DYNAMIC_VARIABLE_RESOLVING = "RESOLVING_VARIABLE!";
 
 const CELL_REF_REGEX = /\b[A-Za-z]+[1-9][0-9]*\b/g;
 const CELL_RANGE_REGEX =
@@ -8,6 +12,7 @@ const SPACE_REMOVAL_REGEX = /\s+(?=(?:[^']*'[^']*')*[^']*$)/g;
 const SHEET_TO_CELL_REF_REGEX =
   /(?:'([^']*)'|\b[A-Za-z0-9]+)\![A-Za-z]+[1-9][0-9]*/g;
 const CELL_REF_REPLACE_REGEX = /(?:\b[A-Za-z0-9_]+\b!)?[A-Za-z]+\d+\b/g;
+const ACCOUNTING_FORMAT_REGEX = /^\s*[€£¥₹$¢₱₦₩]?[\s]*\(?-?[\d,]+(\.\d+)?\)?$/;
 
 const PX_TO_PT = 0.75;
 
@@ -108,6 +113,8 @@ const INDEXED_COLORS = {
 
 const DEFAULT_ROW_HEIGHT = 20;
 
+const EXCEL_ERRORS = [REF_ERROR, GENERAL_ERROR, VALUE_ERROR];
+
 export {
   REF_ERROR,
   GENERAL_ERROR,
@@ -120,4 +127,10 @@ export {
   AVAILABLE_FEATURES,
   INDEXED_COLORS,
   DEFAULT_ROW_HEIGHT,
+  DYNAMIC_VARIABLE_ERROR,
+  CIRCULAR_DEPENDENCY_ERROR,
+  DYNAMIC_VARIABLE_RESOLVING,
+  ACCOUNTING_FORMAT_REGEX,
+  VALUE_ERROR,
+  EXCEL_ERRORS,
 };

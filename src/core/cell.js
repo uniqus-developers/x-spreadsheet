@@ -1,6 +1,9 @@
 import {
   CELL_RANGE_REGEX,
   CELL_REF_REGEX,
+  CIRCULAR_DEPENDENCY_ERROR,
+  DYNAMIC_VARIABLE_ERROR,
+  DYNAMIC_VARIABLE_RESOLVING,
   GENERAL_ERROR,
   REF_ERROR,
   SHEET_TO_CELL_REF_REGEX,
@@ -242,19 +245,63 @@ const rangeToCellConversion = (range) => {
   return cells;
 };
 
-const parserFormulaString = (string, getCellText, cellRender) => {
+const parserFormulaString = (
+  string,
+  getCellText,
+  cellRender,
+  getDynamicVariable,
+  trigger,
+  formulaCallStack,
+  sheetName
+) => {
   if (string?.length) {
     try {
       let isFormulaResolved = false;
-      let newFormulaString = "";
+      let newFormulaString = string;
+      let dynamicVariableError = false;
+      let isCircularDependency = false;
+      let isVariableResolving = false;
+      if (trigger) {
+        let dynamicVariableRegEx = new RegExp(`\\${trigger}\\S*`, "g");
+        newFormulaString = newFormulaString.replace(
+          dynamicVariableRegEx,
+          (match) => {
+            const { text, resolved, resolving } = getDynamicVariable(match);
+            if (resolving) isVariableResolving = true;
+            else if (resolved) return text;
+            else dynamicVariableError = true;
+          }
+        );
+      }
+      if (isVariableResolving) return DYNAMIC_VARIABLE_RESOLVING;
+      else if (dynamicVariableError) return DYNAMIC_VARIABLE_ERROR;
       // Removing spaces other than the spaces that are in apostrophes
-      newFormulaString = string.replace(SPACE_REMOVAL_REGEX, "");
+      newFormulaString = newFormulaString.replace(SPACE_REMOVAL_REGEX, "");
       newFormulaString = newFormulaString.replace(
         SHEET_TO_CELL_REF_REGEX,
         (match) => {
-          const [sheetName, cellRef] = match.replaceAll("'", "").split("!");
+          const [linkSheetName, cellRef] = match.replaceAll("'", "").split("!");
           const [x, y] = expr2xy(cellRef);
-          const text = getCellText(x, y, sheetName);
+          const text = getCellText(x, y, linkSheetName);
+          if (text?.startsWith?.("=")) {
+            if (formulaCallStack?.[linkSheetName]?.includes(cellRef))
+              isCircularDependency = true;
+            else {
+              formulaCallStack[linkSheetName] =
+                formulaCallStack[linkSheetName] || [];
+              formulaCallStack[linkSheetName].push(cellRef);
+            }
+            return isCircularDependency
+              ? 0
+              : cellRender(
+                  text,
+                  getCellText,
+                  getDynamicVariable,
+                  trigger,
+                  formulaCallStack,
+                  linkSheetName
+                );
+          }
           if (text === REF_ERROR) isFormulaResolved = true;
           return isNaN(Number(text)) ? `"${text}"` : text;
         }
@@ -267,12 +314,27 @@ const parserFormulaString = (string, getCellText, cellRender) => {
           return cells;
         }
       });
-      newFormulaString = newFormulaString.replace(CELL_REF_REGEX, (match) => {
-        const [x, y] = expr2xy(match);
+      newFormulaString = newFormulaString.replace(CELL_REF_REGEX, (cellRef) => {
+        const [x, y] = expr2xy(cellRef);
         const text = getCellText(x, y);
         if (text) {
-          if (text.startsWith("=")) {
-            return cellRender(text, [], getCellText);
+          if (text?.startsWith?.("=")) {
+            if (formulaCallStack?.[sheetName]?.includes(cellRef))
+              isCircularDependency = true;
+            else {
+              formulaCallStack[sheetName] = formulaCallStack[sheetName] || [];
+              formulaCallStack[sheetName].push(cellRef);
+            }
+            return isCircularDependency
+              ? 0
+              : cellRender(
+                  text,
+                  getCellText,
+                  getDynamicVariable,
+                  trigger,
+                  formulaCallStack,
+                  sheetName
+                );
           } else {
             return isNaN(Number(text)) ? `"${text}"` : text;
           }
@@ -280,7 +342,9 @@ const parserFormulaString = (string, getCellText, cellRender) => {
           return 0;
         }
       });
-      return newFormulaString;
+      return isCircularDependency
+        ? CIRCULAR_DEPENDENCY_ERROR
+        : newFormulaString;
     } catch (e) {
       return string;
     }
@@ -288,15 +352,37 @@ const parserFormulaString = (string, getCellText, cellRender) => {
   return string;
 };
 
-const cellRender = (src, formulaMap, getCellText, cellList = []) => {
+const cellRender = (
+  src,
+  getCellText,
+  getDynamicVariable,
+  trigger,
+  formulaCallStack = {},
+  sheetName
+) => {
   if (src[0] === "=") {
-    const a = src.substring(1);
+    const formula = src.substring(1);
     try {
       var parser = new Parser();
-      const parsedFormula = parserFormulaString(a, getCellText, cellRender);
+      const parsedFormula = parserFormulaString(
+        formula,
+        getCellText,
+        cellRender,
+        getDynamicVariable,
+        trigger,
+        formulaCallStack,
+        sheetName
+      );
+
       if (parsedFormula.includes(REF_ERROR)) return REF_ERROR;
+      else if (parsedFormula.includes(CIRCULAR_DEPENDENCY_ERROR))
+        return CIRCULAR_DEPENDENCY_ERROR;
+      else if (parsedFormula.includes(DYNAMIC_VARIABLE_RESOLVING))
+        return DYNAMIC_VARIABLE_RESOLVING;
+      else if (parsedFormula.includes(DYNAMIC_VARIABLE_ERROR))
+        return DYNAMIC_VARIABLE_ERROR;
       const data = parser.parse(parsedFormula);
-      return data?.error ?? data?.result;
+      return data?.error?.replace("#", "") ?? data?.result;
     } catch (e) {
       return GENERAL_ERROR;
     }
@@ -313,6 +399,14 @@ const cellRender = (src, formulaMap, getCellText, cellList = []) => {
     //     cellRender(getCellText(x, y), formulaMap, getCellText, cellList),
     //   cellList
     // );
+  }
+  if (src[0] === trigger) {
+    const { text, resolved, resolving } = getDynamicVariable(src);
+    return resolving
+      ? DYNAMIC_VARIABLE_RESOLVING
+      : resolved
+        ? text ?? src
+        : DYNAMIC_VARIABLE_ERROR;
   }
   return src;
 };
