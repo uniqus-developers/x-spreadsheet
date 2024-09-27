@@ -15,6 +15,7 @@ import { expr2expr, expr2xy, xy2expr } from "./alphabet";
 import { t } from "../locale/locale";
 import {
   generateUniqueId,
+  getNumberFormatFromStyles,
   getRowHeightForTextWrap,
   getStylingForClass,
   parseCssToXDataStyles,
@@ -24,7 +25,11 @@ import {
 import SheetConfig from "./sheetConfig";
 import CellConfig from "./cellConfig";
 import Variable from "./variable";
-import { DEFAULT_ROW_HEIGHT } from "../constants";
+import {
+  ACCOUNTING_FORMAT_REGEX,
+  DEFAULT_ROW_HEIGHT,
+  EXCEL_ERRORS,
+} from "../constants";
 import { getFontSizePxByPt } from "./font";
 import { getDrawBox } from "../component/table";
 import { npx } from "../canvas/draw";
@@ -495,95 +500,148 @@ export default class DataProxy {
   }
 
   pasteFromSystemClipboard(evt, resetSheet, eventTrigger) {
-    const { selector } = this;
-    const htmlContent = evt?.clipboardData?.getData("text/html");
+    try {
+      const { selector } = this;
+      const htmlContent = evt?.clipboardData?.getData("text/html");
+      navigator.clipboard
+        .read()
+        .then((data) => {
+          data.forEach((item) => {
+            if (item?.types?.includes("text/html")) {
+              const parser = new DOMParser();
+              const htmlDocument = parser.parseFromString(
+                htmlContent,
+                "text/html"
+              );
+              const htmlStyles =
+                htmlDocument?.getElementsByTagName("style")?.[0];
+              const htmlBody = htmlDocument?.getElementsByTagName("body")?.[0];
+              const tableContent = htmlBody?.querySelectorAll("table");
+              const numberFormats = getNumberFormatFromStyles(htmlStyles);
 
-    navigator.clipboard
-      .read()
-      .then((data) => {
-        data.forEach((item) => {
-          if (item?.types?.includes("text/html")) {
-            const parser = new DOMParser();
-            const htmlDocument = parser.parseFromString(
-              htmlContent,
-              "text/html"
-            );
-            const htmlStyles = htmlDocument?.getElementsByTagName("style")?.[0];
-            const htmlBody = htmlDocument?.getElementsByTagName("body")?.[0];
-            const tableContent = htmlBody?.querySelectorAll("table");
+              tableContent?.forEach((table) => {
+                const tBody = table?.querySelector("tbody");
+                const trs = tBody?.querySelectorAll("tr");
+                let startRow = selector.ri;
+                trs?.forEach((tr) => {
+                  let startColumn = selector.ci;
+                  const tds = tr?.querySelectorAll("td");
+                  tds?.forEach((td) => {
+                    const cellContent = parseHtmlToText(td?.innerHTML ?? "");
+                    let rawCellContent = cellContent;
+                    let isNegative = false;
+                    let isAccountingFormat = false;
+                    if (cellContent[0] === "-") {
+                      isNegative = true;
+                      rawCellContent = cellContent.substring(
+                        1,
+                        cellContent.length
+                      );
+                    }
+                    if (ACCOUNTING_FORMAT_REGEX.test(rawCellContent)) {
+                      isAccountingFormat = true;
+                      isNegative =
+                        isNegative ||
+                        rawCellContent.includes("(") ||
+                        rawCellContent.includes("-");
+                      rawCellContent = rawCellContent.replace(/[^\d.]/g, "");
+                      if (isNegative) rawCellContent = `-${rawCellContent}`;
+                    }
 
-            tableContent?.forEach((table) => {
-              const tBody = table?.querySelector("tbody");
-              const trs = tBody?.querySelectorAll("tr");
-              let startRow = selector.ri;
-              trs?.forEach((tr) => {
-                let startColumn = selector.ci;
-                const tds = tr?.querySelectorAll("td");
-                tds?.forEach((td) => {
-                  const cellContent = parseHtmlToText(td?.innerHTML ?? "");
+                    const mergedCellRange = this.merges.getFirstIncludes(
+                      startRow,
+                      startColumn
+                    );
 
-                  const mergedCellRange = this.merges.getFirstIncludes(
-                    startRow,
-                    startColumn
-                  );
+                    if (mergedCellRange) {
+                      for (
+                        let k = startColumn;
+                        k <= mergedCellRange.eci;
+                        k += 1
+                      )
+                        startColumn += 1;
+                    }
 
-                  if (mergedCellRange) {
-                    for (let k = startColumn; k <= mergedCellRange.eci; k += 1)
-                      startColumn += 1;
-                  }
+                    this.setCellText(
+                      startRow,
+                      startColumn,
+                      isAccountingFormat ? rawCellContent : cellContent,
+                      "input"
+                    );
+                    const rowSpan = Number(td?.getAttribute("rowspan") ?? 1);
+                    const colSpan = Number(td?.getAttribute("colspan") ?? 1);
+                    if (rowSpan - 1 !== 0 || colSpan - 1 !== 0) {
+                      this.setCellMerge(startRow, startColumn, [
+                        rowSpan - 1,
+                        colSpan - 1,
+                      ]);
+                    }
+                    const cellClassName = td?.getAttribute("class");
+                    const cellStyleString = `${td?.getAttribute("style") ?? ""};${getStylingForClass(htmlStyles, cellClassName)}`;
+                    const cellStyle =
+                      parseCssToXDataStyles(cellStyleString)?.parsedStyles ??
+                      {};
+                    const { width, height } = cellStyle?.dimensions ?? {};
+                    delete cellStyle.dimensions;
+                    if (width && this.getColWidth(startColumn) < width) {
+                      this.setColWidth(startColumn, width);
+                    }
+                    if (height && this.getRowHeight(startRow) < height) {
+                      this.setRowHeight(startRow, height);
+                    }
+                    const cell = this.getCell(startRow, startColumn);
+                    if (cell) {
+                      if (numberFormats.hasOwnProperty(cellClassName)) {
+                        cell.t = "n";
+                        cell.z = numberFormats[cellClassName];
+                        cell.w = cellContent;
+                        cellStyle.align = "right";
+                        if (cellContent === "-") cell.text = 0;
+                      } else if (!isNaN(Number(rawCellContent))) {
+                        cell.t = "n";
+                        cell.w = cellContent;
+                        cellStyle.align = "right";
+                        if (cellContent === "-") cell.text = 0;
+                      }
+                      cell.style = this.addStyle(cellStyle);
+                    }
 
-                  this.setCellText(startRow, startColumn, cellContent, "input");
-                  const rowSpan = Number(td?.getAttribute("rowspan") ?? 1);
-                  const colSpan = Number(td?.getAttribute("colspan") ?? 1);
-                  if (rowSpan - 1 !== 0 || colSpan - 1 !== 0) {
-                    this.setCellMerge(startRow, startColumn, [
-                      rowSpan - 1,
-                      colSpan - 1,
-                    ]);
-                  }
-                  const cellClassName = td?.getAttribute("class");
-                  const cellStyleString = `${td?.getAttribute("style") ?? ""};${getStylingForClass(htmlStyles, cellClassName)}`;
-                  const cellStyle =
-                    parseCssToXDataStyles(cellStyleString)?.parsedStyles ?? {};
-                  const { width, height } = cellStyle?.dimensions ?? {};
-                  delete cellStyle.dimensions;
-                  if (width && this.getColWidth(startColumn) < width) {
-                    this.setColWidth(startColumn, width);
-                  }
-                  if (height && this.getRowHeight(startRow) < height) {
-                    this.setRowHeight(startRow, height);
-                  }
-                  const cell = this.getCell(startRow, startColumn);
-                  if (cell) cell.style = this.addStyle(cellStyle);
-
-                  startColumn += colSpan;
+                    startColumn += colSpan;
+                  });
+                  startRow += 1;
                 });
-                startRow += 1;
-              });
-            });
-            resetSheet();
-            eventTrigger(this.rows.getData());
-          } else if (item?.types?.includes("text/plain")) {
-            navigator.clipboard.readText().then((content) => {
-              const contentToPaste = this.parseClipboardContent(content);
-              let startRow = selector.ri;
-              contentToPaste.forEach((row) => {
-                let startColumn = selector.ci;
-                row.forEach((cellContent) => {
-                  this.setCellText(startRow, startColumn, cellContent, "input");
-                  startColumn += 1;
-                });
-                startRow += 1;
               });
               resetSheet();
               eventTrigger(this.rows.getData());
-            });
-          }
+            } else if (item?.types?.includes("text/plain")) {
+              navigator.clipboard.readText().then((content) => {
+                const contentToPaste = this.parseClipboardContent(content);
+                let startRow = selector.ri;
+                contentToPaste.forEach((row) => {
+                  let startColumn = selector.ci;
+                  row.forEach((cellContent) => {
+                    this.setCellText(
+                      startRow,
+                      startColumn,
+                      cellContent,
+                      "input"
+                    );
+                    startColumn += 1;
+                  });
+                  startRow += 1;
+                });
+                resetSheet();
+                eventTrigger(this.rows.getData());
+              });
+            }
+          });
+        })
+        .catch((err) => {
+          console.error("Failed to read clipboard contents: ", err);
         });
-      })
-      .catch((err) => {
-        console.error("Failed to read clipboard contents: ", err);
-      });
+    } catch (err) {
+      console.error("Pasting error: ", err);
+    }
   }
 
   parseClipboardContent(clipboardContent) {
@@ -642,25 +700,55 @@ export default class DataProxy {
     else [sri, eri] = [nri, cri];
     if (nci > cci) [sci, eci] = [cci, nci];
     else [sci, eci] = [nci, cci];
-    selector.range = merges.union(new CellRange(sri, sci, eri, eci));
-    selector.range = merges.union(selector.range);
-    // console.log('selector.range:', selector.range);
+    if (ri !== -1 && ci !== -1) {
+      selector.range = merges.union(new CellRange(sri, sci, eri, eci));
+      selector.range = merges.union(selector.range);
+    }
     return selector.range;
   }
 
+  getMaximumAvailableIndexes() {
+    const { rows } = this;
+    let maxRow = 0,
+      maxCol = 0;
+    const rowList = rows?._;
+    if (rowList) {
+      for (const rowKey of Object.keys(rowList)) {
+        const numericRowKey = Number(rowKey);
+        const cells = rowList[rowKey].cells ?? {};
+        if (maxRow <= numericRowKey && Object.keys(cells)?.length) {
+          maxRow = numericRowKey;
+        }
+
+        for (const cellKey of Object.keys(cells)) {
+          const numericCellKey = Number(cellKey);
+          if (maxCol <= numericCellKey) {
+            maxCol = numericCellKey;
+          }
+        }
+      }
+    }
+    return { maxRow, maxCol };
+  }
+
   calSelectedRangeByStart(ri, ci) {
-    const { selector, rows, cols, merges } = this;
+    const { selector, rows, cols, merges, settings = {} } = this;
+    const { suppressMaximumSelection } = settings;
+    let maxRow = 0,
+      maxCol = 0;
+    if (suppressMaximumSelection) {
+      ({ maxRow, maxCol } = this.getMaximumAvailableIndexes());
+    }
     let cellRange = merges.getFirstIncludes(ri, ci);
-    // console.log('cellRange:', cellRange, ri, ci, merges);
     if (cellRange === null) {
       cellRange = new CellRange(ri, ci, ri, ci);
       if (ri === -1) {
         cellRange.sri = 0;
-        cellRange.eri = rows.len - 1;
+        cellRange.eri = suppressMaximumSelection ? maxRow : rows.len - 1;
       }
       if (ci === -1) {
         cellRange.sci = 0;
-        cellRange.eci = cols.len - 1;
+        cellRange.eci = suppressMaximumSelection ? maxCol : cols.len - 1;
       }
     }
     selector.range = cellRange;
@@ -792,6 +880,10 @@ export default class DataProxy {
   // state: input | finished
   setFormulaCellText(text, ri, ci, state = "input") {
     const { autoFilter, rows } = this;
+    if (state === "finished") {
+      rows.setCellProperty(ri, ci, "f", text);
+      return;
+    }
     let nri = ri;
     if (this.unsortedRowMap.has(ri)) {
       nri = this.unsortedRowMap.get(ri);
@@ -1223,26 +1315,39 @@ export default class DataProxy {
 
   resolveDynamicVariable(text) {
     const trigger = this.settings?.mentionProgress?.trigger;
+    let resolved = false;
+    let resolving = true;
     if (trigger && text?.includes?.(trigger)) {
       let regex = new RegExp(`\\${trigger}\\S*`, "g");
       const map = this?.variables?.map ?? {};
       text = text.replace(regex, (match) => {
-        const newMatch = match?.toLowerCase();
-        const value = map[newMatch];
-        if (value) {
+        const variableName = match?.replaceAll?.(" ", "_")?.toLowerCase?.();
+        if (map.hasOwnProperty(match) || map.hasOwnProperty(variableName)) {
+          const { value, resolved: isResolved } =
+            map[match] || map[variableName];
+          resolved = isResolved;
+          resolving = false;
           return value;
         } else {
+          resolved = false;
+          resolving = true;
           return match;
         }
       });
     }
-    return text;
+    return { text: text, resolved: resolved, resolving: resolving };
   }
 
   getCellTextOrDefault(ri, ci) {
-    const cell = this.getCell(ri, ci);
+    const cell = this.getCell(ri, ci) ?? {};
     const text = cell && cell.text ? cell.text : "";
-    return this.resolveDynamicVariable.call(this, text);
+    return this.resolveDynamicVariable.call(this, text)?.text;
+  }
+
+  getCellFormulaOrTextOrDefault(ri, ci) {
+    const cell = this.getCell(ri, ci) ?? {};
+    const text = cell && cell.f ? cell.f : cell.text ? cell.text : "";
+    return this.resolveDynamicVariable.call(this, text)?.text;
   }
 
   getCellStyle(ri, ci) {
@@ -1296,6 +1401,10 @@ export default class DataProxy {
     }
     // validator
     validations.validate(ri, ci, text);
+  }
+
+  setCellProperty(ri, ci, key, value) {
+    this.rows(ri, ci, key, value);
   }
 
   freezeIsActive() {
@@ -1543,10 +1652,14 @@ export default class DataProxy {
         const cells = rowData[rowIndex]?.cells;
         for (let cellIndex in cells) {
           const cell = cells[cellIndex];
-          const text = cell.text;
+          const text = cell.f ?? cell.text;
           text?.replaceAll?.(regex, (match) => {
-            const newMatch = match?.toLowerCase();
-            map.add(newMatch);
+            if (
+              trigger === "#" &&
+              !EXCEL_ERRORS?.includes(match.substring(1, match.length))
+            )
+              map.add(match);
+            else if (trigger !== "#") map.add(match);
           });
         }
       }

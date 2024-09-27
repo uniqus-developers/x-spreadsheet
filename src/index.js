@@ -183,6 +183,11 @@ class Spreadsheet {
     return this;
   }
 
+  setCellProperty(ri, ci, key, value) {
+    this.datas[sheetIndex].setCellProperty(ri, ci, key, value);
+    return this;
+  }
+
   cell(ri, ci, sheetIndex = 0) {
     return this.datas[sheetIndex].getCell(ri, ci);
   }
@@ -257,6 +262,14 @@ class Spreadsheet {
 
   selectCell(ri, ci) {
     this.sheet.selectCell(ri, ci);
+  }
+
+  selectCellAndFocus(ri, ci) {
+    this.sheet.selectCellAndFocus(ri, ci);
+  }
+
+  selectCellsAndFocus(range) {
+    this.sheet.selectCellsAndFocus(range);
   }
 }
 

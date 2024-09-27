@@ -51,6 +51,7 @@ declare module "x-data-spreadsheet" {
     valueFormatter?: (metaData: FormatterMeta) => string;
     valueSetter?: (metaData: FormatterMeta) => string;
     editValueFormatter?: (metaData: FormatterMeta) => string;
+    cellStyleProvider?: (attr: object, metaData: FormatterMeta) => object;
     extendedContextMenu?: ExtendedContextMenu[];
     mentionProgress?: {
       trigger: string;
@@ -59,6 +60,7 @@ declare module "x-data-spreadsheet" {
     };
     allowMultipleSheets?: boolean;
     disableFeatures?: string[];
+    suppressMaximumSelection?: boolean;
   }
 
   export type CELL_SELECTED = "cell-selected";

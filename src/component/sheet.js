@@ -533,13 +533,20 @@ function colResizerFinished(cRect, distance) {
 
 function dataSetCellText(text, state = "finished") {
   const { data, table, editor } = this;
+  const trigger = data?.settings?.mentionProgress?.trigger;
   if (data.settings.mode === "read") return;
   const inputText = editor.inputText;
   if (editor.formulaCell && state === "finished") {
     const { ri, ci } = editor.formulaCell;
     data.setFormulaCellText(inputText, ri, ci, state);
     this.trigger("cell-edited", inputText, ri, ci);
+    this.trigger("cell-edit-finished", text, ri, ci);
     editor.setFormulaCell(null);
+  } else if (state === "finished" && text?.trim?.().startsWith(trigger)) {
+    const { ri, ci } = data.selector;
+    data.setFormulaCellText(inputText, ri, ci, state);
+    this.trigger("cell-edited", inputText, ri, ci);
+    this.trigger("cell-edit-finished", text, ri, ci);
   } else if (!editor.formulaCell) {
     data.setSelectedCellText(text, state);
     const { ri, ci } = data.selector;
@@ -723,7 +730,7 @@ function sheetInitEvents() {
   };
   // editor
   editor.change = (state, itext) => {
-    if (itext.trim()?.startsWith("=")) {
+    if (itext?.trim?.()?.startsWith("=")) {
       const { ri, ci } = this.data.selector;
       if (!editor.formulaCell) {
         editor.setFormulaCell({ ri, ci });
@@ -756,7 +763,7 @@ function sheetInitEvents() {
       if (match) {
         const { ri, ci, range } = this.data.selector;
         const cell = this.data.getSelectedCell();
-        match.callback?.call?.(this, ri, ci, range, cell);
+        match.callback?.call?.(this, ri, ci, range, cell, match);
       }
     }
     if (type === "validation") {
@@ -1104,5 +1111,33 @@ export default class Sheet {
 
   selectCell(ri, ci) {
     selectorSet.call(this, false, ri, ci);
+  }
+
+  selectCellAndFocus(ri, ci) {
+    selectorSet.call(this, false, ri, ci);
+    scrollbarMove.call(this);
+  }
+
+  selectCellsAndFocus(range) {
+    const { sri, eri, sci, eci } = range ?? {};
+    if (
+      isNaN(parseInt(sri)) ||
+      isNaN(parseInt(eri)) ||
+      isNaN(parseInt(sci)) ||
+      isNaN(parseInt(eci))
+    ) {
+      return;
+    }
+    if (sri === eri && sci === eci) selectorSet.call(this, false, sri, sci);
+    else {
+      selectorSet.call(this, false, sri, sci);
+      for (let ri = sri; ri <= eri; ri++) {
+        for (let ci = sci; ci <= eci; ci++) {
+          selectorSet.call(this, true, ri, ci, true, true);
+        }
+      }
+      selectorSet.call(this, true, eri, eci, true, false);
+    }
+    scrollbarMove.call(this);
   }
 }

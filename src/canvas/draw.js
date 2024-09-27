@@ -68,15 +68,15 @@ class DrawBox {
     return x;
   }
 
-  texty(align, h) {
+  texty(align, h, textStart) {
     const { height, padding } = this;
     let { y } = this;
     if (align === "top") {
-      y += padding;
+      y += padding + textStart;
     } else if (align === "middle") {
-      y += height / 2 - h / 2;
+      y += height / 2 - h / 2 + textStart;
     } else if (align === "bottom") {
-      y += height - padding - h;
+      y += height - padding - h + textStart;
     }
     return y;
   }
@@ -240,7 +240,7 @@ class Draw {
     textWrap: text wrapping
   */
   textConfigOperation(text, cellMeta) {
-    if (text) {
+    if (text === 0 || text) {
       const valueFormatter = this.options.valueFormatter;
       const numberConfig = this.options.numberConfig ?? {};
       if (valueFormatter) {
@@ -261,9 +261,10 @@ class Draw {
   }
 
   text(mtxt, box, attr = {}, textWrap = true, cellMeta = {}) {
-    mtxt = this.data.resolveDynamicVariable.call(this.data, mtxt);
+    mtxt = this.data.resolveDynamicVariable.call(this.data, mtxt)?.text ?? mtxt;
     mtxt = this.textConfigOperation(mtxt, cellMeta);
     const { ctx } = this;
+    attr = this.options.cellStyleProvider?.(attr, cellMeta) ?? attr;
     const { align, valign, font, color, strike, underline } = attr;
     const tx = box.textx(align);
     ctx.save();
@@ -297,9 +298,11 @@ class Draw {
         ntxts.push(it);
       }
     });
-    const txtHeight = (ntxts.length - 1) * (font.size + 2);
-    let ty = box.texty(valign, txtHeight);
-    ntxts.forEach((txt) => {
+
+    const txtHeight = (ntxts.length - 1) * Number(font.size) + 2;
+    ntxts.forEach((txt, index) => {
+      let textStart = txtHeight * index;
+      let ty = box.texty(valign, txtHeight, textStart);
       const txtWidth = ctx.measureText(txt).width;
       this.fillText(txt, tx, ty);
       if (strike) {
@@ -334,9 +337,9 @@ class Draw {
 
   border(style, color) {
     const { ctx, data } = this;
-    ctx.lineWidth = thinLineWidth;
+    ctx.lineWidth = thinLineWidth();
     ctx.strokeStyle =
-      !!data.sheetConfig?.gridLine === false ? color ?? "#ffffff" : color;
+      !!data.sheetConfig?.gridLine === false ? (color ?? "#ffffff") : color;
     // console.log('style:', style);
     if (style === "medium") {
       ctx.lineWidth = npx(2) - 0.5;
