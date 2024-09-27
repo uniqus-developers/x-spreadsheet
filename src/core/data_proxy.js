@@ -1329,8 +1329,18 @@ export default class DataProxy {
           resolving = false;
           return value;
         } else {
-          resolved = false;
-          resolving = true;
+          if (
+            trigger === "#" &&
+            EXCEL_ERRORS?.includes(
+              match.replaceAll(" ", "").substring(1, match.length)
+            )
+          ) {
+            resolved = true;
+            resolving = false;
+          } else {
+            resolved = false;
+            resolving = true;
+          }
           return match;
         }
       });
