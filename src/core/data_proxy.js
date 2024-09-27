@@ -25,7 +25,11 @@ import {
 import SheetConfig from "./sheetConfig";
 import CellConfig from "./cellConfig";
 import Variable from "./variable";
-import { ACCOUNTING_FORMAT_REGEX, DEFAULT_ROW_HEIGHT } from "../constants";
+import {
+  ACCOUNTING_FORMAT_REGEX,
+  DEFAULT_ROW_HEIGHT,
+  EXCEL_ERRORS,
+} from "../constants";
 import { getFontSizePxByPt } from "./font";
 import { getDrawBox } from "../component/table";
 import { npx } from "../canvas/draw";
@@ -1650,7 +1654,12 @@ export default class DataProxy {
           const cell = cells[cellIndex];
           const text = cell.f ?? cell.text;
           text?.replaceAll?.(regex, (match) => {
-            map.add(match);
+            if (
+              trigger === "#" &&
+              !EXCEL_ERRORS?.includes(match.substring(1, match.length))
+            )
+              map.add(match);
+            else if (trigger !== "#") map.add(match);
           });
         }
       }
