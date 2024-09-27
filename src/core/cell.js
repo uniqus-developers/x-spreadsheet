@@ -377,6 +377,10 @@ const cellRender = (
       if (parsedFormula.includes(REF_ERROR)) return REF_ERROR;
       else if (parsedFormula.includes(CIRCULAR_DEPENDENCY_ERROR))
         return CIRCULAR_DEPENDENCY_ERROR;
+      else if (parsedFormula.includes(DYNAMIC_VARIABLE_RESOLVING))
+        return DYNAMIC_VARIABLE_RESOLVING;
+      else if (parsedFormula.includes(DYNAMIC_VARIABLE_ERROR))
+        return DYNAMIC_VARIABLE_ERROR;
       const data = parser.parse(parsedFormula);
       return data?.error?.replace("#", "") ?? data?.result;
     } catch (e) {
