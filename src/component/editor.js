@@ -342,12 +342,12 @@ export default class Editor {
     const editValueFormatter = this.options.editValueFormatter;
     const { el, datepicker, suggest } = this;
     el.show();
-    this.cell = cell;
+    this.cell = cell ?? {};
     let text = "";
     if (editValueFormatter) {
       text = editValueFormatter({ ...this, cell }) ?? cell?.text ?? "";
     } else {
-      text = cell.f !== "" ? cell.f : cell.text ?? "";
+      text = cell?.f || (cell?.text ?? "");
     }
     this.setText(text);
     this.validator = validator;

@@ -339,20 +339,24 @@ function cut() {
 
 function paste(what, evt) {
   const { data } = this;
+  const eventTrigger = (type = "system") => {
+    this.trigger("pasted-clipboard", { type, data });
+  };
   if (data.settings.mode === "read") return;
   if (data.clipboard.isClear()) {
     const resetSheet = () => sheetReset.call(this);
-    const eventTrigger = (rows) => {
-      this.trigger("pasted-clipboard", rows);
-    };
     // pastFromSystemClipboard is async operation, need to tell it how to reset sheet and trigger event after it finishes
     // pasting content from system clipboard
-    data.pasteFromSystemClipboard(evt, resetSheet, eventTrigger);
+    data.pasteFromSystemClipboard(evt, resetSheet);
+    eventTrigger("system");
+    resetSheet();
   } else if (data.paste(what, (msg) => xtoast("Tip", msg))) {
+    eventTrigger("internal");
     sheetReset.call(this);
   } else if (evt) {
     const cdata = evt.clipboardData.getData("text/plain");
     this.data.pasteFromText(cdata);
+    eventTrigger("system");
     sheetReset.call(this);
   }
 }
@@ -966,6 +970,11 @@ function sheetInitEvents() {
         const cell = this.data.getCell(range.sri, range.sci);
         this.trigger("cells-selected", cell, range);
       }
+    }
+  });
+  bind(document, "visibilitychange", (evt) => {
+    if (document.visibilityState === "hidden") {
+      this.data?.clipboard?.clear();
     }
   });
 }
