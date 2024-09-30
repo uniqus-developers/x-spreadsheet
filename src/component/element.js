@@ -266,6 +266,11 @@ class Element {
     this.css("display", "none");
     return this;
   }
+
+  remove() {
+    this.el.remove();
+    return this;
+  }
 }
 
 const h = (tag, className = "") => new Element(tag, className);
