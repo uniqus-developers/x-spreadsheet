@@ -181,8 +181,6 @@ class Rows {
                 const nri = ii + (i - sri);
                 const nci = jj + (j - sci);
                 const ncell = helper.cloneDeep(this._[i].cells[j]);
-                //deleting cell meta incase of copy paste
-                delete ncell?.cellMeta;
                 // ncell.text
                 if (autofill && ncell && ncell.text && ncell.text.length > 0) {
                   const { text } = ncell;
