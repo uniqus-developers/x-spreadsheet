@@ -879,7 +879,8 @@ export default class DataProxy {
   setFormulaCellText(text, ri, ci, state = "input") {
     const { autoFilter, rows } = this;
     if (state === "finished") {
-      rows.setCellProperty(ri, ci, "f", text);
+      const isFormula = text?.startsWith?.("=");
+      rows.setCellProperty(ri, ci, "f", isFormula ? text.toUpperCase() : text);
       return;
     }
     let nri = ri;
