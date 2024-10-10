@@ -298,10 +298,10 @@ class Draw {
         ntxts.push(it);
       }
     });
-
-    const txtHeight = (ntxts.length - 1) * Number(font.size) + 2;
+    const lineHeight = Number(font.size) + 2;
+    const txtHeight = (ntxts.length - 1) * lineHeight;
     ntxts.forEach((txt, index) => {
-      let textStart = txtHeight * index;
+      let textStart = lineHeight * index;
       let ty = box.texty(valign, txtHeight, textStart);
       const txtWidth = ctx.measureText(txt).width;
       this.fillText(txt, tx, ty);

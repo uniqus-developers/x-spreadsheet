@@ -499,7 +499,7 @@ export default class DataProxy {
     return true;
   }
 
-  pasteFromSystemClipboard(evt, resetSheet, eventTrigger) {
+  pasteFromSystemClipboard(evt, resetSheet) {
     try {
       const { selector } = this;
       const htmlContent = evt?.clipboardData?.getData("text/html");
@@ -612,7 +612,6 @@ export default class DataProxy {
                 });
               });
               resetSheet();
-              eventTrigger(this.rows.getData());
             } else if (item?.types?.includes("text/plain")) {
               navigator.clipboard.readText().then((content) => {
                 const contentToPaste = this.parseClipboardContent(content);
@@ -631,7 +630,6 @@ export default class DataProxy {
                   startRow += 1;
                 });
                 resetSheet();
-                eventTrigger(this.rows.getData());
               });
             }
           });
@@ -881,7 +879,8 @@ export default class DataProxy {
   setFormulaCellText(text, ri, ci, state = "input") {
     const { autoFilter, rows } = this;
     if (state === "finished") {
-      rows.setCellProperty(ri, ci, "f", text);
+      const isFormula = text?.startsWith?.("=");
+      rows.setCellProperty(ri, ci, "f", isFormula ? text.toUpperCase() : text);
       return;
     }
     let nri = ri;
