@@ -61,32 +61,34 @@ function initBtns2() {
 }
 
 function moreResize() {
-  const { el, btns, moreEl, btns2 } = this;
-  const { moreBtns, contentEl } = moreEl.dd;
-  el.css("width", `${this.widthFn()}px`);
-  const elBox = el.box();
+  try {
+    const { el, btns, moreEl, btns2 } = this;
+    const { moreBtns, contentEl } = moreEl.dd;
+    el.css("width", `${this.widthFn()}px`);
+    const elBox = el.box();
 
-  let sumWidth = 160;
-  let sumWidth2 = 12;
-  const list1 = [];
-  const list2 = [];
-  btns2.forEach(([it, w], index) => {
-    sumWidth += w;
-    if (index === btns2.length - 1 || sumWidth < elBox.width) {
-      list1.push(it);
+    let sumWidth = 160;
+    let sumWidth2 = 12;
+    const list1 = [];
+    const list2 = [];
+    btns2.forEach(([it, w], index) => {
+      sumWidth += w;
+      if (index === btns2.length - 1 || sumWidth < elBox.width) {
+        list1.push(it);
+      } else {
+        sumWidth2 += w;
+        list2.push(it);
+      }
+    });
+    btns.html("").children(...list1);
+    moreBtns.html("").children(...list2);
+    contentEl.css("width", `${sumWidth2}px`);
+    if (list2.length > 0) {
+      moreEl.show();
     } else {
-      sumWidth2 += w;
-      list2.push(it);
+      moreEl.hide();
     }
-  });
-  btns.html("").children(...list1);
-  moreBtns.html("").children(...list2);
-  contentEl.css("width", `${sumWidth2}px`);
-  if (list2.length > 0) {
-    moreEl.show();
-  } else {
-    moreEl.hide();
-  }
+  } catch (e) {}
 }
 
 function genBtn(it) {
