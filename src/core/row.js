@@ -3,7 +3,7 @@ import { expr2expr } from "./alphabet";
 import { replaceCellRefWithNew } from "../utils";
 
 class Rows {
-  constructor(dataProxyContext, { len, height }, options = {}) {
+  constructor(dataProxyContext, { len, height, minHeight }, options = {}) {
     this.options = options;
     this._ = {};
     this.len = len;
@@ -11,6 +11,7 @@ class Rows {
     this.height = height;
     this.data = dataProxyContext;
     this.isHeightChanged = false;
+    this.minHeight = minHeight ?? height;
   }
 
   getHeight(ri) {

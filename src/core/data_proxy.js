@@ -101,6 +101,7 @@ const defaultSettings = {
   row: {
     len: 100,
     height: DEFAULT_ROW_HEIGHT,
+    minHeight: DEFAULT_ROW_HEIGHT,
   },
   col: {
     len: 26,
@@ -844,14 +845,13 @@ export default class DataProxy {
                   )
                 : DEFAULT_ROW_HEIGHT;
 
-              const rowHeight = value
+                const rowHeight = value
                 ? oldRowHeight > newRowHeight
                   ? oldRowHeight
                   : newRowHeight > DEFAULT_ROW_HEIGHT
                     ? newRowHeight
                     : DEFAULT_ROW_HEIGHT
                 : DEFAULT_ROW_HEIGHT;
-
               if (!this.rows.isHeightChanged)
                 this.rows.setHeight(ri, rowHeight, true);
             }
