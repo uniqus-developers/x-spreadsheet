@@ -48,6 +48,11 @@ export default {
     addComment: "Add Comment",
     showComment: "Show Comment",
   },
+  comment: {
+    reply: "Reply",
+    comment: "Comment",
+    cancel: "Cancel",
+  },
   print: {
     size: "Paper size",
     orientation: "Page orientation",
