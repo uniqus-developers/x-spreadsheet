@@ -845,10 +845,10 @@ export default class DataProxy {
                   )
                 : DEFAULT_ROW_HEIGHT;
 
-              const rowHeight = value
+                const rowHeight = value
                 ? oldRowHeight > newRowHeight
                   ? oldRowHeight
-                  : newRowHeight
+                  : newRowHeight > DEFAULT_ROW_HEIGHT
                     ? newRowHeight
                     : DEFAULT_ROW_HEIGHT
                 : DEFAULT_ROW_HEIGHT;
