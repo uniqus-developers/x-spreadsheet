@@ -24,12 +24,13 @@ declare module "x-data-spreadsheet" {
     row?: {
       len: number;
       height: number;
+      minHeight?:number
     };
     col?: {
       len: number;
       width: number;
       indexWidth: number;
-      minWidth: number;
+      minWidth?: number;
     };
     style?: {
       bgcolor: string;
