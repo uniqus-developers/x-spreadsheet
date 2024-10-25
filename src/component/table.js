@@ -20,7 +20,7 @@ function tableFixedHeaderStyle() {
     font: `500 ${npx(12)}px Source Sans Pro`,
     fillStyle: "#585757",
     lineWidth: thinLineWidth(),
-    strokeStyle: "#e6e6e6",
+    strokeStyle: "#e6e6e6"
   };
 }
 
@@ -140,6 +140,9 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
     }
   });
   draw.drawIcon(dbox, cellMeta);
+  if (settings?.comment?.indicator && cell?.c) {
+    draw.comment(dbox, settings?.comment?.indicator);
+  }
   if (style.border !== undefined) {
     dbox.setBorders(style.border);
     draw.strokeBorders(dbox);

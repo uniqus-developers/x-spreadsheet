@@ -11,6 +11,9 @@ import { getNewSheetName, stox } from "./utils";
 
 class Spreadsheet {
   constructor(selectors, options = {}) {
+    options.comment = {
+      indicator: "red",
+    };
     let targetEl = selectors;
     this.options = {
       showBottomBar: true,
