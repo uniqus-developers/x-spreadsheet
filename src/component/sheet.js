@@ -15,6 +15,7 @@ import { xtoast } from "./message";
 import { cssPrefix } from "../config";
 import { formulas } from "../core/formula";
 import { constructFormula, getCellName } from "../algorithm/cellInjection";
+import Comment from "./comment";
 
 /**
  * @desc throttle fn
@@ -654,6 +655,7 @@ function sheetInitEvents() {
     toolbar,
     modalValidation,
     sortFilter,
+    comment,
   } = this;
   // overlayer
   overlayerEl
@@ -784,6 +786,9 @@ function sheetInitEvents() {
       paste.call(this, "format");
     } else if (type === "hide") {
       hideRowsOrCols.call(this);
+    } else if (type === "add-comment" || type === "show-comment") {
+      comment.show();
+      contextMenu.hide();
     } else {
       insertDeleteRowColumn.call(this, type);
     }
@@ -1025,6 +1030,8 @@ export default class Sheet {
     );
     // sortFilter
     this.sortFilter = new SortFilter();
+    this.comment = new Comment(this, () => this.getRect());
+    this.hoverTimer = null;
     // root element
     this.el.children(
       this.tableEl,
@@ -1035,7 +1042,8 @@ export default class Sheet {
       this.horizontalScrollbar.el,
       this.contextMenu.el,
       this.modalValidation.el,
-      this.sortFilter.el
+      this.sortFilter.el,
+      this.comment.el
     );
     // table
     this.table = new Table(this.tableEl.el, data, this.options);

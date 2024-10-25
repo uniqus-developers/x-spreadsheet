@@ -389,7 +389,7 @@ body {
     z-index: 100;
     pointer-events: auto;
 
-    textarea {
+    div {
       box-sizing: content-box;
       border: none;
       padding: 0 3px;
@@ -409,6 +409,7 @@ body {
       word-wrap: break-word;
       line-height: 22px;
       margin: 0;
+      background-color: white;
     }
 
     .textline {
@@ -1289,4 +1290,17 @@ form fieldset {
   min-height: 40px;
   margin-top: 20px;
   margin-left: 40%;
+}
+
+.@{css-prefix}-comment-box {
+  position: absolute;
+  height:100px;
+  min-height: 100px;
+  background-color: red;
+  box-shadow: 1px 2px 5px 2px rgba(51, 51, 51, 0.15);
+  z-index: 100;
+  width: 260px;
+  pointer-events: auto;
+  overflow: auto;
+  min-height: 150px;
 }

@@ -28,9 +28,6 @@ const menuItems = [
   { key: "divider" },
   { key: "validation", title: tf("contextmenu.validation") },
   { key: "divider" },
-  // { key: "cell-printable", title: tf("contextmenu.cellprintable") },
-  // { key: "cell-non-printable", title: tf("contextmenu.cellnonprintable") },
-  // { key: "divider" },
   { key: "cell-editable", title: tf("contextmenu.celleditable") },
   { key: "cell-non-editable", title: tf("contextmenu.cellnoneditable") },
 ];
@@ -55,9 +52,10 @@ function buildMenuItem(item) {
       this.hide();
     })
     .children(
-      typeof item.title === "function" ? item.title() : item.title ?? "",
+      typeof item.title === "function" ? item.title() : (item.title ?? ""),
       h("div", "label").child(item.label || "")
-    );
+    )
+    .attr("data-key", item.key);
 
   if (item.subMenus) {
     const arrowIcon = h("div", `${cssPrefix}-icon label `).child(
@@ -99,12 +97,69 @@ function buildMenuItem(item) {
   return ele;
 }
 
+function checkCommentButtonStatus(element, key) {
+  const { sheet = {} } = this;
+  const { data = {} } = sheet;
+  const cell = data.getSelectedCell();
+  const { c = [] } = cell ?? {};
+  if (c.length) {
+    if (key === "add-comment") {
+      element.hide();
+    } else if (key === "show-comment") {
+      element.show();
+    }
+  } else {
+    if (key === "add-comment") {
+      element.show();
+    } else if (key === "show-comment") {
+      element.hide();
+    }
+  }
+}
+
+function handleDynamicMenu() {
+  const { menuItems, extendedContextMenu, sheet } = this;
+  menuItems.forEach((element) => {
+    const key = element.attr("data-key");
+    if (key === "add-comment" || key === "show-comment") {
+      checkCommentButtonStatus.call(this, element, key);
+    } else if (extendedContextMenu?.length) {
+      const match = extendedContextMenu?.find((menu) => menu.key === key);
+      if (match?.visibility) {
+        const status = match?.visibility?.(sheet, key);
+        if (status) {
+          element.show();
+        } else {
+          element.hide();
+        }
+      }
+    }
+  });
+}
+
 function buildMenu() {
-  const extendedContextMenu = this.extendedContextMenu;
-  const buildInMenus = menuItems.map((it) => buildMenuItem.call(this, it));
+  const { sheet, extendedContextMenu } = this;
+  let menu = [];
+  if (typeof sheet?.options?.comment === "object") {
+    menu = [
+      {
+        key: "add-comment",
+        title: tf("contextmenu.addComment"),
+      },
+      {
+        key: "show-comment",
+        title: tf("contextmenu.showComment"),
+      },
+      { key: "divider" },
+      ...menuItems,
+    ];
+  } else {
+    menu = menuItems;
+  }
+  const buildInMenus = menu.map((it) => buildMenuItem.call(this, it));
   let additionalMenus = [];
   if (extendedContextMenu?.length) {
-    const extMenu = Array.from(extendedContextMenu)
+    const extMenu = Array.from(extendedContextMenu);
     extMenu.push({ key: "divider" });
     additionalMenus = extMenu.map((it) => buildMenuItem.call(this, it));
   }
@@ -114,6 +169,7 @@ function buildMenu() {
 export default class ContextMenu {
   constructor(sheetContext, viewFn, isHide = false, extendedContextMenu = []) {
     this.extendedContextMenu = extendedContextMenu;
+    this.sheet = sheetContext;
     this.menuItems = buildMenu.call(this);
     this.el = h("div", `${cssPrefix}-contextmenu`)
       .children(...this.menuItems)
@@ -122,17 +178,21 @@ export default class ContextMenu {
     this.itemClick = () => {};
     this.isHide = isHide;
     this.setMode("range");
-    this.sheet = sheetContext;
   }
 
   // row-col: the whole rows or the whole cols
   // range: select range
+  //This may cause any issue in future
   setMode(mode) {
-    const hideEl = this.menuItems[12];
-    if (mode === "row-col") {
-      hideEl.show();
-    } else {
-      hideEl.hide();
+    const hideEl = this.menuItems.find((ele) => {
+      return ele.attr("data-key") === "hide";
+    });
+    if (hideEl) {
+      if (mode === "row-col") {
+        hideEl.show();
+      } else {
+        hideEl.hide();
+      }
     }
   }
 
@@ -145,6 +205,7 @@ export default class ContextMenu {
   setPosition(x, y) {
     if (this.isHide) return;
     const { el } = this;
+    handleDynamicMenu.call(this);
     const { width } = el.show().offset();
     const view = this.viewFn();
     const vhf = view.height / 2;
