@@ -95,6 +95,10 @@ class Element {
     this.el.removeChild(el);
   }
 
+  textContent(text) {
+    this.el.textContent = text;
+  }
+
   /*
   first() {
     return this.el.firstChild;
@@ -270,6 +274,11 @@ class Element {
   remove() {
     this.el.remove();
     return this;
+  }
+
+  removeAllChild() {
+    this.el.innerHTML = "";
+    return this
   }
 }
 

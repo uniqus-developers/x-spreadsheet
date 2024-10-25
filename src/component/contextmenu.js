@@ -178,6 +178,7 @@ export default class ContextMenu {
     this.itemClick = () => {};
     this.isHide = isHide;
     this.setMode("range");
+    this.lastCoordinate = { x: 0, y: 0 };
   }
 
   // row-col: the whole rows or the whole cols
@@ -203,6 +204,7 @@ export default class ContextMenu {
   }
 
   setPosition(x, y) {
+    this.lastCoordinate = { x, y };
     if (this.isHide) return;
     const { el } = this;
     handleDynamicMenu.call(this);

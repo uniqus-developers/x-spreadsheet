@@ -140,8 +140,8 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
     }
   });
   draw.drawIcon(dbox, cellMeta);
-  if (settings?.comment?.indicator && cell?.c) {
-    draw.comment(dbox, settings?.comment?.indicator);
+  if (settings?.comment?.indicatorColor && cell?.c) {
+    draw.comment(dbox, settings?.comment?.indicatorColor);
   }
   if (style.border !== undefined) {
     dbox.setBorders(style.border);
