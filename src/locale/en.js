@@ -52,6 +52,7 @@ export default {
     reply: "Reply",
     comment: "Comment",
     cancel: "Cancel",
+    clear: "Clear",
   },
   print: {
     size: "Paper size",
