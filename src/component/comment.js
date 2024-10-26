@@ -20,7 +20,7 @@ function insertComment() {
       if (c) {
         c.push(newObj);
       } else {
-        c = [newObj];
+        cell.c = [newObj];
       }
       handleReplyClick.call(this);
     }
@@ -41,13 +41,16 @@ function handleCancelClick() {
 }
 
 function buildCommentBox() {
-  const { el, textEl } = this;
+  const { el, textEl, sheet } = this;
+  const { data } = sheet;
+  const cell = data.getSelectedCell() ?? {};
+  const { c = [] } = cell;
   const commentButton = h("button", `${cssPrefix}-comment-reply-button`)
-    .child(tf("comment.reply")())
+    .child(tf(c?.length ? "comment.reply" : "comment.comment")())
     .on("click", () => insertComment.call(this));
 
   const cancelButton = h("button", `${cssPrefix}-comment-cancel-button`)
-    .child(tf("comment.cancel")())
+    .child(tf("comment.clear")())
     .on("click", () => handleCancelClick.call(this));
 
   const buttonContainer = h("div", `${cssPrefix}-comment-button-container`);
@@ -59,14 +62,29 @@ function buildCommentBox() {
   el.child(replyBox);
 }
 
+function buildUser() {
+  const { config } = this;
+  const { authorName } = config;
+  const avatar = h("div", `${cssPrefix}-comment-avatar`).child(
+    authorName ? authorName.toString()[0]?.toUpperCase() : ""
+  );
+  const name = h("div", `${cssPrefix}-comment-name`).child(authorName);
+  const box = h("div", `${cssPrefix}-title-box`).child(name);
+  const header = h("div", `${cssPrefix}-comment-inner-box`)
+    .child(avatar)
+    .child(box);
+  const div = h("div", `${cssPrefix}-inner-box`).child(header);
+  return div;
+}
+
 function buildCommentStack(comments) {
   const ele = comments.map((cmt) => {
     const { a, t } = cmt;
     const avatar = h("div", `${cssPrefix}-comment-avatar`).child(
-      a?.toString?.()?.[0]
+      a ? a.toString()[0]?.toUpperCase() : ""
     );
     const name = h("div", `${cssPrefix}-comment-name`).child(a);
-    const date = h("div", `${cssPrefix}-comment-data`).child(a ?? "");
+    const date = h("div", `${cssPrefix}-comment-data`).child(date ?? "");
     const box = h("div", `${cssPrefix}-title-box`).child(name).child(date);
     const header = h("div", `${cssPrefix}-comment-inner-box`)
       .child(avatar)
@@ -82,7 +100,7 @@ function buildCommentStack(comments) {
 
 function removeComments() {
   const { el } = this;
-  el.html("")
+  el.html("");
 }
 
 async function showAddedComment() {
@@ -92,7 +110,7 @@ async function showAddedComment() {
   const { data = {} } = sheet;
   const cell = data.getSelectedCell();
   if (cell) {
-    el.child(loader)
+    el.child(loader);
     loader.show();
     let cmtArray;
     if (showComments) {
@@ -102,7 +120,12 @@ async function showAddedComment() {
     }
     const elements = buildCommentStack.call(this, cmtArray);
     loader.hide();
-    el.children(...elements);
+    if (elements?.length) {
+      el.children(...elements);
+    } else {
+      const ele = buildUser.call(this);
+      el.child(ele);
+    }
   }
 }
 
