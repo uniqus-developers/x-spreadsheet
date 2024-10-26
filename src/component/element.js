@@ -275,11 +275,6 @@ class Element {
     this.el.remove();
     return this;
   }
-
-  removeAllChild() {
-    this.el.innerHTML = "";
-    return this
-  }
 }
 
 const h = (tag, className = "") => new Element(tag, className);
