@@ -4,11 +4,33 @@ import { bindClickoutside, unbindClickoutside } from "./event";
 import { tf } from "../locale/locale";
 
 function insertComment() {
-  const { textEl, config } = this;
-  const {} = config;
+  const { textEl, config, sheet } = this;
+  const { data } = sheet;
+  const { selector } = data;
+  const { ri, ci } = selector;
+  const cell = data.getSelectedCell();
+  const { onCommentAddClick, authorName } = config;
   const value = textEl.el.value;
   if (value) {
+    if (onCommentAddClick) {
+      onCommentAddClick(cell, ri, ci, value);
+    } else {
+      const { c } = cell;
+      const newObj = { a: authorName ?? "", t: value };
+      if (c) {
+        c.push(newObj);
+      } else {
+        c = [newObj];
+      }
+      handleReplyClick.call(this);
+    }
   }
+}
+
+async function handleReplyClick() {
+  handleCancelClick.call(this);
+  await showAddedComment.call(this);
+  buildCommentBox.call(this);
 }
 
 function keydownEventHandler(evt) {}
@@ -19,7 +41,7 @@ function handleCancelClick() {
 }
 
 function buildCommentBox() {
-  const { sheet = {}, el, textEl } = this;
+  const { el, textEl } = this;
   const commentButton = h("button", `${cssPrefix}-comment-reply-button`)
     .child(tf("comment.reply")())
     .on("click", () => insertComment.call(this));
@@ -58,12 +80,20 @@ function buildCommentStack(comments) {
   return ele;
 }
 
+function removeComments() {
+  const { el } = this;
+  el.html("")
+}
+
 async function showAddedComment() {
-  const { el, sheet = {}, config } = this;
+  removeComments.call(this);
+  const { el, sheet = {}, config, loader } = this;
   const { showComments } = config;
   const { data = {} } = sheet;
   const cell = data.getSelectedCell();
   if (cell) {
+    el.child(loader)
+    loader.show();
     let cmtArray;
     if (showComments) {
       cmtArray = await showComments?.(cell);
@@ -71,12 +101,13 @@ async function showAddedComment() {
       cmtArray = cell.c ?? [];
     }
     const elements = buildCommentStack.call(this, cmtArray);
+    loader.hide();
     el.children(...elements);
   }
 }
 
 function removeAllChildren(el) {
-  el.removeAllChild();
+  el.html("");
   el.hide();
   unbindClickoutside(el);
 }
@@ -88,6 +119,7 @@ export default class Comment {
     this.viewFn = viewFn;
     this.data = [];
     this.isHide = isHide;
+    this.loader = h("div", `${cssPrefix}-loader`).child("Loading...").hide();
     this.textEl = h("textarea", `${cssPrefix}-comment-textarea`).on(
       "keydown",
       (evt) => keydownEventHandler.call(this, evt)
@@ -101,13 +133,13 @@ export default class Comment {
     unbindClickoutside(el);
   }
 
-  show() {
+  async show() {
     if (!this?.config.indicatorColor) return;
     if (this.isHide) return;
     const { el, sheet = {} } = this;
     const { contextMenu } = sheet;
+    await showAddedComment.call(this);
     buildCommentBox.call(this);
-    showAddedComment.call(this);
     const { x, y } = contextMenu.lastCoordinate;
     const { width } = el.show().offset();
     const view = this.viewFn();
