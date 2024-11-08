@@ -58,11 +58,11 @@ class DrawBox {
   textx(align) {
     const { width, padding } = this;
     let { x } = this;
-    if (align === "left") {
+    if (align === "left" || align === "start") {
       x += padding;
     } else if (align === "center") {
       x += width / 2;
-    } else if (align === "right") {
+    } else if (align === "right" || align === "end") {
       x += width - padding;
     }
     return x;
