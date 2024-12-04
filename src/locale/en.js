@@ -47,6 +47,7 @@ export default {
     cellnoneditable: "Disable editing",
     addComment: "Add Comment",
     showComment: "Show Comment",
+    navigate: "Navigate to the cell",
   },
   comment: {
     reply: "Reply",

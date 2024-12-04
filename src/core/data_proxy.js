@@ -29,6 +29,7 @@ import {
   ACCOUNTING_FORMAT_REGEX,
   DEFAULT_ROW_HEIGHT,
   EXCEL_ERRORS,
+  EXTRACT_FORMULA_CELL_NAME_REGEX,
 } from "../constants";
 import { getFontSizePxByPt } from "./font";
 import { getDrawBox } from "../component/table";
@@ -880,7 +881,11 @@ export default class DataProxy {
     const { autoFilter, rows } = this;
     if (state === "finished") {
       const isFormula = text?.startsWith?.("=");
-      rows.setCellProperty(ri, ci, "f", isFormula ? text.toUpperCase() : text);
+      const updatedFormula =
+        text?.replace(EXTRACT_FORMULA_CELL_NAME_REGEX, (match) =>
+          match.toUpperCase()
+        ) ?? text;
+      rows.setCellProperty(ri, ci, "f", isFormula ? updatedFormula : text);
       return;
     }
     let nri = ri;
