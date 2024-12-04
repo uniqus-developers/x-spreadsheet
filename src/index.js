@@ -12,9 +12,9 @@ import { getNewSheetName, stox } from "./utils";
 class Spreadsheet {
   constructor(selectors, options = {}) {
     options.comment = {
-      indicatorColor: "red",
+      indicatorColor: "purple",
       onCommentMention: () => {},
-      authorName:'jatin kumar'
+      authorName: "User",
     };
     let targetEl = selectors;
     this.options = {
