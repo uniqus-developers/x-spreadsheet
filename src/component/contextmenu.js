@@ -2,8 +2,14 @@ import { h } from "./element";
 import { bindClickoutside, unbindClickoutside } from "./event";
 import { cssPrefix } from "../config";
 import { tf } from "../locale/locale";
+import { CELL_REF_REGEX, SHEET_TO_CELL_REF_REGEX } from "../constants";
 
 const menuItems = [
+  {
+    key: "navigate",
+    title: tf("contextmenu.navigate"),
+    label: "Ctrl+[",
+  },
   { key: "copy", title: tf("contextmenu.copy"), label: "Ctrl+C" },
   { key: "cut", title: tf("contextmenu.cut"), label: "Ctrl+X" },
   { key: "paste", title: tf("contextmenu.paste"), label: "Ctrl+V" },
@@ -52,7 +58,7 @@ function buildMenuItem(item) {
       this.hide();
     })
     .children(
-      typeof item.title === "function" ? item.title() : (item.title ?? ""),
+      typeof item.title === "function" ? item.title() : item.title ?? "",
       h("div", "label").child(item.label || "")
     )
     .attr("data-key", item.key);
@@ -117,12 +123,26 @@ function checkCommentButtonStatus(element, key) {
   }
 }
 
+function setNavigateVisibility(element) {
+  const { sheet = {} } = this;
+  const { data = {} } = sheet;
+  const cell = data.getSelectedCell();
+  const { f } = cell ?? {};
+  if (f?.match(SHEET_TO_CELL_REF_REGEX) || f?.match(CELL_REF_REGEX)) {
+    element.show();
+  } else {
+    element.hide();
+  }
+}
+
 function handleDynamicMenu() {
   const { menuItems, extendedContextMenu, sheet } = this;
   menuItems.forEach((element) => {
     const key = element.attr("data-key");
     if (key === "add-comment" || key === "show-comment") {
       checkCommentButtonStatus.call(this, element, key);
+    } else if (key === "navigate") {
+      setNavigateVisibility.call(this, element);
     } else if (extendedContextMenu?.length) {
       const match = extendedContextMenu?.find((menu) => menu.key === key);
       if (match?.visibility) {
