@@ -8,7 +8,7 @@ function insertComment() {
   const { data } = sheet;
   const { selector } = data;
   const { ri, ci } = selector;
-  const cell = data.getSelectedCell();
+  const cell = data.rows.getCellOrNew(ri, ci);
   const { onCommentAddClick, authorName } = config;
   const value = textEl.el.value;
   if (value) {
