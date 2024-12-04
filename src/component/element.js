@@ -95,6 +95,10 @@ class Element {
     this.el.removeChild(el);
   }
 
+  textContent(text) {
+    this.el.textContent = text;
+  }
+
   /*
   first() {
     return this.el.firstChild;

@@ -1290,3 +1290,169 @@ form fieldset {
   margin-top: 20px;
   margin-left: 40%;
 }
+
+.@{css-prefix}-comment-box {
+  position: absolute;
+  min-height: 100px;
+  box-shadow: 1px 0px 8px rgba(0, 0, 0, 0.4);
+  border: 0.5px solid #79716b;
+  z-index: 200;
+  width: 340px;
+  pointer-events: auto;
+  overflow: auto;
+  min-height: 100px;
+  background-color: #fff;
+  max-height: 700px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+// .@{css-prefix}-comment-box > * {
+//   margin-bottom: 20px;
+// }
+
+.@{css-prefix}-comment-box > *:last-child {
+  margin-bottom: 0;
+}
+
+.@{css-prefix}-comment-inner-box {
+  display: flex;
+  margin-bottom: auto;
+  height: 60px;
+  width: 100%;
+  justify-content: flex-start;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.@{css-prefix}-comment-avatar {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  border: 1px solid#E0DFDA;
+  display: flex;
+  font-size: 20px;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.@{css-prefix}-comment-name {
+  font-size: 16px;
+  line-height: 1;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: black;
+}
+
+.@{css-prefix}-comment-data {
+  font-size: 12px;
+  line-height: 1;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #343a40;
+  margin-top: 3px;
+}
+
+.@{css-prefix}-title-box {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+  margin-top: 3px;
+  width: 200px;
+}
+
+.@{css-prefix}-content-box {
+  flex-direction: column;
+  margin-left: 10px;
+  width: 100%;
+  max-width: 100%;
+  word-wrap: break-word;
+  margin-bottom: 12px;
+}
+
+.@{css-prefix}-inner-box {
+  max-width: 310px;
+  width: 310px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.@{css-prefix}-comment-reply-box {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Text Area Styling */
+.@{css-prefix}-comment-textarea {
+  width: 100%;
+  height: 50px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 7px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1b1c1d;
+  resize: vertical;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.3s ease;
+  resize: none;
+  overflow-y: auto;
+  max-height: 105px;
+}
+
+.@{css-prefix}-comment-textarea:focus {
+  border-color: #007bff;
+}
+
+.@{css-prefix}-comment-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.@{css-prefix}-comment-reply-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100px;
+  margin-left: 10px;
+  height: 35px;
+}
+
+.@{css-prefix}-comment-reply-button:hover {
+  background-color: #0056b3;
+}
+
+.@{css-prefix}-comment-cancel-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #e0e0e0;
+  color: #333;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100px;
+  height: 35px;
+}
+
+.@{css-prefix}-comment-cancel-button:hover {
+  background-color: #b0b0b0;
+}
