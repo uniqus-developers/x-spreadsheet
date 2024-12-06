@@ -108,7 +108,7 @@ function checkCommentButtonStatus(element, key) {
   const { data = {} } = sheet;
   const cell = data.getSelectedCell();
   const { c = [] } = cell ?? {};
-  if (c.length) {
+  if (c?.length) {
     if (key === "add-comment") {
       element.hide();
     } else if (key === "show-comment") {
