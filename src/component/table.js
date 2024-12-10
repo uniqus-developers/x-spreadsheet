@@ -20,7 +20,7 @@ function tableFixedHeaderStyle() {
     font: `500 ${npx(12)}px Source Sans Pro`,
     fillStyle: "#585757",
     lineWidth: thinLineWidth(),
-    strokeStyle: "#e6e6e6"
+    strokeStyle: "#e6e6e6",
   };
 }
 
@@ -96,9 +96,6 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
       if (cell.w) {
         cell.w = cellText?.toString?.() ?? cellText;
       }
-      if (cell.h) {
-        cell.h = cellText?.toString?.() ?? cellText;
-      }
     } else {
       cellText = cell.text ?? "";
     }
@@ -116,7 +113,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
     const font = Object.assign({}, style.font);
     font.size = getFontSizePxByPt(font.size);
     draw.text(
-      cellText,
+      { textValue: cellText, htmlValue: cell.h },
       dbox,
       {
         align: style.align,

@@ -36,7 +36,10 @@
           1: {
             cells: {
               0: { text: "testingtesttestetst" },
-              2: { text: "testing" },
+              2: {
+                text: "this is Bold and this is italic",
+                h: "This is <b>Bold</b> and this is <i>italic</i>",
+              },
             },
           },
           2: {
@@ -104,23 +107,17 @@
               ],
               merges: ["C3:D4"],
               cols: {
-                len: 10,
+                len: 26,
                 2: { width: 200 },
               },
               rows,
             },
             { name: "sheet-test", rows: rows10 },
           ])
-          .change((cdata) => {});
-
-        xs.on("cell-selected", (cell, ri, ci) => {})
-          .on("cell-edited", (text, ri, ci) => {})
-          .on("pasted-clipboard", (data) => {})
-          .on("grid-load", (text, ri, ci) => {
-            console.log("grid-load", xs.sheet.data.getVariables());
+          .change((cdata) => {
+            console.log("CHANGE", cdata);
           });
       }
     </script>
-    <!--script type="text/javascript" src="https://unpkg.com/x-data-spreadsheet@1.0.20/dist/locale/zh-cn.js"></script-->
   </body>
 </html>

@@ -543,6 +543,7 @@ function dataSetCellText(text, state = "finished") {
   const trigger = data?.settings?.mentionProgress?.trigger;
   if (data.settings.mode === "read") return;
   const inputText = editor.inputText;
+  const inputHtml = editor.inputHtml;
   if (editor.formulaCell && state === "finished") {
     const { ri, ci } = editor.formulaCell;
     data.setFormulaCellText(inputText, ri, ci, state);
@@ -555,7 +556,13 @@ function dataSetCellText(text, state = "finished") {
     this.trigger("cell-edited", inputText, ri, ci);
     this.trigger("cell-edit-finished", text, ri, ci);
   } else if (!editor.formulaCell) {
-    data.setSelectedCellText(text, state);
+    data.setSelectedCellText(
+      {
+        textValue: text,
+        htmlValue: inputHtml,
+      },
+      state
+    );
     const { ri, ci } = data.selector;
     if (state === "finished") {
       this.trigger("cell-edit-finished", text, ri, ci);
@@ -763,8 +770,8 @@ function sheetInitEvents() {
     horizontalScrollbarMove.call(this, distance, evt);
   };
   // editor
-  editor.change = (state, itext) => {
-    if (itext?.trim?.()?.startsWith("=")) {
+  editor.change = (state, textValue, htmlValue) => {
+    if (textValue?.trim?.()?.startsWith("=")) {
       const { ri, ci } = this.data.selector;
       if (!editor.formulaCell) {
         editor.setFormulaCell({ ri, ci });
@@ -772,7 +779,7 @@ function sheetInitEvents() {
     } else {
       editor.setFormulaCell(null);
     }
-    dataSetCellText.call(this, itext, state);
+    dataSetCellText.call(this, textValue, state);
   };
   // modal validation
   modalValidation.change = (action, ...args) => {

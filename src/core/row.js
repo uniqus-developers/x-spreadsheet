@@ -116,30 +116,30 @@ class Rows {
     }
   }
 
-  setCellText(ri, ci, text) {
+  setCellText(ri, ci, values) {
+    const { textValue, htmlValue } = values;
     const cell = this.getCellOrNew(ri, ci);
     if (cell.editable !== false) {
       const valueSetter = this.options.valueSetter;
       if (valueSetter) {
-        const result = valueSetter({ ...this, text, cell });
-        let retrievedText, formattedText, html;
+        const result = valueSetter({ ...this, text: textValue, cell });
+        let retrievedText, formattedText;
         if (result && typeof result === "object" && !Array.isArray(result)) {
-          ({ retrievedText, formattedText, html } = result);
+          ({ retrievedText, formattedText } = result);
         } else if (Array.isArray(result)) {
-          [retrievedText, formattedText, html] = result;
+          [retrievedText, formattedText] = result;
         } else {
           retrievedText = result;
           formattedText = "";
-          html = "";
         }
         cell.text = retrievedText ?? "";
         cell.w = formattedText ?? "";
         cell.f = "";
-        cell.h = html ?? "";
+        cell.h = htmlValue === textValue ? "" : htmlValue;
       } else {
-        cell.text = text;
+        cell.text = textValue;
         cell.f = "";
-        cell.h = "";
+        cell.h = htmlValue === textValue ? "" : htmlValue;
       }
     }
   }
@@ -249,7 +249,7 @@ class Rows {
       const ri = sri + i;
       row.forEach((cell, j) => {
         const ci = sci + j;
-        this.setCellText(ri, ci, cell);
+        this.setCellText(ri, ci, { textValue: cell });
       });
     });
   }

@@ -27,8 +27,10 @@ import CellConfig from "./cellConfig";
 import Variable from "./variable";
 import {
   ACCOUNTING_FORMAT_REGEX,
+  DEFAULT_COL_WIDTH,
   DEFAULT_ROW_HEIGHT,
   EXCEL_ERRORS,
+  EXEC_COMMAND_MAP,
   EXTRACT_FORMULA_CELL_NAME_REGEX,
 } from "../constants";
 import { getFontSizePxByPt } from "./font";
@@ -106,7 +108,7 @@ const defaultSettings = {
   },
   col: {
     len: 26,
-    width: 100,
+    width: DEFAULT_COL_WIDTH,
     indexWidth: 60,
     minWidth: 60,
   },
@@ -567,7 +569,9 @@ export default class DataProxy {
                     this.setCellText(
                       startRow,
                       startColumn,
-                      isAccountingFormat ? rawCellContent : cellContent,
+                      isAccountingFormat
+                        ? { textValue: rawCellContent }
+                        : { textValue: cellContent },
                       "input"
                     );
                     const rowSpan = Number(td?.getAttribute("rowspan") ?? 1);
@@ -624,7 +628,7 @@ export default class DataProxy {
                     this.setCellText(
                       startRow,
                       startColumn,
-                      cellContent,
+                      { textValue: cellContent },
                       "input"
                     );
                     startColumn += 1;
@@ -808,9 +812,18 @@ export default class DataProxy {
             property === "font-size"
           ) {
             const nfont = {};
-            nfont[property.split("-")[1]] = value;
-            cstyle.font = Object.assign(cstyle.font || {}, nfont);
-            cell.style = this.addStyle(cstyle);
+            const styleProperty = property.split("-")[1];
+            if (window?.getSelection?.()?.toString?.()) {
+              document.execCommand?.(
+                EXEC_COMMAND_MAP[styleProperty],
+                true,
+                value
+              );
+            } else {
+              nfont[styleProperty] = value;
+              cstyle.font = Object.assign(cstyle.font || {}, nfont);
+              cell.style = this.addStyle(cstyle);
+            }
           } else if (
             property === "strike" ||
             property === "textwrap" ||
@@ -846,7 +859,7 @@ export default class DataProxy {
                   )
                 : DEFAULT_ROW_HEIGHT;
 
-                const rowHeight = value
+              const rowHeight = value
                 ? oldRowHeight > newRowHeight
                   ? oldRowHeight
                   : newRowHeight > DEFAULT_ROW_HEIGHT
@@ -856,8 +869,12 @@ export default class DataProxy {
               if (!this.rows.isHeightChanged)
                 this.rows.setHeight(ri, rowHeight, true);
             }
-            cstyle[property] = value;
-            cell.style = this.addStyle(cstyle);
+            if (window?.getSelection?.()?.toString?.()) {
+              document.execCommand?.(EXEC_COMMAND_MAP[property], true, value);
+            } else {
+              cstyle[property] = value;
+              cell.style = this.addStyle(cstyle);
+            }
           } else if (property === "editable") {
             cell[property] = value;
             cell.cellMeta = cell?.cellMeta ?? {};
@@ -894,7 +911,7 @@ export default class DataProxy {
     }
     const oldCell = rows.getCell(nri, ci);
     const oldText = oldCell ? oldCell.text : "";
-    this.setCellText(nri, ci, text, state);
+    this.setCellText(nri, ci, { textValue: text }, state);
     // replace filter.value
     if (autoFilter.active()) {
       const filter = autoFilter.getFilter(ci);
@@ -908,7 +925,8 @@ export default class DataProxy {
   }
 
   // state: input | finished
-  setSelectedCellText(text, state = "input") {
+  setSelectedCellText(values, state = "input") {
+    const { textValue, htmlValue } = values;
     const { autoFilter, selector, rows } = this;
     const { ri, ci } = selector;
     let nri = ri;
@@ -917,7 +935,7 @@ export default class DataProxy {
     }
     const oldCell = rows.getCell(nri, ci);
     const oldText = oldCell ? oldCell.text : "";
-    this.setCellText(nri, ci, text, state);
+    this.setCellText(nri, ci, { textValue, htmlValue }, state);
     // replace filter.value
     if (autoFilter.active()) {
       const filter = autoFilter.getFilter(ci);
@@ -926,7 +944,6 @@ export default class DataProxy {
         if (vIndex >= 0) {
           filter.value.splice(vIndex, 1, text);
         }
-        // console.log('filter:', filter, oldCell);
       }
     }
     // this.resetAutoFilter();
@@ -1403,18 +1420,19 @@ export default class DataProxy {
   }
 
   // state: input | finished
-  setCellText(ri, ci, text, state) {
+  setCellText(ri, ci, values, state) {
+    const { textValue = "" } = values;
     const { rows, history, validations } = this;
     if (state === "finished") {
-      rows.setCellText(ri, ci, "");
+      rows.setCellText(ri, ci, { textValue: "", htmlValue: "" });
       history.add(this.getData());
-      rows.setCellText(ri, ci, text);
+      rows.setCellText(ri, ci, values);
     } else {
-      rows.setCellText(ri, ci, text);
+      rows.setCellText(ri, ci, values);
       this.change(this.getData());
     }
     // validator
-    validations.validate(ri, ci, text);
+    validations.validate(ri, ci, textValue);
   }
 
   setCellProperty(ri, ci, key, value) {
