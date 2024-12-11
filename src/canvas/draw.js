@@ -1,3 +1,5 @@
+import html2canvas from "html2canvas";
+import { DEFAULT_ROW_HEIGHT } from "../constants";
 /* global window */
 function dpr() {
   return window.devicePixelRatio || 1;
@@ -147,7 +149,7 @@ class Draw {
   constructor(el, width, height, options = {}, data = {}) {
     this.options = options;
     this.el = el;
-    this.ctx = el.getContext("2d");
+    this.ctx = el.getContext("2d", { willReadFrequently: true });
     this.resize(width, height);
     this.ctx.scale(dpr(), dpr());
     this.numberRegexObject = {
@@ -222,6 +224,26 @@ class Draw {
     return this;
   }
 
+  fillHtml(html, { x, y, w, h, fontSize }) {
+    const parser = new DOMParser();
+    const parsedHtml = parser
+      .parseFromString(html, "text/html")
+      .getElementsByTagName("body")[0];
+    const element = document.createElement("span");
+    element.style.display = "inline-block";
+    element.style.width = `${w}px`;
+    element.style.height = `${h}px`;
+    element.style.fontSize = `${fontSize}px`;
+    element.style.paddingLeft = "2px";
+    element.innerHTML = parsedHtml.innerHTML;
+    document.body.appendChild(element);
+    html2canvas(element).then((canvas) => {
+      this.ctx.drawImage(canvas, npx(x), npx(y));
+      document.body.removeChild(element);
+    });
+    return this;
+  }
+
   /*
     txt: render text
     box: DrawBox
@@ -260,7 +282,9 @@ class Draw {
     return text;
   }
 
-  text(mtxt, box, attr = {}, textWrap = true, cellMeta = {}) {
+  text(values, box, attr = {}, textWrap = true, cellMeta = {}) {
+    const { textValue, htmlValue } = values;
+    let mtxt = textValue;
     mtxt = this.data.resolveDynamicVariable.call(this.data, mtxt)?.text ?? mtxt;
     mtxt = this.textConfigOperation(mtxt, cellMeta);
     const { ctx } = this;
@@ -300,37 +324,47 @@ class Draw {
     });
     const lineHeight = Number(font.size) + 2;
     const txtHeight = (ntxts.length - 1) * lineHeight;
-    ntxts.forEach((txt, index) => {
-      let textStart = lineHeight * index;
-      let ty = box.texty(valign, txtHeight, textStart);
-      const txtWidth = ctx.measureText(txt).width;
-      this.fillText(txt, tx, ty);
-      if (strike) {
-        drawFontLine.call(
-          this,
-          "strike",
-          tx,
-          ty,
-          align,
-          valign,
-          font.size,
-          txtWidth
-        );
-      }
-      if (underline) {
-        drawFontLine.call(
-          this,
-          "underline",
-          tx,
-          ty,
-          align,
-          valign,
-          font.size,
-          txtWidth
-        );
-      }
-      ty += font.size + 2;
-    });
+    if (htmlValue) {
+      this.fillHtml(htmlValue, {
+        x: box.x + this.data.settings.col.indexWidth,
+        y: box.y + DEFAULT_ROW_HEIGHT,
+        w: box.width - 3,
+        h: box.height,
+        fontSize: font.size,
+      });
+    } else {
+      ntxts.forEach((txt, index) => {
+        let textStart = lineHeight * index;
+        let ty = box.texty(valign, txtHeight, textStart);
+        const txtWidth = ctx.measureText(txt).width;
+        this.fillText(txt, tx, ty);
+        if (strike) {
+          drawFontLine.call(
+            this,
+            "strike",
+            tx,
+            ty,
+            align,
+            valign,
+            font.size,
+            txtWidth
+          );
+        }
+        if (underline) {
+          drawFontLine.call(
+            this,
+            "underline",
+            tx,
+            ty,
+            align,
+            valign,
+            font.size,
+            txtWidth
+          );
+        }
+        ty += font.size + 2;
+      });
+    }
     ctx.restore();
     return this;
   }

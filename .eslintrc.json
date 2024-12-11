@@ -1,4 +1,4 @@
-module.exports = {
+{
   "extends": "airbnb-base",
   "rules": {
     "no-param-reassign": ["error", { "props": false }],
@@ -6,5 +6,5 @@ module.exports = {
     "no-restricted-syntax": ["error", "WithStatement"],
     "quotes": ["error", "single", { "allowTemplateLiterals": true }],
     "no-console": "off"
-  },
-};
+  }
+}

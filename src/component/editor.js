@@ -37,7 +37,13 @@ function insertText({ target }, itxt) {
   const { value, selectionEnd } = target;
   const ntxt = `${value.slice(0, selectionEnd)}${itxt}${value.slice(selectionEnd)}`;
   target.value = ntxt;
-  target.setSelectionRange(selectionEnd + 1, selectionEnd + 1);
+
+  const range = document.createRange();
+  const sel = window.getSelection();
+  range.setStart(target, selectionEnd + 1);
+  range.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(range);
 
   this.inputText = ntxt;
   this.textlineEl.html(ntxt);
@@ -79,7 +85,9 @@ function mentionMenuSearch(text) {
 }
 
 function inputEventHandler(evt) {
-  const v = evt.target.value;
+  const textValue = evt.target.innerText ?? evt.target.value ?? "";
+  const htmlValue =
+    evt.target.innerHTML !== "<br>" ? evt.target.innerHTML : undefined;
   const { suggest, textlineEl, validator, mention, trigger } = this;
   const { cell } = this;
   if (cell !== null) {
@@ -87,62 +95,65 @@ function inputEventHandler(evt) {
       ("editable" in cell && cell.editable === true) ||
       cell.editable === undefined
     ) {
-      this.inputText = v;
+      this.inputText = textValue;
+      this.inputHtml = htmlValue;
       if (validator) {
         if (validator.type === "list") {
-          suggest.search(v);
+          suggest.search(textValue);
         } else {
           suggest.hide();
         }
       } else {
-        const start = v.lastIndexOf("=");
+        const start = textValue.lastIndexOf("=");
         if (start !== -1) {
-          suggest.search(v.substring(start + 1));
+          suggest.search(textValue.substring(start + 1));
         } else {
           suggest.hide();
         }
       }
       if (trigger) {
-        if (v?.includes(trigger)) {
+        if (textValue?.includes(trigger)) {
           suggest.hide();
-          mentionMenuSearch.call(this, v);
+          mentionMenuSearch.call(this, textValue);
         } else {
           mention.hide();
         }
       }
-      textlineEl.html(v);
+      textlineEl.html(textValue);
       resetTextareaSize.call(this);
-      this.change("input", v);
+      this.change("input", textValue);
     } else {
       evt.target.value = cell.text ?? "";
+      evt.target.innerText = cell.text ?? "";
     }
   } else {
-    this.inputText = v;
+    this.inputText = textValue;
+    this.inputHtml = htmlValue;
     if (validator) {
       if (validator.type === "list") {
-        suggest.search(v);
+        suggest.search(textValue);
       } else {
         suggest.hide();
       }
     } else {
-      const start = v.lastIndexOf("=");
+      const start = textValue.lastIndexOf("=");
       if (start !== -1) {
-        suggest.search(v.substring(start + 1));
+        suggest.search(textValue.substring(start + 1));
       } else {
         suggest.hide();
       }
       if (trigger) {
-        if (v?.includes(trigger)) {
+        if (textValue?.includes(trigger)) {
           suggest.hide();
-          mentionMenuSearch.call(this, v);
+          mentionMenuSearch.call(this, textValue);
         } else {
           mention.hide();
         }
       }
     }
-    textlineEl.html(v);
+    textlineEl.html(textValue);
     resetTextareaSize.call(this);
-    this.change("input", v);
+    this.change("input", textValue, htmlValue);
   }
 }
 
@@ -150,17 +161,24 @@ function setTextareaRange(position) {
   const { el } = this.textEl;
   setTimeout(() => {
     el.focus();
-    el.setSelectionRange(position, position);
+    const range = document.createRange();
+    const sel = window.getSelection();
+    if (this.inputHtml) range.setStart(el, el.childNodes.length);
+    else range.setStart(el.childNodes[0], position);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
   }, 0);
 }
 
-function setText(text, position) {
+function setText(values, position) {
+  const { textValue, htmlValue } = values;
   const { textEl, textlineEl } = this;
   // firefox bug
   textEl.el.blur();
 
-  textEl.val(text);
-  textlineEl.html(text);
+  textEl.html(htmlValue ? htmlValue : textValue);
+  textlineEl.html(htmlValue ? htmlValue : textValue);
   setTextareaRange.call(this, position);
 }
 
@@ -184,7 +202,7 @@ function suggestItemClick(it) {
     position = this.inputText.length;
     this.inputText += `)${eit}`;
   }
-  setText.call(this, this.inputText, position);
+  setText.call(this, { textValue: this.inputText }, position);
 }
 
 function resetSuggestItems() {
@@ -234,7 +252,7 @@ function mentionInputHandler(item) {
 
   this.inputText = newText;
   const position = start + word?.length ?? this.inputText?.length;
-  setText.call(this, this.inputText, position);
+  setText.call(this, { textValue: this.inputText }, position);
   resetTextareaSize.call(this);
 }
 
@@ -255,12 +273,18 @@ export default class Editor {
     this.datepicker = new Datepicker();
     this.datepicker.change((d) => {
       // console.log('d:', d);
-      this.setText(dateFormat(d));
+      this.setText({ textValue: dateFormat(d) });
       this.clear();
     });
     this.areaEl = h("div", `${cssPrefix}-editor-area`)
       .children(
-        (this.textEl = h("textarea", "")
+        (this.textEl = h("div", "")
+          .css({
+            outline: "none",
+            "line-height": 1.5,
+            "background-color": "#fff",
+          })
+          .attr("contenteditable", true)
           .on("input", (evt) => inputEventHandler.call(this, evt))
           .on("paste.stop", () => {})
           .on("keydown", (evt) => keydownEventHandler.call(this, evt))),
@@ -297,8 +321,9 @@ export default class Editor {
     this.cell = null;
     this.areaOffset = null;
     this.inputText = "";
+    this.inputHtml = "";
     this.el.hide();
-    this.textEl.val("");
+    this.textEl.html("");
     this.textlineEl.html("");
     resetSuggestItems.call(this);
     this.datepicker.hide();
@@ -327,7 +352,7 @@ export default class Editor {
         left: left - elOffset.left - 0.8,
         top: top - elOffset.top - 0.8,
       });
-      textEl.offset({ width: width - 9 + 0.8, height: height - 3 + 0.8 });
+      textEl.offset({ width: width - 3 + 0.8, height: height - 3 + 0.8 });
       const sOffset = { left: 0 };
       sOffset[suggestPosition] = height;
       suggest.setOffset(sOffset);
@@ -349,7 +374,7 @@ export default class Editor {
     } else {
       text = cell?.f || (cell?.text ?? "");
     }
-    this.setText(text);
+    this.setText({ textValue: text, htmlValue: cell?.h });
     this.validator = validator;
     if (validator) {
       const { type } = validator;
@@ -374,9 +399,11 @@ export default class Editor {
     this.formulaCell = cellRef;
   }
 
-  setText(text) {
-    this.inputText = text;
-    setText.call(this, text, text.length);
+  setText(values) {
+    const { textValue, htmlValue } = values;
+    this.inputText = textValue;
+    this.inputHtml = htmlValue;
+    setText.call(this, values, textValue.length);
     resetTextareaSize.call(this);
   }
 

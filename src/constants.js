@@ -113,8 +113,20 @@ const INDEXED_COLORS = {
 };
 
 const DEFAULT_ROW_HEIGHT = 20;
+const DEFAULT_COL_WIDTH = 100;
 
 const EXCEL_ERRORS = [REF_ERROR, GENERAL_ERROR, VALUE_ERROR];
+
+const EXEC_COMMAND_MAP = {
+  bold: "bold",
+  italic: "italic",
+  underline: "underline",
+  strike: "strikeThrough",
+  name: "fontName",
+  size: "fontSize",
+  color: "foreColor",
+  bgcolor: "backColor",
+};
 
 export {
   REF_ERROR,
@@ -135,4 +147,6 @@ export {
   VALUE_ERROR,
   EXCEL_ERRORS,
   EXTRACT_FORMULA_CELL_NAME_REGEX,
+  EXEC_COMMAND_MAP,
+  DEFAULT_COL_WIDTH,
 };
