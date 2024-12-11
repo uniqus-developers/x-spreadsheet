@@ -328,7 +328,7 @@ class Draw {
       this.fillHtml(htmlValue, {
         x: box.x + this.data.settings.col.indexWidth,
         y: box.y + DEFAULT_ROW_HEIGHT,
-        w: box.width,
+        w: box.width - 3,
         h: box.height,
         fontSize: font.size,
       });

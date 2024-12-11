@@ -37,7 +37,13 @@ function insertText({ target }, itxt) {
   const { value, selectionEnd } = target;
   const ntxt = `${value.slice(0, selectionEnd)}${itxt}${value.slice(selectionEnd)}`;
   target.value = ntxt;
-  // target.setSelectionRange(selectionEnd + 1, selectionEnd + 1);
+
+  const range = document.createRange();
+  const sel = window.getSelection();
+  range.setStart(target, selectionEnd + 1);
+  range.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(range);
 
   this.inputText = ntxt;
   this.textlineEl.html(ntxt);
@@ -79,8 +85,9 @@ function mentionMenuSearch(text) {
 }
 
 function inputEventHandler(evt) {
-  const textValue = evt.target.innerText;
-  const htmlValue = evt.target.innerHTML;
+  const textValue = evt.target.innerText ?? evt.target.value ?? "";
+  const htmlValue =
+    evt.target.innerHTML !== "<br>" ? evt.target.innerHTML : undefined;
   const { suggest, textlineEl, validator, mention, trigger } = this;
   const { cell } = this;
   if (cell !== null) {
@@ -117,6 +124,7 @@ function inputEventHandler(evt) {
       this.change("input", textValue);
     } else {
       evt.target.value = cell.text ?? "";
+      evt.target.innerText = cell.text ?? "";
     }
   } else {
     this.inputText = textValue;
@@ -153,8 +161,13 @@ function setTextareaRange(position) {
   const { el } = this.textEl;
   setTimeout(() => {
     el.focus();
-    // TODO : Need to handle this
-    // el.setSelectionRange(position, position);
+    const range = document.createRange();
+    const sel = window.getSelection();
+    if (this.inputHtml) range.setStart(el, el.childNodes.length);
+    else range.setStart(el.childNodes[0], position);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
   }, 0);
 }
 
