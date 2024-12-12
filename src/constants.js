@@ -14,6 +14,8 @@ const SHEET_TO_CELL_REF_REGEX =
 const CELL_REF_REPLACE_REGEX = /(?:\b[A-Za-z0-9_]+\b!)?[A-Za-z]+\d+\b/g;
 const ACCOUNTING_FORMAT_REGEX = /^\s*[€£¥₹$¢₱₦₩]?[\s]*\(?-?[\d,]+(\.\d+)?\)?$/;
 const EXTRACT_FORMULA_CELL_NAME_REGEX = /\b[a-z]+\b(?=\()|(?<=\W)[a-z]\d+\b/gi;
+const EXTRACT_MSO_NUMBER_FORMAT_REGEX =
+  /\.([^ \{]+)\s*{[^}]*mso-number-format:\s*"([^"]+)"/g;
 
 const PX_TO_PT = 0.75;
 
@@ -149,4 +151,5 @@ export {
   EXTRACT_FORMULA_CELL_NAME_REGEX,
   EXEC_COMMAND_MAP,
   DEFAULT_COL_WIDTH,
+  EXTRACT_MSO_NUMBER_FORMAT_REGEX,
 };
