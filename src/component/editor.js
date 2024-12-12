@@ -164,7 +164,7 @@ function setTextareaRange(position) {
     const range = document.createRange();
     const sel = window.getSelection();
     if (this.inputHtml) range.setStart(el, el.childNodes.length);
-    else range.setStart(el.childNodes[0], position);
+    else range.setStart(el.childNodes?.[0] ?? el, position);
     range.collapse(true);
     sel.removeAllRanges();
     sel.addRange(range);
