@@ -5,6 +5,7 @@ import {
   CELL_REF_REPLACE_REGEX,
   SHEET_TO_CELL_REF_REGEX,
   INDEXED_COLORS,
+  EXTRACT_MSO_NUMBER_FORMAT_REGEX,
 } from "./constants";
 import { fonts } from "./core/font";
 import { npx } from "./canvas/draw";
@@ -660,14 +661,14 @@ const deepClone = (data) => JSON.parse(JSON.stringify(data));
 
 const getNumberFormatFromStyles = (styleTag) => {
   const styleContent = styleTag.innerHTML;
-
-  const regex = /\.([^ \{]+)\s*{[^}]*mso-number-format:([^}]+)}/g;
   let match;
   const results = {};
 
-  while ((match = regex.exec(styleContent)) !== null) {
-    const className = match[1].replace("\n\t", ""); // Class name
-    const msoNumberFormat = match[2] // format value
+  while (
+    (match = EXTRACT_MSO_NUMBER_FORMAT_REGEX.exec(styleContent)) !== null
+  ) {
+    const className = match[1].replace("\n\t", "");
+    const msoNumberFormat = match[2]
       .trim()
       .replaceAll("\\", "")
       .replaceAll("0022", "")
