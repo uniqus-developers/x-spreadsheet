@@ -1082,15 +1082,15 @@ form fieldset select {
 .x-spreadsheet-comment-inner-box {
   display: flex;
   margin-bottom: auto;
-  height: 60px;
+  height: 42px;
   width: 100%;
   justify-content: flex-start;
   padding: 5px;
   box-sizing: border-box;
 }
 .x-spreadsheet-comment-avatar {
-  height: 40px;
-  width: 40px;
+  height: 32px;
+  width: 32px;
   border-radius: 50%;
   border: 1px solid #E0DFDA;
   display: flex;
