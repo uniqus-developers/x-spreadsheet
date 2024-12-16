@@ -62,6 +62,13 @@ declare module "x-data-spreadsheet" {
     allowMultipleSheets?: boolean;
     disableFeatures?: string[];
     suppressMaximumSelection?: boolean;
+    comment?: {
+      indicatorColor?: string;
+      authorName?: string;
+      onCommentAddClick: (cell: any, ri: number, ci: number, text: string) => Promise;
+      showComments: (cell: any) => Promise;
+      onCommentMention: (cell: any, text: string) => Promise;
+    };
   }
 
   export type CELL_SELECTED = "cell-selected";
@@ -85,6 +92,7 @@ declare module "x-data-spreadsheet" {
       cellMeta: CellData
     ) => void;
     subMenus: ExtendedContextMenu[];
+    visibility?: (sheet: any, key: string) => boolean;
   }
 
   export interface FormatterMeta {

@@ -45,6 +45,15 @@ export default {
     cellnonprintable: "Disable export",
     celleditable: "Enable editing",
     cellnoneditable: "Disable editing",
+    addComment: "Add Comment",
+    showComment: "Show Comment",
+    navigate: "Navigate to the cell",
+  },
+  comment: {
+    reply: "Reply",
+    comment: "Comment",
+    cancel: "Cancel",
+    clear: "Clear",
   },
   print: {
     size: "Paper size",

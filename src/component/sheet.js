@@ -15,6 +15,9 @@ import { xtoast } from "./message";
 import { cssPrefix } from "../config";
 import { formulas } from "../core/formula";
 import { constructFormula, getCellName } from "../algorithm/cellInjection";
+import Comment from "./comment";
+import { CELL_REF_REGEX, SHEET_TO_CELL_REF_REGEX } from "../constants";
+import { expr2xy } from "../core/alphabet";
 
 /**
  * @desc throttle fn
@@ -641,6 +644,32 @@ function sortFilterChange(ci, order, operator, value) {
   sheetReset.call(this);
 }
 
+function navigateToCell() {
+  const cell = this.data.getSelectedCell();
+  const { f } = cell ?? {};
+  if (f) {
+    const sheetToCellRef = f.match(SHEET_TO_CELL_REF_REGEX);
+    if (sheetToCellRef?.length) {
+      const [linkSheetName, cellRef] = sheetToCellRef[0]
+        .replaceAll("'", "")
+        .split("!");
+      const [x, y] = expr2xy(cellRef);
+      const sheetNames = this.data?.rootContext?.bottombar?.dataNames ?? [];
+      const sheetIndex = sheetNames.indexOf(linkSheetName);
+      if (sheetIndex !== -1) {
+        this.data.rootContext.selectSheet(sheetIndex);
+        this.selectCellAndFocus.call(this, y, x);
+      }
+    } else {
+      const cellRef = f.match(CELL_REF_REGEX);
+      if (cellRef?.length) {
+        const [x, y] = expr2xy(cellRef[0]);
+        this.selectCellAndFocus.call(this, y, x);
+      }
+    }
+  }
+}
+
 function sheetInitEvents() {
   const {
     selector,
@@ -654,6 +683,7 @@ function sheetInitEvents() {
     toolbar,
     modalValidation,
     sortFilter,
+    comment,
   } = this;
   // overlayer
   overlayerEl
@@ -784,6 +814,11 @@ function sheetInitEvents() {
       paste.call(this, "format");
     } else if (type === "hide") {
       hideRowsOrCols.call(this);
+    } else if (type === "add-comment" || type === "show-comment") {
+      comment.show();
+      contextMenu.hide();
+    } else if (type === "navigate") {
+      navigateToCell.call(this);
     } else {
       insertDeleteRowColumn.call(this, type);
     }
@@ -889,6 +924,9 @@ function sheetInitEvents() {
           // ctrl + A
           selector.set(-1, -1, true);
           break;
+        case 219:
+          // Ctrl + [
+          navigateToCell.call(this);
         default:
           break;
       }
@@ -1025,6 +1063,8 @@ export default class Sheet {
     );
     // sortFilter
     this.sortFilter = new SortFilter();
+    this.comment = new Comment(this, () => this.getRect());
+    this.hoverTimer = null;
     // root element
     this.el.children(
       this.tableEl,
@@ -1035,7 +1075,8 @@ export default class Sheet {
       this.horizontalScrollbar.el,
       this.contextMenu.el,
       this.modalValidation.el,
-      this.sortFilter.el
+      this.sortFilter.el,
+      this.comment.el
     );
     // table
     this.table = new Table(this.tableEl.el, data, this.options);
