@@ -16,7 +16,11 @@ function insertComment() {
       onCommentAddClick(cell, ri, ci, value);
     } else {
       const { c } = cell;
-      const newObj = { a: authorName ?? "", t: value };
+      const newObj = {
+        a: authorName ?? "",
+        t: value,
+        timestamp: new Date().toISOString(),
+      };
       if (c) {
         c.push(newObj);
       } else {
@@ -79,13 +83,14 @@ function buildUser() {
 
 function buildCommentStack(comments) {
   const ele = comments.map((cmt) => {
-    const { a, t } = cmt;
+    const { a, t, timestamp } = cmt;
     const avatar = h("div", `${cssPrefix}-comment-avatar`).child(
       a ? a.toString()[0]?.toUpperCase() : ""
     );
     const name = h("div", `${cssPrefix}-comment-name`).child(a);
-    const date = h("div", `${cssPrefix}-comment-data`).child(date ?? "");
-    const box = h("div", `${cssPrefix}-title-box`).child(name).child(date);
+    // const date = h("div", `${cssPrefix}-comment-data`).child(date ?? "");
+    const box = h("div", `${cssPrefix}-title-box`).child(name);
+    // .child(date);
     const header = h("div", `${cssPrefix}-comment-inner-box`)
       .child(avatar)
       .child(box);
