@@ -24,7 +24,7 @@ declare module "x-data-spreadsheet" {
     row?: {
       len: number;
       height: number;
-      minHeight?:number
+      minHeight?: number;
     };
     col?: {
       len: number;
@@ -65,9 +65,13 @@ declare module "x-data-spreadsheet" {
     comment?: {
       indicatorColor?: string;
       authorName?: string;
-      onCommentAddClick: (cell: any, ri: number, ci: number, text: string) => Promise;
+      onCommentAddClick: (
+        cell: any,
+        ri: number,
+        ci: number,
+        text: string
+      ) => Promise;
       showComments: (cell: any) => Promise;
-      onCommentMention: (cell: any, text: string) => Promise;
     };
   }
 
