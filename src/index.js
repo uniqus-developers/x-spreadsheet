@@ -7,21 +7,25 @@ import { cssPrefix } from "./config";
 import { locale } from "./locale/locale";
 import "./index.less";
 import { AVAILABLE_FEATURES, SHEET_TO_CELL_REF_REGEX } from "./constants";
-import { getNewSheetName, stox } from "./utils";
+import { deepClone, getNewSheetName, stox } from "./utils";
 
 class Spreadsheet {
   constructor(selectors, options = {}) {
-    options.comment = {
-      indicatorColor: "purple",
-      onCommentMention: () => {},
-      authorName: "User",
-    };
     let targetEl = selectors;
     this.options = {
       showBottomBar: true,
       allowMultipleSheets: true,
+      comment: {
+        indicatorColor: "purple",
+        authorName: "User",
+      },
       ...options,
     };
+    if (options.comment) {
+      this.options.comment.indicatorColor =
+        options.comment.indicatorColor ?? "purple";
+      this.options.comment.authorName = options.comment.authorName ?? "User";
+    }
     if (this.options?.mode === "read") {
       this.options.showToolbar = false;
       this.options.allowMultipleSheets = false;
