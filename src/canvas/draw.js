@@ -261,7 +261,8 @@ class Draw {
   }
 
   text(mtxt, box, attr = {}, textWrap = true, cellMeta = {}) {
-    mtxt = this.data.resolveDynamicVariable.call(this.data, mtxt)?.text ?? mtxt;
+    mtxt =
+      this.data.resolveDynamicVariable?.call(this.data, mtxt)?.text ?? mtxt;
     mtxt = this.textConfigOperation(mtxt, cellMeta);
     const { ctx } = this;
     attr = this.options.cellStyleProvider?.(attr, cellMeta) ?? attr;
@@ -339,7 +340,7 @@ class Draw {
     const { ctx, data } = this;
     ctx.lineWidth = thinLineWidth();
     ctx.strokeStyle =
-      !!data.sheetConfig?.gridLine === false ? (color ?? "#ffffff") : color;
+      !!data.sheetConfig?.gridLine === false ? color ?? "#ffffff" : color;
     // console.log('style:', style);
     if (style === "medium") {
       ctx.lineWidth = npx(2) - 0.5;
@@ -496,9 +497,9 @@ class Draw {
     const { x, y } = box;
     ctx.save();
     ctx.beginPath();
-    ctx.moveTo(npx(x), npx(y - 1));        
-    ctx.lineTo(npx(x + 8), npx(y - 1));    
-    ctx.lineTo(npx(x), npx(y + 8));    
+    ctx.moveTo(npx(x), npx(y - 1));
+    ctx.lineTo(npx(x + 8), npx(y - 1));
+    ctx.lineTo(npx(x), npx(y + 8));
     ctx.closePath();
     ctx.fillStyle = "rgba(0, 255, 0, .85)";
     ctx.fill();
