@@ -62,7 +62,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
   const trigger = settings?.mentionProgress?.trigger;
   const style = data.getCellStyleOrDefault(nrindex, cindex);
   const cellMeta = data.getCellMetaOrDefault(nrindex, cindex);
-  const dbox = getDrawBox(data, rindex, cindex, yoffset);
+  const dbox = getDrawBox(data, nrindex, cindex, yoffset);
   dbox.bgcolor = style.bgcolor;
   draw.rect(dbox, () => {
     // render text
@@ -127,12 +127,11 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         underline: style.underline,
       },
       style.textwrap,
-      { ...(cell ?? {}), rindex, cindex }
+      { ...(cell ?? {}), nrindex, cindex }
     );
     // error
-    const error = data.validations.getError(rindex, cindex);
+    const error = data.validations.getError(nrindex, cindex);
     if (error) {
-      // console.log('error:', rindex, cindex, error);
       draw.error(dbox);
     }
     if (frozen) {

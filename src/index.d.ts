@@ -63,8 +63,10 @@ declare module "x-data-spreadsheet" {
     disableFeatures?: string[];
     suppressMaximumSelection?: boolean;
     comment?: {
-      indicatorColor?: string;
+      userId?: string;
       authorName?: string;
+      indicatorColor?: string;
+      enableTimeStamp?: boolean;
       onCommentAddClick: (
         cell: any,
         ri: number,
