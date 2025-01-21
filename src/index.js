@@ -7,7 +7,7 @@ import { cssPrefix } from "./config";
 import { locale } from "./locale/locale";
 import "./index.less";
 import { AVAILABLE_FEATURES, SHEET_TO_CELL_REF_REGEX } from "./constants";
-import { deepClone, getNewSheetName, stox } from "./utils";
+import { getNewSheetName, stox } from "./utils";
 
 class Spreadsheet {
   constructor(selectors, options = {}) {
@@ -18,6 +18,7 @@ class Spreadsheet {
       comment: {
         indicatorColor: "purple",
         authorName: "User",
+        enableTimeStamp: false,
       },
       ...options,
     };
@@ -25,6 +26,8 @@ class Spreadsheet {
       this.options.comment.indicatorColor =
         options.comment.indicatorColor ?? "purple";
       this.options.comment.authorName = options.comment.authorName ?? "User";
+      this.options.comment.userId = options.comment.userId;
+      this.options.comment.enableTimeStamp = options.comment.enableTimeStamp;
     }
     if (this.options?.mode === "read") {
       this.options.showToolbar = false;
