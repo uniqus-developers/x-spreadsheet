@@ -377,6 +377,7 @@ export default class DataProxy {
     this.clipboard = new Clipboard();
     this.autoFilter = new AutoFilter();
     this.change = () => {};
+    this.includeRowSet = new Set();
     this.exceptRowSet = new Set();
     this.sortedRowMap = new Map();
     this.unsortedRowMap = new Map();
@@ -846,7 +847,7 @@ export default class DataProxy {
                   )
                 : DEFAULT_ROW_HEIGHT;
 
-                const rowHeight = value
+              const rowHeight = value
                 ? oldRowHeight > newRowHeight
                   ? oldRowHeight
                   : newRowHeight > DEFAULT_ROW_HEIGHT
@@ -1087,6 +1088,7 @@ export default class DataProxy {
     this.changeData(() => {
       if (autoFilter.active()) {
         autoFilter.clear();
+        this.includeRowSet = new Set();
         this.exceptRowSet = new Set();
         this.sortedRowMap = new Map();
         this.unsortedRowMap = new Map();
@@ -1119,6 +1121,7 @@ export default class DataProxy {
         return 0;
       });
     }
+    this.includeRowSet = fset;
     this.exceptRowSet = rset;
     this.sortedRowMap = new Map();
     this.unsortedRowMap = new Map();
@@ -1524,8 +1527,7 @@ export default class DataProxy {
   }
 
   viewRange() {
-    const { scroll, rows, cols, freeze, exceptRowSet } = this;
-    // console.log('scroll:', scroll, ', freeze:', freeze)
+    const { scroll, rows, cols, freeze, includeRowSet } = this;
     let { ri, ci } = scroll;
     if (ri <= 0) [ri] = freeze;
     if (ci <= 0) [, ci] = freeze;
@@ -1533,10 +1535,8 @@ export default class DataProxy {
     let [x, y] = [0, 0];
     let [eri, eci] = [rows.len, cols.len];
     for (let i = ri; i < rows.len; i += 1) {
-      if (!exceptRowSet.has(i)) {
-        y += rows.getHeight(i);
-        eri = i;
-      }
+      if (includeRowSet.has(i)) y += rows.getHeight(i);
+      eri = i;
       if (y > this.viewHeight()) break;
     }
     for (let j = ci; j < cols.len; j += 1) {
