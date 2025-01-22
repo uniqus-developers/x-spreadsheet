@@ -5,7 +5,7 @@ import { formatm } from "../core/format";
 
 import { Draw, DrawBox, thinLineWidth, npx } from "../canvas/draw";
 import { REF_ERROR } from "../constants";
-// gobal var
+// Global variables
 const cellPaddingWidth = 5;
 const tableFixedHeaderCleanStyle = { fillStyle: "#f4f5f8" };
 const tableGridStyle = {
@@ -28,6 +28,7 @@ export function getDrawBox(data, rindex, cindex, yoffset = 0) {
   const { left, top, width, height } = data.cellRect(rindex, cindex);
   return new DrawBox(left, top + yoffset, width, height, cellPaddingWidth);
 }
+
 /*
 function renderCellBorders(bboxes, translateFunc) {
   const { draw } = this;
@@ -65,7 +66,6 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
   const dbox = getDrawBox(data, nrindex, cindex, yoffset);
   dbox.bgcolor = style.bgcolor;
   draw.rect(dbox, () => {
-    // render text
     let cellText = "";
     if (!data.settings.evalPaused && cell.f) {
       cellText = _cell.render(
@@ -166,7 +166,6 @@ function renderContent(viewRange, fw, fh, tx, ty) {
   draw.translate(fw, fh).translate(tx, ty);
 
   const { exceptRowSet } = data;
-  // const exceptRows = Array.from(exceptRowSet);
   const filteredTranslateFunc = (ri) => {
     const ret = exceptRowSet.has(ri);
     if (ret) {

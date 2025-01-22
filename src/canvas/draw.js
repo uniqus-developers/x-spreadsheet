@@ -478,7 +478,7 @@ class Draw {
 
   dropdown(box) {
     const { ctx } = this;
-    const { x, y, width, height } = box;
+    const { x, y, width, height, color } = box;
     const sx = x + width - 15;
     const sy = y + height - 15;
     ctx.save();
@@ -487,7 +487,7 @@ class Draw {
     ctx.lineTo(npx(sx + 8), npx(sy));
     ctx.lineTo(npx(sx + 4), npx(sy + 6));
     ctx.closePath();
-    ctx.fillStyle = "rgba(0, 0, 0, .45)";
+    ctx.fillStyle = color || "rgba(0, 0, 0, .45)";
     ctx.fill();
     ctx.restore();
   }
