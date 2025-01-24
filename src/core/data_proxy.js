@@ -1545,7 +1545,15 @@ export default class DataProxy {
   }
 
   viewRange() {
-    const { scroll, rows, cols, freeze, includeRowSet } = this;
+    const {
+      scroll,
+      rows,
+      cols,
+      freeze,
+      includeRowSet,
+      autoFilter,
+      exceptRowSet,
+    } = this;
     let { ri, ci } = scroll;
     if (ri <= 0) [ri] = freeze;
     if (ci <= 0) [, ci] = freeze;
@@ -1553,7 +1561,12 @@ export default class DataProxy {
     let [x, y] = [0, 0];
     let [eri, eci] = [rows.len, cols.len];
     for (let i = ri; i < rows.len; i += 1) {
-      if (includeRowSet.has(i)) y += rows.getHeight(i);
+      if (autoFilter.active() && includeRowSet.size > 0) {
+        if (includeRowSet.has(i)) y += rows.getHeight(i);
+        else if (!exceptRowSet.has(i)) y += rows.getHeight(i);
+      } else {
+        y += rows.getHeight(i);
+      }
       eri = i;
       if (y > this.viewHeight()) break;
     }
