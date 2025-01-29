@@ -91,6 +91,16 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         {},
         data.name
       );
+      // check for flip sign meta
+      if (
+        trigger &&
+        cell.f?.includes?.(trigger) &&
+        cell.cellMeta?.isFlipSign &&
+        !isNaN(Number(cellText))
+      ) {
+        cellText = Number(cellText) * -1;
+      }
+
       cell.text = cellText;
       //Below code is temporarily added will be removed once we completely remove froala
       if (cell.w) {
