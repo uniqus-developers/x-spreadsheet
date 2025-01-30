@@ -96,6 +96,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         trigger &&
         cell.f?.includes?.(trigger) &&
         cellMeta?.flipSign &&
+        cellText.toString().length > 0 &&
         !isNaN(Number(cellText))
       ) {
         cellText = Number(cellText) * -1;
