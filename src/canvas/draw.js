@@ -543,13 +543,13 @@ class Draw {
   // FlipSign
   flipSign(box) {
     const { ctx } = this;
-    const { x, y, width, height } = box;
-    const sx = x + width - 1;
+    const { x, y, height } = box;
+    const sx = x;
     const sy = y + height - 1;
     ctx.save();
     ctx.beginPath();
-    ctx.moveTo(npx(sx - 8), npx(sy));
-    ctx.lineTo(npx(sx), npx(sy));
+    ctx.moveTo(npx(sx), npx(sy));
+    ctx.lineTo(npx(sx + 8), npx(sy));
     ctx.lineTo(npx(sx), npx(sy - 8));
     ctx.closePath();
     ctx.fillStyle = "rgba(0, 0, 255, .65)";
