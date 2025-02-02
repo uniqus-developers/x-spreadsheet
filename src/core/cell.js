@@ -262,18 +262,6 @@ const parserFormulaString = (
       let isCircularDependency = false;
       let isVariableResolving = false;
       if (trigger) {
-        console.log(
-          "🚀 ~ trigger:",
-          trigger,
-          string,
-          getCellText,
-          cellRender,
-          getDynamicVariable,
-          trigger,
-          formulaCallStack,
-          sheetName
-        );
-        debugger;
         let dynamicVariableRegEx = new RegExp(`\\${trigger}\\S*`, "g");
         newFormulaString = newFormulaString.replace(
           dynamicVariableRegEx,

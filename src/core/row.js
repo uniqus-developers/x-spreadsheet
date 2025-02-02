@@ -133,7 +133,22 @@ class Rows {
           html = "";
         }
         cell.text = retrievedText ?? "";
+        if (
+          cell.cellMeta?.flipSign &&
+          !isNaN(Number(cell.text)) &&
+          (cell.text !== "" || cell.text !== 0)
+        ) {
+          cell.text = Number(cell.text) * -1;
+        }
         cell.w = formattedText ?? "";
+        if (
+          cell.cellMeta?.flipSign &&
+          !isNaN(Number(cell.text)) &&
+          (cell.text !== "" || cell.text !== 0)
+        ) {
+          cell.w = `(${cell.w})`;
+        }
+
         cell.f = "";
         cell.h = html ?? "";
       } else {
