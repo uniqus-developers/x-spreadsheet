@@ -91,6 +91,17 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         {},
         data.name
       );
+      // check for flip sign meta
+      if (
+        trigger &&
+        cell.f?.includes?.(trigger) &&
+        cellMeta?.flipSign &&
+        cellText.toString().length > 0 &&
+        !isNaN(Number(cellText))
+      ) {
+        cellText = Number(cellText) * -1;
+      }
+
       cell.text = cellText;
       //Below code is temporarily added will be removed once we completely remove froala
       if (cell.w) {
@@ -134,7 +145,11 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
     if (frozen) {
       draw.frozen(dbox);
     }
+    if (cellMeta?.flipSign) {
+      draw.flipSign(dbox);
+    }
   });
+
   draw.drawIcon(dbox, cellMeta);
   if (settings?.comment?.indicatorColor && cell?.c) {
     draw.comment(dbox, settings?.comment?.indicatorColor);
