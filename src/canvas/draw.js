@@ -340,7 +340,7 @@ class Draw {
     const { ctx, data } = this;
     ctx.lineWidth = thinLineWidth();
     ctx.strokeStyle =
-      !!data.sheetConfig?.gridLine === false ? color ?? "#ffffff" : color;
+      !!data.sheetConfig?.gridLine === false ? (color ?? "#ffffff") : color;
     // console.log('style:', style);
     if (style === "medium") {
       ctx.lineWidth = npx(2) - 0.5;
@@ -502,6 +502,23 @@ class Draw {
     ctx.lineTo(npx(x), npx(y + 8));
     ctx.closePath();
     ctx.fillStyle = "rgba(0, 255, 0, .85)";
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // FlipSign
+  flipSign(box) {
+    const { ctx } = this;
+    const { x, y, height } = box;
+    const sx = x;
+    const sy = y + height - 1;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(npx(sx), npx(sy));
+    ctx.lineTo(npx(sx + 8), npx(sy));
+    ctx.lineTo(npx(sx), npx(sy - 8));
+    ctx.closePath();
+    ctx.fillStyle = "rgba(0, 0, 255, .65)";
     ctx.fill();
     ctx.restore();
   }
