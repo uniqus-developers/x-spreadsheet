@@ -1364,7 +1364,13 @@ export default class DataProxy {
   getCellFormulaOrTextOrDefault(ri, ci) {
     const cell = this.getCell(ri, ci) ?? {};
     const text = cell && cell.f ? cell.f : cell.text ? cell.text : "";
-    return this.resolveDynamicVariable.call(this, text)?.text;
+    const { flipSign } = cell.cellMeta ?? {};
+    const resolvedValue = this.resolveDynamicVariable.call(this, text)?.text;
+    let finalValue = resolvedValue;
+    if (flipSign && !isNaN(Number(finalValue)) && resolvedValue !== "") {
+      finalValue = (Number(finalValue) * -1).toString();
+    }
+    return finalValue;
   }
 
   getCellStyle(ri, ci) {
