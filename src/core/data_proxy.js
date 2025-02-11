@@ -1367,7 +1367,15 @@ export default class DataProxy {
     const { flipSign } = cell.cellMeta ?? {};
     const resolvedValue = this.resolveDynamicVariable.call(this, text)?.text;
     let finalValue = resolvedValue;
-    if (flipSign && !isNaN(Number(finalValue)) && resolvedValue !== "") {
+    const trigger = this.settings?.mentionProgress?.trigger;
+    // Check if the the cell is DV cell
+    if (
+      flipSign &&
+      trigger &&
+      text?.startsWith?.(trigger) &&
+      !isNaN(Number(finalValue)) &&
+      resolvedValue !== ""
+    ) {
       finalValue = (Number(finalValue) * -1).toString();
     }
     return finalValue;
