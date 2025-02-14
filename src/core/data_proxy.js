@@ -1344,6 +1344,7 @@ export default class DataProxy {
     if (trigger && text?.includes?.(trigger)) {
       let regex = new RegExp(`\\${trigger}\\S*`, "g");
       const map = this?.variables?.map ?? {};
+      console.log(map, text, "line")
       text = text.replace(regex, (match) => {
         const variableName = match?.replaceAll?.(" ", "_")?.toLowerCase?.();
         if (map.hasOwnProperty(match) || map.hasOwnProperty(variableName)) {
@@ -1369,6 +1370,7 @@ export default class DataProxy {
         }
       });
     }
+    console.log(text, "line 1")
     return { text: text, resolved: resolved, resolving: resolving };
   }
 
