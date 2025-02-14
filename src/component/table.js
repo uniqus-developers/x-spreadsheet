@@ -138,7 +138,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         underline: style.underline,
       },
       style.textwrap,
-      { ...(cell ?? {}), nrindex, cindex }
+      { ...(cell ?? {}), rindex: nrindex, cindex }
     );
     // error
     const error = data.validations.getError(nrindex, cindex);
