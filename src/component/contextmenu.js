@@ -196,8 +196,7 @@ function addCustomScrollbar(container) {
   const updateScrollbar = () => {
     const viewableRatio = container.clientHeight / container.scrollHeight;
     const thumbHeight = Math.max(viewableRatio * container.clientHeight, 30);
-    scrollbarThumb.css("height", `${thumbHeight}px`).el.style.height =
-      `${thumbHeight}px`;
+    scrollbarThumb.css("height", `${thumbHeight}px`)
     scrollbarTrack.css(
       "display",
       container.scrollHeight <= container.clientHeight ? "none" : "block"
