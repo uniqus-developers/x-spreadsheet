@@ -1692,7 +1692,7 @@ export default class DataProxy {
         const cells = rowData[rowIndex]?.cells;
         for (let cellIndex in cells) {
           const cell = cells[cellIndex];
-          const text = cell.f ?? cell.text;
+          const text = cell.f || cell.text;
           text?.replaceAll?.(regex, (match) => {
             if (
               trigger === "#" &&

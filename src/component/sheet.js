@@ -543,13 +543,19 @@ function dataSetCellText(text, state = "finished") {
   const trigger = data?.settings?.mentionProgress?.trigger;
   if (data.settings.mode === "read") return;
   const inputText = editor.inputText;
+  const trimmedText = text?.trim?.()
   if (editor.formulaCell && state === "finished") {
     const { ri, ci } = editor.formulaCell;
     data.setFormulaCellText(inputText, ri, ci, state);
     this.trigger("cell-edited", inputText, ri, ci);
     this.trigger("cell-edit-finished", text, ri, ci);
     editor.setFormulaCell(null);
-  } else if (state === "finished" && text?.trim?.().startsWith(trigger)) {
+    //The below condition is ro inject variable inside formula when there is only one formula and above case will handle for = sign, if there is more variable or ant this ese then it will go to text
+  } else if (
+    state === "finished" &&
+    trimmedText?.startsWith(trigger) &&
+    trimmedText?.split(' ').length === 1
+  ) {
     const { ri, ci } = data.selector;
     data.setFormulaCellText(inputText, ri, ci, state);
     this.trigger("cell-edited", inputText, ri, ci);
