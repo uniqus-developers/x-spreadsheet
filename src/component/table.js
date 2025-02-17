@@ -123,8 +123,10 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
 
     if (style.format) {
       cellText = formatm[style.format].render(cellText);
-      cellMeta.customFormat = formatm[style.format].key;
-      console.log("🚀 ~ draw.rect ~ cellText:", cellText, cellMeta);
+      cell.cellMeta.customFormat = formatm[style.format].key;
+      if (style.format === "percent") {
+        console.log("🚀 ~ draw.rect ~ cellText:", cellText, cell);
+      }
     }
     const font = Object.assign({}, style.font);
     font.size = getFontSizePxByPt(font.size);

@@ -264,6 +264,7 @@ class Draw {
     mtxt =
       this.data.resolveDynamicVariable?.call(this.data, mtxt)?.text ?? mtxt;
     mtxt = this.textConfigOperation(mtxt, cellMeta);
+    console.log("🚀 ~ Draw ~ text ~ cellMeta:", cellMeta, mtxt);
     const { ctx } = this;
     attr = this.options.cellStyleProvider?.(attr, cellMeta) ?? attr;
     const { align, valign, font, color, strike, underline } = attr;
