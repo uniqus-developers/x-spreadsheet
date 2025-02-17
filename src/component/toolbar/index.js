@@ -140,7 +140,8 @@ export default class Toolbar {
         { id: "paintFormat", btn: (this.paintformatEl = new Paintformat()) },
         { id: "clearFormat", btn: (this.clearformatEl = new Clearformat()) },
       ],
-      [{ id: "format", btn: (this.formatEl = new Format()) }],
+      // Todo enable format button
+      // [{ id: "format", btn: (this.formatEl = new Format()) }],
       [
         { id: "font", btn: (this.fontEl = new Font()) },
         { id: "fontSize", btn: (this.fontSizeEl = new FontSize()) },
@@ -313,7 +314,7 @@ export default class Toolbar {
     // this.mergeEl.disabled();
     // console.log('selectedCell:', style, cell);
     const { font, format } = style;
-    this.formatEl.setState(format);
+    // this.formatEl.setState(format);
     this.fontEl.setState(font.name);
     this.fontSizeEl.setState(font.size);
     this.boldEl.setState(font.bold);
