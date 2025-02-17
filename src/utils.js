@@ -57,7 +57,9 @@ const parseCssToXDataStyles = (styleString, cellType) => {
           parsedStyles["align"] = value === "justify" ? "center" : value;
           break;
         case "vertical-align":
-          parsedStyles["valign"] = value;
+          parsedStyles["valign"] = ["justify", "center"].includes(value)
+            ? "middle"
+            : value;
           break;
         case "font-weight":
           const parsedIntValue = parseInt(value);
