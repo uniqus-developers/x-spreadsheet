@@ -123,9 +123,13 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
 
     if (style.format) {
       cellText = formatm[style.format].render(cellText);
+      if (!cell.cellMeta) {
+        cell.cellMeta = {};
+      }
       cell.cellMeta.customFormat = formatm[style.format].key;
+      data.setCellProperty(nrindex, cindex, "cellMeta", cell.cellMeta);
+
       if (style.format === "percent") {
-        console.log("🚀 ~ draw.rect ~ cellText:", cellText, cell);
       }
     }
     const font = Object.assign({}, style.font);
