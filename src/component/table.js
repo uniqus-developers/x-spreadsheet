@@ -221,24 +221,22 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
       cellText = formatm[style.format].render(cellText);
 
       if (!DEFAULT_FORMATS.includes(style.format)) {
-        if (!cell.cellMeta) {
+        if (!cell?.cellMeta) {
           cell.cellMeta = {};
         }
         cell.cellMeta.customFormat = true;
         const { decimalUpto, groupingSymbol, digitGrouping } =
-          this.options.numberConfig;
+          settings.numberConfig || {};
         const fmt = generateSSFFormat(
           groupingSymbol,
           digitGrouping,
           Number(decimalUpto),
-          customFormat
+          style.format
         );
         cell.z = fmt;
       }
 
       // arc - specific can be removed once we are clear on the custom formats, because arc format depends on report config
-
-      cell.cellMeta.customFormat = formatm[style.format].key;
     }
     const font = Object.assign({}, style.font);
     font.size = getFontSizePxByPt(font.size);
