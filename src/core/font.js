@@ -23,6 +23,10 @@ const baseFonts = [
     key: "Book Antiqua",
     title: "Book Antiqua",
   },
+  {
+    key: "Trebuchet MS",
+    title: "Trebuchet MS",
+  },
 ];
 
 /** default fontSize list
