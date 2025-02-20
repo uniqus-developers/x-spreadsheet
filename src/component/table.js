@@ -127,9 +127,10 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         cell.cellMeta = {};
       }
       cell.cellMeta.customFormat = formatm[style.format].key;
-      data.setCellProperty(nrindex, cindex, "cellMeta", cell.cellMeta);
-      // data.setSelectedCellAttr("customFormat", formatm[style.format].key);
+      // data.setCellProperty(nrindex, cindex, "cellMeta", cell.cellMeta);
+      data.setSelectedCellAttr("customFormat", formatm[style.format].key);
       if (style.format === "percent") {
+        let a;
       }
     }
     const font = Object.assign({}, style.font);
