@@ -382,7 +382,17 @@ const cellRender = (
       else if (parsedFormula.includes(DYNAMIC_VARIABLE_ERROR))
         return DYNAMIC_VARIABLE_ERROR;
       const data = parser.parse(parsedFormula);
-      return data?.error?.replace("#", "") ?? data?.result;
+      const { error, result } = data ?? {};
+      if (error) {
+        return error.replace("#", "");
+      } else if (
+        typeof result === "number" &&
+        result.toString().includes("e")
+      ) {
+        return result.toFixed(10);
+      } else {
+        return result;
+      }
     } catch (e) {
       return GENERAL_ERROR;
     }
@@ -405,7 +415,7 @@ const cellRender = (
     return resolving
       ? DYNAMIC_VARIABLE_RESOLVING
       : resolved
-        ? text ?? src
+        ? (text ?? src)
         : DYNAMIC_VARIABLE_ERROR;
   }
   return src;
