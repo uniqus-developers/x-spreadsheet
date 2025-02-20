@@ -126,9 +126,9 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
       if (!cell.cellMeta) {
         cell.cellMeta = {};
       }
-      // cell.cellMeta.customFormat = formatm[style.format].key;
-      // data.setCellProperty(nrindex, cindex, "cellMeta", cell.cellMeta);
-      data.setSelectedCellAttr("customFormat", formatm[style.format].key);
+      cell.cellMeta.customFormat = formatm[style.format].key;
+      data.setCellProperty(nrindex, cindex, "cellMeta", cell.cellMeta);
+      // data.setSelectedCellAttr("customFormat", formatm[style.format].key);
       if (style.format === "percent") {
       }
     }
