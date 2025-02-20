@@ -220,7 +220,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
     if (style.format) {
       cellText = formatm[style.format].render(cellText);
 
-      if (!DEFAULT_FORMATS.contains(style.format)) {
+      if (!DEFAULT_FORMATS.includes(style.format)) {
         if (!cell.cellMeta) {
           cell.cellMeta = {};
         }
