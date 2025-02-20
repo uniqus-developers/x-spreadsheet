@@ -46,6 +46,102 @@ function renderCellBorders(bboxes, translateFunc) {
 }
 */
 
+function generateSSFFormat(
+  groupingSymbol = ",",
+  digitGrouping = "",
+  decimalUpto = 2,
+  customFormat = "normal"
+) {
+  let formatString = "";
+
+  switch (customFormat.toLowerCase()) {
+    case "text":
+      formatString = "@"; // Text format
+      break;
+    case "number":
+      formatString = generateNumberFormat(
+        groupingSymbol,
+        digitGrouping,
+        decimalUpto
+      );
+      break;
+    case "percent":
+      formatString =
+        generateNumberFormat(groupingSymbol, digitGrouping, decimalUpto) + "%";
+      formatString = formatString.replace(/0/, "0%"); // Ensures proper percentage formatting
+      break;
+    case "rmb":
+      formatString =
+        '"¥"' +
+        generateNumberFormat(groupingSymbol, digitGrouping, decimalUpto);
+      break;
+    case "usd":
+      formatString =
+        '"$"' +
+        generateNumberFormat(groupingSymbol, digitGrouping, decimalUpto);
+      break;
+    case "eur":
+      formatString =
+        '"€"' +
+        generateNumberFormat(groupingSymbol, digitGrouping, decimalUpto);
+      break;
+    case "date":
+      formatString = "yyyy-mm-dd";
+      break;
+    case "time":
+      formatString = "hh:mm:ss";
+      break;
+    case "datetime":
+      formatString = "yyyy-mm-dd hh:mm:ss";
+      break;
+    case "duration":
+      formatString = "[hh]:mm:ss";
+      break;
+    default:
+      formatString = generateNumberFormat(
+        groupingSymbol,
+        digitGrouping,
+        decimalUpto
+      );
+      break;
+  }
+
+  return formatString;
+}
+
+function generateNumberFormat(groupingSymbol, digitGrouping, decimalUpto) {
+  const integerPart = digitGrouping?.split(".")[0] ?? "";
+  const groupingPositions = integerPart.split(groupingSymbol);
+  const primaryGroupingSize =
+    groupingPositions?.length > 1 ? groupingPositions[1].length : 3;
+
+  let groupingPart = "#";
+  if (primaryGroupingSize === 3) {
+    groupingPart = "#,##0";
+  } else {
+    groupingPart = "#".repeat(primaryGroupingSize - 1) + "##0";
+  }
+
+  if (groupingSymbol !== ",") {
+    groupingPart = groupingPart.replace(/,/g, groupingSymbol);
+  }
+
+  let decimalPart = "";
+  if (decimalUpto > 0) {
+    decimalPart = "." + "0".repeat(decimalUpto);
+  }
+
+  const formatString = groupingPart + decimalPart;
+
+  // Add handling for negative values and zero
+  const negativePart = `(${groupingPart + decimalPart})`; // Enclose negative numbers in parentheses
+  const zeroPart = "-"; // Show zero as a dash
+  // Return the final format string, including positive, negative, and zero formats
+  return `${formatString};${negativePart};${zeroPart}`;
+
+  // return `${groupingPart}${decimalPart}`
+}
+
 export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
   const { sortedRowMap, rows, cols, settings } = data;
   if (rows.isHide(rindex) || cols.isHide(cindex)) return;
@@ -123,15 +219,26 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
 
     if (style.format) {
       cellText = formatm[style.format].render(cellText);
-      if (!cell.cellMeta) {
-        cell.cellMeta = {};
+
+      if (!DEFAULT_FORMATS.contains(style.format)) {
+        if (!cell.cellMeta) {
+          cell.cellMeta = {};
+        }
+        cell.cellMeta.customFormat = true;
+        const { decimalUpto, groupingSymbol, digitGrouping } =
+          this.options.numberConfig;
+        const fmt = generateSSFFormat(
+          groupingSymbol,
+          digitGrouping,
+          Number(decimalUpto),
+          customFormat
+        );
+        cell.z = fmt;
       }
+
+      // arc - specific can be removed once we are clear on the custom formats, because arc format depends on report config
+
       cell.cellMeta.customFormat = formatm[style.format].key;
-      // data.setCellProperty(nrindex, cindex, "cellMeta", cell.cellMeta);
-      data.setSelectedCellAttr("customFormat", formatm[style.format].key);
-      if (style.format === "percent") {
-        let a;
-      }
     }
     const font = Object.assign({}, style.font);
     font.size = getFontSizePxByPt(font.size);
