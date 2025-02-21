@@ -702,7 +702,8 @@ function generateSSFFormat(
     case "percent":
       formatString =
         generateNumberFormat(groupingSymbol, digitGrouping, decimalUpto) + "%";
-      formatString = formatString.replace(/0/, "0%"); // Ensures proper percentage formatting
+      formatString = formatString.replace(/([\d#,.]+)/g, "$1%"); // Ensures proper percentage formatting
+
       break;
     case "rmb":
       formatString =
