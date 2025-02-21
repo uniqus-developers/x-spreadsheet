@@ -142,6 +142,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         cell.z = fmt;
       } else if (cell?.cellMeta?.customFormat) {
         cell.cellMeta.customFormat = false;
+        cell.z = "General";
       }
     }
     const font = Object.assign({}, style.font);
