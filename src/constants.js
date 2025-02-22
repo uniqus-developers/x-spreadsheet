@@ -119,6 +119,8 @@ const DEFAULT_ROW_HEIGHT = 20;
 const EXCEL_ERRORS = [REF_ERROR, GENERAL_ERROR, VALUE_ERROR];
 const DEFAULT_FORMATS = ["normal", "text", "number"];
 
+const ALIGN_ITEMS = ["left", "center", "justify", "right"];
+
 export {
   REF_ERROR,
   GENERAL_ERROR,
@@ -139,5 +141,6 @@ export {
   EXCEL_ERRORS,
   EXTRACT_FORMULA_CELL_NAME_REGEX,
   EXTRACT_MSO_NUMBER_FORMAT_REGEX,
+  ALIGN_ITEMS,
   DEFAULT_FORMATS,
 };

@@ -62,6 +62,8 @@ class DrawBox {
       x += padding;
     } else if (align === "center") {
       x += width / 2;
+    } else if (align === "justify") {
+      x += padding;
     } else if (align === "right" || align === "end") {
       x += width - padding;
     }
@@ -222,23 +224,6 @@ class Draw {
     return this;
   }
 
-  /*
-    txt: render text
-    box: DrawBox
-    attr: {
-      align: left | center | right
-      valign: top | middle | bottom
-      color: '#333333',
-      strike: false,
-      font: {
-        name: 'Arial',
-        size: 14,
-        bold: false,
-        italic: false,
-      }
-    }
-    textWrap: text wrapping
-  */
   textConfigOperation(text, cellMeta) {
     if (text === 0 || text) {
       const valueFormatter = this.options.valueFormatter;
@@ -259,6 +244,24 @@ class Draw {
     }
     return text;
   }
+
+  /*
+    txt: render text
+    box: DrawBox
+    attr: {
+      align: left | center | justify | right
+      valign: top | middle | bottom
+      color: '#333333',
+      strike: false,
+      font: {
+        name: 'Arial',
+        size: 14,
+        bold: false,
+        italic: false,
+      }
+    }
+    textWrap: text wrapping
+  */
 
   text(mtxt, box, attr = {}, textWrap = true, cellMeta = {}) {
     mtxt =
