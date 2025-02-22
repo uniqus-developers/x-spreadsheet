@@ -879,7 +879,7 @@ form fieldset select {
   line-height: 0;
 }
 .x-spreadsheet-icon .x-spreadsheet-icon-img {
-  background-image: url(8f5473837511e38cdc21b3c12162e5c5.svg);
+  background-image: url(d6e7483946dd0f5655cf0f5d42473745.svg);
   position: absolute;
   width: 262px;
   height: 444px;
@@ -940,6 +940,10 @@ form fieldset select {
 .x-spreadsheet-icon .x-spreadsheet-icon-img.align-center {
   left: -234px;
   top: 0;
+}
+.x-spreadsheet-icon .x-spreadsheet-icon-img.align-justify {
+  left: -126px;
+  top: -54px;
 }
 .x-spreadsheet-icon .x-spreadsheet-icon-img.align-right {
   left: 0;
