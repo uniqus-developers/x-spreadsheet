@@ -701,7 +701,7 @@ function generateSSFFormat(
       break;
     case "percent":
       formatString =
-        generateNumberFormat(groupingSymbol, digitGrouping, decimalUpto) + "%";
+        generateNumberFormat(groupingSymbol, digitGrouping, decimalUpto)
       formatString = formatString.replace(/0(?=[);])/g, "0%"); // Ensures proper percentage formatting
 
       break;
