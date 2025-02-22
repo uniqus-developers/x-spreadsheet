@@ -4,7 +4,8 @@ import _cell from "../core/cell";
 import { formatm } from "../core/format";
 
 import { Draw, DrawBox, thinLineWidth, npx } from "../canvas/draw";
-import { REF_ERROR } from "../constants";
+import { DEFAULT_FORMATS, REF_ERROR } from "../constants";
+import { generateSSFFormat } from "../utils";
 // Global variables
 const cellPaddingWidth = 5;
 const tableFixedHeaderCleanStyle = { fillStyle: "#f4f5f8" };
@@ -123,6 +124,26 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
 
     if (style.format) {
       cellText = formatm[style.format].render(cellText);
+
+      // arc - specific can be removed once we are clear on the custom formats, because arc format depends on report config
+      if (!DEFAULT_FORMATS.includes(style.format)) {
+        if (!cell?.cellMeta) {
+          cell.cellMeta = {};
+        }
+        cell.cellMeta.customFormat = true;
+        const { decimalUpto, groupingSymbol, digitGrouping } =
+          settings.numberConfig || {};
+        const fmt = generateSSFFormat(
+          groupingSymbol,
+          digitGrouping,
+          Number(decimalUpto),
+          style.format
+        );
+        cell.z = fmt;
+      } else if (cell?.cellMeta?.customFormat) {
+        cell.cellMeta.customFormat = false;
+        cell.z = "General";
+      }
     }
     const font = Object.assign({}, style.font);
     font.size = getFontSizePxByPt(font.size);
