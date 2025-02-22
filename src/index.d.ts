@@ -34,7 +34,7 @@ declare module "x-data-spreadsheet" {
     };
     style?: {
       bgcolor: string;
-      align: "left" | "center" | "right";
+      align: "left" | "center" | "justify" | "right";
       valign: "top" | "middle" | "bottom";
       textwrap: boolean;
       strike: boolean;
@@ -224,7 +224,7 @@ declare module "x-data-spreadsheet" {
   }
 
   export interface CellStyle {
-    align?: "left" | "center" | "right";
+    align?: "left" | "center" | "justify" | "right";
     valign?: "top" | "middle" | "bottom";
     font?: {
       bold?: boolean;

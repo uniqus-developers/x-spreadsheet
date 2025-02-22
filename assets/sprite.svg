@@ -136,4 +136,6 @@
 </g>
 <g xmlns="http://www.w3.org/2000/svg" transform="translate(108,54)"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><polygon points="0 0 18 0 18 18 0 18"/><path d="M6.0390625,13 L11.0495605,13 L11.0495605,7.46153846 L15,7.46153846 L8.5,1 L2,7.46153846 L6.0390625,7.46153846 L6.0390625,13 Z M2,15 L15,15 L15,17 L2,17 L2,15 Z" fill="#000000"/></g>
 </g>
+<g xmlns="http://www.w3.org/2000/svg" transform="translate(126,54)"><path fill="#000000" fill-rule="evenodd" d="M1 0h12a1 1 0 0 1 0 2H1a1 1 0 1 1 0-2zm0 8h12a1 1 0 0 1 0 2H1a1 1 0 1 1 0-2zm0-4h12a1 1 0 0 1 0 2H1a1 1 0 1 1 0-2zm0 8h12a1 1 0 0 1 0 2H1a1" transform="translate(2 2)"/>
+</g>
 </svg>

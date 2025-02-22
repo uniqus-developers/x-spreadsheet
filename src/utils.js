@@ -54,7 +54,7 @@ const parseCssToXDataStyles = (styleString, cellType) => {
           else if (value === "line-through") parsedStyles["strike"] = true;
           break;
         case "text-align":
-          parsedStyles["align"] = value === "justify" ? "center" : value;
+          parsedStyles["align"] = value;
           break;
         case "vertical-align":
           parsedStyles["valign"] = ["justify", "center"].includes(value)
