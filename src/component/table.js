@@ -90,12 +90,25 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         },
         trigger,
         {},
-        data.name
+        data.name,
+        (y, x, sheetName = data.name) => {
+          if (!sheetName || sheetName.toLowerCase() === data.name.toLowerCase())
+            return data.getCellMetaOrDefault(x, y);
+          else {
+            const rootContext = data.getRootContext();
+            const sheets = rootContext.datas;
+            const selectedSheet = sheets?.find(
+              (sheet) => sheet.name.toLowerCase() === sheetName.toLowerCase()
+            );
+            return selectedSheet
+              ? selectedSheet.getCellMetaOrDefault(x, y)
+              : {};
+          }
+        }
       );
       // check for flip sign meta
       if (
-        trigger &&
-        cell.f?.includes?.(trigger) &&
+        cell.f &&
         cellMeta?.flipSign &&
         cellText.toString().length > 0 &&
         !isNaN(Number(cellText))
