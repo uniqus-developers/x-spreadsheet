@@ -306,8 +306,6 @@ const parserFormulaString = (
                 sheetName,
                 getCellMetaOrDefault
               );
-              console.log("🚀 ~  referenceResult:", referenceResult, flipSign);
-
               return flipSign ? referenceResult * -1 : referenceResult;
             }
           }
@@ -349,12 +347,6 @@ const parserFormulaString = (
                 sheetName,
                 getCellMetaOrDefault
               );
-              console.log(
-                "🚀 ~ newFormulaString referenceResult:",
-                referenceResult,
-                flipSign
-              );
-
               return flipSign ? referenceResult * -1 : referenceResult;
             }
           } else {

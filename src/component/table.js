@@ -108,7 +108,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
       );
       // check for flip sign meta
       if (
-        cell.f?.startsWith("=") &&
+        cell.f &&
         cellMeta?.flipSign &&
         cellText.toString().length > 0 &&
         !isNaN(Number(cellText))
