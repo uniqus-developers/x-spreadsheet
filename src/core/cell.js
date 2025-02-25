@@ -252,7 +252,8 @@ const parserFormulaString = (
   getDynamicVariable,
   trigger,
   formulaCallStack,
-  sheetName
+  sheetName,
+  getCellMetaOrDefault
 ) => {
   if (string?.length) {
     try {
@@ -283,6 +284,7 @@ const parserFormulaString = (
           const [linkSheetName, cellRef] = match.replaceAll("'", "").split("!");
           const [x, y] = expr2xy(cellRef);
           const text = getCellText(x, y, linkSheetName);
+          const cellMeta = getCellMetaOrDefault(x, y, linkSheetName);
           if (text?.startsWith?.("=")) {
             if (formulaCallStack?.[linkSheetName]?.includes(cellRef))
               isCircularDependency = true;
@@ -291,16 +293,23 @@ const parserFormulaString = (
                 formulaCallStack[linkSheetName] || [];
               formulaCallStack[linkSheetName].push(cellRef);
             }
-            return isCircularDependency
-              ? 0
-              : cellRender(
-                  text,
-                  getCellText,
-                  getDynamicVariable,
-                  trigger,
-                  formulaCallStack,
-                  linkSheetName
-                );
+            if (isCircularDependency) return 0;
+            else {
+              const { flipSign } = cellMeta ?? {};
+
+              const referenceResult = cellRender(
+                text,
+                getCellText,
+                getDynamicVariable,
+                trigger,
+                formulaCallStack,
+                sheetName,
+                getCellMetaOrDefault
+              );
+              console.log("🚀 ~  referenceResult:", referenceResult, flipSign);
+
+              return flipSign ? referenceResult * -1 : referenceResult;
+            }
           }
           if (text === REF_ERROR) isFormulaResolved = true;
           return isNaN(Number(text)) ? `"${text}"` : text;
@@ -317,6 +326,8 @@ const parserFormulaString = (
       newFormulaString = newFormulaString.replace(CELL_REF_REGEX, (cellRef) => {
         const [x, y] = expr2xy(cellRef);
         const text = getCellText(x, y);
+        const cellMeta = getCellMetaOrDefault(x, y);
+
         if (text) {
           if (text?.startsWith?.("=")) {
             if (formulaCallStack?.[sheetName]?.includes(cellRef))
@@ -325,16 +336,27 @@ const parserFormulaString = (
               formulaCallStack[sheetName] = formulaCallStack[sheetName] || [];
               formulaCallStack[sheetName].push(cellRef);
             }
-            return isCircularDependency
-              ? 0
-              : cellRender(
-                  text,
-                  getCellText,
-                  getDynamicVariable,
-                  trigger,
-                  formulaCallStack,
-                  sheetName
-                );
+            if (isCircularDependency) return 0;
+            else {
+              const { flipSign } = cellMeta ?? {};
+
+              const referenceResult = cellRender(
+                text,
+                getCellText,
+                getDynamicVariable,
+                trigger,
+                formulaCallStack,
+                sheetName,
+                getCellMetaOrDefault
+              );
+              console.log(
+                "🚀 ~ newFormulaString referenceResult:",
+                referenceResult,
+                flipSign
+              );
+
+              return flipSign ? referenceResult * -1 : referenceResult;
+            }
           } else {
             return isNaN(Number(text)) ? `"${text}"` : text;
           }
@@ -358,10 +380,12 @@ const cellRender = (
   getDynamicVariable,
   trigger,
   formulaCallStack = {},
-  sheetName
+  sheetName,
+  getCellMetaOrDefault
 ) => {
   if (src[0] === "=") {
     const formula = src.substring(1);
+
     try {
       var parser = new Parser();
       const parsedFormula = parserFormulaString(
@@ -371,7 +395,8 @@ const cellRender = (
         getDynamicVariable,
         trigger,
         formulaCallStack,
-        sheetName
+        sheetName,
+        getCellMetaOrDefault
       );
 
       if (parsedFormula.includes(REF_ERROR)) return REF_ERROR;
