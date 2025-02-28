@@ -876,7 +876,11 @@ export default class DataProxy {
     const cell = rows.getCellOrNew(ri, ci);
     cell.editable = editable;
   }
-
+  extractCellReferences(formula) {
+    const cellRefRegex = /([A-Z]+[1-9][0-9]*)/g; // Regular expression to match cell references (e.g., A1, B10)
+    const matches = formula.match(cellRefRegex) || [];
+    return matches;
+  }
   // state: input | finished
   setFormulaCellText(text, ri, ci, state = "input") {
     const { autoFilter, rows } = this;
@@ -886,6 +890,10 @@ export default class DataProxy {
         text?.replace(EXTRACT_FORMULA_CELL_NAME_REGEX, (match) =>
           match.toUpperCase()
         ) ?? text;
+      const { onFormulaCellFinalized } = this.options;
+      const cellRefs = this.extractCellReferences(updatedFormula);
+
+      onFormulaCellFinalized?.({ ...this, updatedFormula, cell, cellRefs });
       rows.setCellProperty(ri, ci, "f", isFormula ? updatedFormula : text);
       return;
     }
