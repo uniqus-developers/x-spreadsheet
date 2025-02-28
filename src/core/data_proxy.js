@@ -890,10 +890,12 @@ export default class DataProxy {
         text?.replace(EXTRACT_FORMULA_CELL_NAME_REGEX, (match) =>
           match.toUpperCase()
         ) ?? text;
-      const { onFormulaCellFinalized } = this.options;
-      const cellRefs = this.extractCellReferences(updatedFormula);
+      const { onFormulaCellFinalized } = this.settings;
+      if (onFormulaCellFinalized) {
+        const cellRefs = this.extractCellReferences(updatedFormula);
+        onFormulaCellFinalized({ ...this, updatedFormula, cell, cellRefs });
+      }
 
-      onFormulaCellFinalized?.({ ...this, updatedFormula, cell, cellRefs });
       rows.setCellProperty(ri, ci, "f", isFormula ? updatedFormula : text);
       return;
     }
