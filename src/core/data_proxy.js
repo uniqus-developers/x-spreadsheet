@@ -892,6 +892,7 @@ export default class DataProxy {
         ) ?? text;
       const { onFormulaCellFinalized } = this.settings;
       if (onFormulaCellFinalized) {
+        const cell = rows.getCellOrNew(ri, ci);
         const cellRefs = this.extractCellReferences(updatedFormula);
         onFormulaCellFinalized({ ...this, updatedFormula, cell, cellRefs });
       }
