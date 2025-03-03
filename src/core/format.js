@@ -14,8 +14,8 @@ const formatNumberRender = (v) => {
 
 const baseFormats = [
   {
-    key: "normal",
-    title: tf("format.normal"),
+    key: "general",
+    title: tf("format.general"),
     type: "string",
     render: formatStringRender,
   },
@@ -25,17 +25,17 @@ const baseFormats = [
   //   type: "string",
   //   render: formatStringRender,
   // },
-  {
-    key: "number",
-    title: tf("format.number"),
-    type: "number",
-    label: "1,000.12",
-    render: formatNumberRender,
-  },
+  // {
+  //   key: "number",
+  //   title: tf("format.number"),
+  //   type: "number",
+  //   label: "1,000.12",
+  //   render: formatNumberRender,
+  // },
   {
     key: "percent",
     title: tf("format.percent"),
-    type: "number",
+    type: "percent",
     label: "10.12%",
     render: (v) => `${v}%`,
   },
