@@ -19,6 +19,12 @@ const baseFormats = [
     type: "string",
     render: formatStringRender,
   },
+  {
+    key: "number",
+    title: tf("format.number"),
+    type: "string",
+    render: formatStringRender,
+  },
   // {
   //   key: "text",
   //   title: tf("format.text"),
@@ -36,9 +42,10 @@ const baseFormats = [
     key: "percent",
     title: tf("format.percent"),
     type: "percent",
-    label: "10.12%",
+    // label: "10.12%",
     render: (v) => `${v}%`,
   },
+
   // {
   //   key: "rmb",
   //   title: tf("format.rmb"),
