@@ -14,8 +14,8 @@ const formatNumberRender = (v) => {
 
 const baseFormats = [
   {
-    key: "general",
-    title: tf("format.general"),
+    key: "normal",
+    title: tf("format.normal"),
     type: "string",
     render: formatStringRender,
   },

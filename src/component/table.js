@@ -140,10 +140,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
         formatm[style.format]?.render(cellText) ??
         formatm["general"]?.render(cellText);
       if (!cell.cellMeta) cell.cellMeta = {};
-      cell.cellMeta.customFormat = style.format;
-      if (style.format === "General") {
-        cell.t = "s";
-      }
+      if (style.format === "percent") cell.cellMeta.customFormat = style.format;
     }
     const font = Object.assign({}, style.font);
     font.size = getFontSizePxByPt(font.size);
