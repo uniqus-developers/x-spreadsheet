@@ -136,7 +136,14 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
     }
 
     if (style.format) {
-      cellText = formatm[style.format].render(cellText);
+      cellText =
+        formatm[style.format]?.render(cellText) ??
+        formatm["general"]?.render(cellText);
+      if (!cell.cellMeta) cell.cellMeta = {};
+      cell.cellMeta.customFormat = style.format;
+      if (style.format === "General") {
+        cell.t = "s";
+      }
     }
     const font = Object.assign({}, style.font);
     font.size = getFontSizePxByPt(font.size);
