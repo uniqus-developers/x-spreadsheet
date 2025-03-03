@@ -115,6 +115,12 @@ class Rows {
       if (cell.merge) row.cells[ci].merge = cell.merge;
     }
   }
+  setCellFormat(ri, ci, cell, format) {
+    const row = this.getOrNew(ri);
+    row.cells[ci] = row.cells[ci] || {};
+    row.cells[ci].style.format = format;
+    if (cell.merge) row.cells[ci].merge = cell.merge;
+  }
 
   setCellText(ri, ci, text) {
     const cell = this.getCellOrNew(ri, ci);

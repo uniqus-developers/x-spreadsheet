@@ -1424,9 +1424,15 @@ export default class DataProxy {
     return this.getCellMetaOrDefault(ri, ci);
   }
 
-  setCellData(ri, ci, data) {
+  setCellData(ri, ci, data, what = "all") {
     const { rows, rootContext } = this;
-    rows.setCell(ri, ci, data);
+    rows.setCell(ri, ci, data, what);
+    rootContext?.sheet?.table?.render?.();
+  }
+
+  setCellFormat(ri, ci, cell, format) {
+    const { rows, rootContext } = this;
+    rows.setCellFormat(ri, ci, cell, format);
     rootContext?.sheet?.table?.render?.();
   }
 
