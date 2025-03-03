@@ -1430,12 +1430,6 @@ export default class DataProxy {
     rootContext?.sheet?.table?.render?.();
   }
 
-  setCellFormat(ri, ci, cell, format) {
-    const { rows, rootContext } = this;
-    rows.setCellFormat(ri, ci, cell, format);
-    rootContext?.sheet?.table?.render?.();
-  }
-
   // state: input | finished
   setCellText(ri, ci, text, state) {
     const { rows, history, validations } = this;
