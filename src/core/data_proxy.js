@@ -1338,7 +1338,7 @@ export default class DataProxy {
     if (trigger && text?.includes?.(trigger)) {
       let regex = new RegExp(`\\${trigger}\\S*`, "g");
       const map = this?.variables?.map ?? {};
-      text = text.replace(regex, (match) => {
+      text = String(text ?? "").replace(regex, (match) => {
         const variableName = match?.replaceAll?.(" ", "_")?.toLowerCase?.();
         if (map.hasOwnProperty(match) || map.hasOwnProperty(variableName)) {
           const { value, resolved: isResolved } =
@@ -1446,7 +1446,7 @@ export default class DataProxy {
   }
 
   setCellProperty(ri, ci, key, value) {
-    this.rows(ri, ci, key, value);
+    this.rows.setCellProperty(ri, ci, key, value);
   }
 
   freezeIsActive() {
