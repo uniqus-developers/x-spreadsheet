@@ -410,6 +410,8 @@ const cellRender = (
         result.toString().includes("e")
       ) {
         return result.toFixed(10);
+      } else if (isNaN(Number(result))) {
+        return result;
       } else {
         // Info : below function will be used to format the cell value upto 8 decimal places
         const valueUpto8Decimals = XLSX.utils.format_cell(
