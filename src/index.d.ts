@@ -53,7 +53,6 @@ declare module "x-data-spreadsheet" {
     valueSetter?: (metaData: FormatterMeta) => string;
     editValueFormatter?: (metaData: FormatterMeta) => string;
     cellStyleProvider?: (attr: object, metaData: FormatterMeta) => object;
-    onFormulaCellFinalized?: (params: Record<string, any>) => void;
     extendedContextMenu?: ExtendedContextMenu[];
     mentionProgress?: {
       trigger: string;
