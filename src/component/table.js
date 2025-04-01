@@ -4,7 +4,8 @@ import _cell from "../core/cell";
 import { formatm } from "../core/format";
 
 import { Draw, DrawBox, thinLineWidth, npx } from "../canvas/draw";
-import { REF_ERROR } from "../constants";
+import { DEFAULT_FORMATS, REF_ERROR } from "../constants";
+import { generateSSFFormat } from "../utils";
 // Global variables
 const cellPaddingWidth = 5;
 const tableFixedHeaderCleanStyle = { fillStyle: "#f4f5f8" };
