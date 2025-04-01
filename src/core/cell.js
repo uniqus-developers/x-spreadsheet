@@ -407,8 +407,6 @@ const cellRender = (
         result.toString().includes("e")
       ) {
         return result.toFixed(10);
-      } else if (isNaN(Number(result))) {
-        return result;
       } else {
         return result;
       }
