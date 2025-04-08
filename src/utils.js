@@ -684,7 +684,7 @@ function generateSSFFormat(
   groupingSymbol = ",",
   digitGrouping = "",
   decimalUpto = 2,
-  customFormat = "normal"
+  customFormat = "general"
 ) {
   let formatString = "";
 
@@ -700,8 +700,11 @@ function generateSSFFormat(
       );
       break;
     case "percent":
-      formatString =
-        generateNumberFormat(groupingSymbol, digitGrouping, decimalUpto)
+      formatString = generateNumberFormat(
+        groupingSymbol,
+        digitGrouping,
+        decimalUpto
+      );
       formatString = formatString.replace(/0(?=[);])/g, "0%"); // Ensures proper percentage formatting
 
       break;

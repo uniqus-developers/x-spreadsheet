@@ -124,7 +124,7 @@ const defaultSettings = {
       bold: false,
       italic: false,
     },
-    format: "normal",
+    format: "general",
   },
 };
 
@@ -788,10 +788,11 @@ export default class DataProxy {
       } else if (
         cellConfig?.cellButtons?.find((button) => button?.tag === property)
       ) {
-        const { ri, ci } = selector;
-        const cell = rows.getCellOrNew(ri, ci);
-        cell.cellMeta = cell?.cellMeta ?? {};
-        cell.cellMeta[property] = value;
+        selector.range.each((ri, ci) => {
+          const cell = rows.getCellOrNew(ri, ci);
+          cell.cellMeta = cell.cellMeta ?? {};
+          cell.cellMeta[property] = value;
+        });
       } else {
         selector.range.each((ri, ci) => {
           const cell = rows.getCellOrNew(ri, ci);
