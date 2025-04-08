@@ -121,6 +121,15 @@ const DEFAULT_FORMATS = ["general", "text", "number"];
 
 const ALIGN_ITEMS = ["left", "center", "justify", "right"];
 
+const GENERAL_CELL_OBJECT = {
+  t: "n",
+  v: "",
+  h: "",
+  s: "",
+  f: "",
+  z: "General",
+};
+
 export {
   REF_ERROR,
   GENERAL_ERROR,
@@ -143,4 +152,5 @@ export {
   EXTRACT_MSO_NUMBER_FORMAT_REGEX,
   ALIGN_ITEMS,
   DEFAULT_FORMATS,
+  GENERAL_CELL_OBJECT,
 };

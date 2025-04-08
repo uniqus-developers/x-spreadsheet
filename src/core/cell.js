@@ -4,14 +4,17 @@ import {
   CIRCULAR_DEPENDENCY_ERROR,
   DYNAMIC_VARIABLE_ERROR,
   DYNAMIC_VARIABLE_RESOLVING,
+  GENERAL_CELL_OBJECT,
   GENERAL_ERROR,
   REF_ERROR,
   SHEET_TO_CELL_REF_REGEX,
   SPACE_REMOVAL_REGEX,
 } from "../constants";
+import { deepClone } from "../utils";
 import { expr2xy, xy2expr } from "./alphabet";
 import { numberCalc } from "./helper";
 import { Parser } from "hot-formula-parser";
+import * as XLSX from "xlsx";
 
 // Converting infix expression to a suffix expression
 // src: AVERAGE(SUM(A1,A2), B1) + 50 + B20
@@ -410,7 +413,13 @@ const cellRender = (
       } else if (isNaN(Number(result))) {
         return result;
       } else {
-        return result;
+        // Info : below function will be used to format the cell value upto 8 decimal places
+        const valueUpto8Decimals = XLSX.utils.format_cell(
+          deepClone(GENERAL_CELL_OBJECT),
+          result
+        );
+
+        return Number(valueUpto8Decimals);
       }
     } catch (e) {
       return GENERAL_ERROR;
