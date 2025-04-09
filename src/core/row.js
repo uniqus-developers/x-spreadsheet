@@ -289,9 +289,9 @@ class Rows {
       } else if (ri > eri) {
         ndata[nri - n] = row;
         this.eachCells(ri, (ci, cell) => {
-          if (cell.text && cell.text[0] === "=") {
-            cell.text = replaceCellRefWithNew(
-              cell.text,
+          if (cell.f && cell.f[0] === "=") {
+            cell.f = replaceCellRefWithNew(
+              cell.f,
               (word) => expr2expr(word, 0, -n, (x, y) => y > eri),
               {
                 sheetName: this.data.name,
