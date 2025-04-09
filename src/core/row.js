@@ -261,9 +261,9 @@ class Rows {
       if (nri >= sri) {
         nri += n;
         this.eachCells(ri, (ci, cell) => {
-          if (cell.text && cell.text[0] === "=") {
-            cell.text = replaceCellRefWithNew(
-              cell.text,
+          if (cell.f && cell.f[0] === "=") {
+            cell.f = replaceCellRefWithNew(
+              cell.f,
               (word) => expr2expr(word, 0, n, (x, y) => y >= sri),
               {
                 sheetName: this.data.name,
@@ -300,6 +300,20 @@ class Rows {
             );
           }
         });
+      } else {
+        // Handle cells within the deleted range
+        this.eachCells(ri, (ci, cell) => {
+          if (cell.f && cell.f[0] === "=") {
+            cell.f = replaceCellRefWithNew(
+              cell.f,
+              (word) => expr2expr(word, 0, -n, (x, y) => y > eri),
+              {
+                sheetName: this.data.name,
+                isSameSheet: true,
+              }
+            );
+          }
+        });
       }
     });
     this._ = ndata;
@@ -313,9 +327,9 @@ class Rows {
         let nci = parseInt(ci, 10);
         if (nci >= sci) {
           nci += n;
-          if (cell.text && cell.text[0] === "=") {
-            cell.text = replaceCellRefWithNew(
-              cell.text,
+          if (cell.f && cell.f[0] === "=") {
+            cell.f = replaceCellRefWithNew(
+              cell.f,
               (word) => expr2expr(word, n, 0, (x) => x >= sci),
               {
                 sheetName: this.data.name,
@@ -340,9 +354,9 @@ class Rows {
           rndata[nci] = cell;
         } else if (nci > eci) {
           rndata[nci - n] = cell;
-          if (cell.text && cell.text[0] === "=") {
-            cell.text = replaceCellRefWithNew(
-              cell.text,
+          if (cell.f && cell.f[0] === "=") {
+            cell.f = replaceCellRefWithNew(
+              cell.f,
               (word) => expr2expr(word, -n, 0, (x) => x > eci),
               {
                 sheetName: this.data.name,
