@@ -684,7 +684,7 @@ function generateSSFFormat(
   groupingSymbol = ",",
   digitGrouping = "",
   decimalUpto = 2,
-  customFormat = "normal"
+  customFormat = "general"
 ) {
   let formatString = "";
 
@@ -700,8 +700,11 @@ function generateSSFFormat(
       );
       break;
     case "percent":
-      formatString =
-        generateNumberFormat(groupingSymbol, digitGrouping, decimalUpto)
+      formatString = generateNumberFormat(
+        groupingSymbol,
+        digitGrouping,
+        decimalUpto
+      );
       formatString = formatString.replace(/0(?=[);])/g, "0%"); // Ensures proper percentage formatting
 
       break;
@@ -775,6 +778,41 @@ function generateNumberFormat(groupingSymbol, digitGrouping, decimalUpto) {
   return `${formatString};${negativePart};${zeroPart}`;
 }
 
+const countDecimals = (num) => {
+  if (num.includes(".")) {
+    return num.split(".")[1].length; // Count digits after decimal
+  }
+  return 0; // No decimal places
+};
+
+const getMultiplierPenalty = (numString) => {
+  let num = Number(numString);
+  if (num === 0) return 0; // Edge case for zero
+
+  let count = 0;
+  while (num % 10 === 0) {
+    count++;
+    num /= 10;
+  }
+  return count;
+};
+
+const getDecimalPlaces = (expression) => {
+  let numbers = expression.match(/[\d.]+/g); // Extract numbers
+  if (!numbers) return "Invalid Input";
+
+  let totalDecimalPlaces = numbers.reduce(
+    (sum, num) => sum + countDecimals(num),
+    0
+  );
+  let totalPenalty = numbers.reduce(
+    (sum, num) => sum + getMultiplierPenalty(num),
+    0
+  );
+
+  return Math.max(totalDecimalPlaces - totalPenalty, 0);
+};
+
 export {
   getStylingForClass,
   parseCssToXDataStyles,
@@ -789,4 +827,5 @@ export {
   deepClone,
   getNumberFormatFromStyles,
   generateSSFFormat,
+  getDecimalPlaces,
 };

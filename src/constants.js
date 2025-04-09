@@ -117,9 +117,18 @@ const INDEXED_COLORS = {
 const DEFAULT_ROW_HEIGHT = 20;
 
 const EXCEL_ERRORS = [REF_ERROR, GENERAL_ERROR, VALUE_ERROR];
-const DEFAULT_FORMATS = ["normal", "text", "number"];
+const DEFAULT_FORMATS = ["general", "text", "number"];
 
 const ALIGN_ITEMS = ["left", "center", "justify", "right"];
+
+const GENERAL_CELL_OBJECT = {
+  t: "n",
+  v: "",
+  h: "",
+  s: "",
+  f: "",
+  z: "General",
+};
 
 export {
   REF_ERROR,
@@ -143,4 +152,5 @@ export {
   EXTRACT_MSO_NUMBER_FORMAT_REGEX,
   ALIGN_ITEMS,
   DEFAULT_FORMATS,
+  GENERAL_CELL_OBJECT,
 };
