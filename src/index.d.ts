@@ -89,7 +89,7 @@ declare module "x-data-spreadsheet" {
   export type COPIED_CLIPBOARD = "copied-clipboard";
   export type GRID_LOAD = "grid-load";
   export type CELL_EDIT_FINISHED = "cell-edit-finished";
-  export type CELL_SELECTED_RANGE = "cell-selected-range";
+  export type ROW_COLUMN_OPERATION = "row-column-operation";
 
   export interface ExtendedContextMenu {
     key: string;

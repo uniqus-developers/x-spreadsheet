@@ -330,7 +330,8 @@ function copy(evt) {
   if (data.settings.mode === "read") return;
   data.copy();
   data.copyToSystemClipboard(evt);
-  this.trigger("copied-clipboard", { type, data });
+  const copiedCellRange = selector.range;
+  this.trigger("copied-clipboard", copiedCellRange);
   selector.showClipboard();
 }
 
@@ -338,7 +339,8 @@ function cut() {
   const { data, selector } = this;
   if (data.settings.mode === "read") return;
   data.cut();
-  this.trigger("cut-clipboard", { type, data });
+  const cutCellRange = selector.range;
+  this.trigger("cut-clipboard", cutCellRange);
   selector.showClipboard();
 }
 
