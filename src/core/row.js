@@ -182,6 +182,9 @@ class Rows {
                 const nri = ii + (i - sri);
                 const nci = jj + (j - sci);
                 const ncell = helper.cloneDeep(this._[i].cells[j]);
+                if (ncell.cellMeta) {
+                  ncell.cellMeta = {};
+                }
                 // ncell.text
                 if (autofill && ncell && ncell.text && ncell.text.length > 0) {
                   const { text } = ncell;
@@ -235,6 +238,9 @@ class Rows {
           nci = dstCellRange.sci + (nci - srcCellRange.sci);
         }
         ncellmm[nri] = ncellmm[nri] || { cells: {} };
+        if (this._[ri].cells[ci].cellMeta) {
+          this._[ri].cells[ci].cellMeta = {};
+        }
         ncellmm[nri].cells[nci] = this._[ri].cells[ci];
       });
     });
