@@ -813,6 +813,16 @@ const getDecimalPlaces = (expression) => {
   return Math.max(totalDecimalPlaces - totalPenalty, 0);
 };
 
+const isElementInView = (container, element) => {
+  const containerTop = container.scrollTop;
+  const containerBottom = containerTop + container.clientHeight;
+
+  const elementTop = element.offsetTop;
+  const elementBottom = elementTop + element.offsetHeight;
+
+  return elementBottom > containerTop && elementTop < containerBottom;
+};
+
 export {
   getStylingForClass,
   parseCssToXDataStyles,
@@ -828,4 +838,5 @@ export {
   getNumberFormatFromStyles,
   generateSSFFormat,
   getDecimalPlaces,
+  isElementInView,
 };
