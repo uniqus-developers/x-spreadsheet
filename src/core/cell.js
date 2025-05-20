@@ -391,6 +391,12 @@ const cellRender = (
 
     try {
       var parser = new Parser();
+      parser.setFunction("TEXT", (params) => {
+        const [value, format] = params;
+        return format && !isNaN(value)
+          ? XLSX.SSF.format(format, Number(value))
+          : value;
+      });
       const parsedFormula = parserFormulaString(
         formula,
         getCellText,
@@ -420,7 +426,7 @@ const cellRender = (
         return result.toFixed(10);
       } else if (isNaN(Number(result))) {
         return result;
-      } else {
+      } else if (String(result)?.includes(".")) {
         // Info : below function will be used to format the cell value upto 8 decimal places
         const valueUpto8Decimals = XLSX.utils.format_cell(
           deepClone(GENERAL_CELL_OBJECT),
@@ -428,6 +434,8 @@ const cellRender = (
         );
 
         return Number(valueUpto8Decimals);
+      } else {
+        return result;
       }
     } catch (e) {
       return GENERAL_ERROR;
