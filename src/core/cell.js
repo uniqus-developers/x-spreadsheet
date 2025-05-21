@@ -427,9 +427,16 @@ const cellRender = (
       } else if (isNaN(Number(result))) {
         return result;
       } else if (String(result)?.includes(".")) {
+        const numberString = String(result);
+        const [numberPart, decimalPart] = numberString.split(".");
+        const format = `${"#".repeat(numberPart.length)}${decimalPart ? "." : ""}${"0".repeat(decimalPart.length)}`;
         // Info : below function will be used to format the cell value upto 8 decimal places
+        const cellObject = {
+          ...GENERAL_CELL_OBJECT,
+          z: format,
+        };
         const valueUpto8Decimals = XLSX.utils.format_cell(
-          deepClone(GENERAL_CELL_OBJECT),
+          deepClone(cellObject),
           result
         );
 
